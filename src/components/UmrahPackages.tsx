@@ -1,58 +1,9 @@
-import PackageCard from "./PackageCard";
 import medinaImage from "@/assets/medina-mosque.jpg";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import DynamicPackages from "./DynamicPackages";
 
 const UmrahPackages = () => {
-  const packages = [
-    {
-      name: "Economy",
-      price: "1,42,000/-",
-      flightDate: "Dec 15, 2025",
-      features: [
-        "5-Star Hotels near Haram",
-        "Adjacent to Haram in Mecca",
-        "Adjacent to Masjid Nabawi in Medina",
-        "4 people per room",
-        "Laundry and other services",
-        "Saudi Airlines (Business Class)",
-        "Private Transport Service",
-        "Buffet food arrangement",
-      ],
-    },
-    {
-      name: "Etekaf Package",
-      price: "1,20,000/-",
-      flightDate: "March 15, 2025",
-      isPopular: true,
-      features: [
-        "5-Star Hotels near Haram",
-        "Adjacent to Haram in Mecca",
-        "Adjacent to Masjid Nabawi in Medina",
-        "4 people per room",
-        "Laundry and other services",
-        "Saudi Airlines (Business Class)",
-        "Private Transport Service",
-        "Complete Ziyarah",
-      ],
-    },
-    {
-      name: "VIP",
-      price: "2,50,000/-",
-      flightDate: "Customizable",
-      features: [
-        "5-Star Premium Hotels",
-        "Adjacent to Haram in Mecca",
-        "Adjacent to Masjid Nabawi in Medina",
-        "4 people per room (upgradeable)",
-        "Full concierge service",
-        "Saudi Airlines (Business Class)",
-        "Private VIP Transport",
-        "Exclusive Ziyarah experience",
-      ],
-    },
-  ];
-
   return (
     <section id="umrah" className="py-24 bg-background relative overflow-hidden">
       {/* Background decoration */}
@@ -141,11 +92,7 @@ const UmrahPackages = () => {
           </motion.div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {packages.map((pkg, index) => (
-            <PackageCard key={pkg.name} {...pkg} index={index} />
-          ))}
-        </div>
+        <DynamicPackages type="umrah" />
       </div>
     </section>
   );

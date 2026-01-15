@@ -1,68 +1,8 @@
-import PackageCard from "./PackageCard";
 import { motion } from "framer-motion";
 import { Calendar, MapPin } from "lucide-react";
+import DynamicPackages from "./DynamicPackages";
 
 const HajjPackages = () => {
-  const packages = [
-    {
-      name: "Super Economy",
-      price: "6,35,000/-",
-      features: [
-        "Hotels in Makkah and Medina",
-        "800m from Haram in Mecca",
-        "900m from Masjid Nabawi in Medina",
-        "5-6 people per room",
-        "Saudi / Biman Bangladesh Airlines",
-        "AC Bus Transportation",
-        "Three meals daily (Local food)",
-        "Ziyarah in Makkah & Madinah",
-      ],
-    },
-    {
-      name: "Classic",
-      price: "7,40,000/-",
-      features: [
-        "3-Star Hotels in Makkah and Medina",
-        "700m from Haram in Mecca",
-        "600m from Masjid Nabawi in Medina",
-        "5-6 people per room",
-        "Saudi / Biman Bangladesh Airlines",
-        "AC Bus Transportation",
-        "Three meals daily (Local food)",
-        "Ziyarah in Makkah & Madinah",
-      ],
-    },
-    {
-      name: "Premium",
-      price: "8,90,000/-",
-      isPopular: true,
-      features: [
-        "3-Star Hotels in Makkah and Medina",
-        "500m from Haram in Mecca",
-        "300m from Masjid Nabawi in Medina",
-        "4-5 people per room",
-        "Laundry service included",
-        "Saudi / Biman Bangladesh Airlines",
-        "AC Bus Transportation",
-        "Three meals daily",
-      ],
-    },
-    {
-      name: "VIP",
-      price: "14,50,000/-",
-      features: [
-        "5-Star Hotels in Makkah and Medina",
-        "Adjacent to Haram in Mecca",
-        "Adjacent to Masjid Nabawi in Medina",
-        "4 people per room",
-        "Full laundry and concierge service",
-        "Saudi Airlines (Business Class)",
-        "Private Transport Service",
-        "Buffet food arrangement",
-      ],
-    },
-  ];
-
   return (
     <section id="hajj" className="py-24 bg-muted geometric-pattern relative overflow-hidden">
       {/* Decorative Elements */}
@@ -102,11 +42,7 @@ const HajjPackages = () => {
           </div>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4 xl:gap-6">
-          {packages.map((pkg, index) => (
-            <PackageCard key={pkg.name} {...pkg} index={index} />
-          ))}
-        </div>
+        <DynamicPackages type="hajj" />
 
         {/* Trust Badge */}
         <motion.div
