@@ -27,9 +27,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Search, Eye, CheckCircle, XCircle, Clock, AlertCircle, Download } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Search, Eye, CheckCircle, XCircle, Clock, AlertCircle, Download, CalendarIcon, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/currency";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Booking {
   id: string;
@@ -73,6 +81,8 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
 
   useEffect(() => {
     fetchBookings();
@@ -163,6 +173,11 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
     }
   };
 
+  const clearDateFilter = () => {
+    setDateFrom(undefined);
+    setDateTo(undefined);
+  };
+
   const filteredBookings = bookings.filter((booking) => {
     const customerInfo = getCustomerInfo(booking);
     const matchesSearch =
@@ -174,7 +189,23 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
 
     const matchesStatus = statusFilter === "all" || booking.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    // Date range filter
+    const bookingDate = new Date(booking.created_at);
+    bookingDate.setHours(0, 0, 0, 0);
+    
+    let matchesDateRange = true;
+    if (dateFrom) {
+      const fromDate = new Date(dateFrom);
+      fromDate.setHours(0, 0, 0, 0);
+      matchesDateRange = matchesDateRange && bookingDate >= fromDate;
+    }
+    if (dateTo) {
+      const toDate = new Date(dateTo);
+      toDate.setHours(23, 59, 59, 999);
+      matchesDateRange = matchesDateRange && bookingDate <= toDate;
+    }
+
+    return matchesSearch && matchesStatus && matchesDateRange;
   });
 
   const getStatusBadge = (status: string) => {
@@ -281,29 +312,103 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
               Export CSV
             </Button>
           </CardTitle>
-          <div className="flex flex-col sm:flex-row gap-4 mt-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by name, email, or booking ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+          <div className="flex flex-col gap-4 mt-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name, email, or booking ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-48">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  {statusOptions.map((status) => (
+                    <SelectItem key={status.value} value={status.value}>
+                      {status.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                {statusOptions.map((status) => (
-                  <SelectItem key={status.value} value={status.value}>
-                    {status.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            
+            {/* Date Range Filter */}
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <div className="flex items-center gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[160px] justify-start text-left font-normal",
+                        !dateFrom && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dateFrom}
+                      onSelect={setDateFrom}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+                <span className="text-muted-foreground">to</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[160px] justify-start text-left font-normal",
+                        !dateTo && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateTo ? format(dateTo, "MMM dd, yyyy") : "To date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dateTo}
+                      onSelect={setDateTo}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+                {(dateFrom || dateTo) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={clearDateFilter}
+                    className="h-9 w-9"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              {(dateFrom || dateTo) && (
+                <Badge variant="secondary" className="text-xs">
+                  {dateFrom && dateTo
+                    ? `${format(dateFrom, "MMM dd")} - ${format(dateTo, "MMM dd, yyyy")}`
+                    : dateFrom
+                    ? `From ${format(dateFrom, "MMM dd, yyyy")}`
+                    : `Until ${format(dateTo!, "MMM dd, yyyy")}`}
+                </Badge>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
