@@ -16,6 +16,8 @@ export default {
       fontFamily: {
         heading: ['Playfair Display', 'serif'],
         body: ['Inter', 'sans-serif'],
+        arabic: ['Amiri', 'serif'],
+        kufi: ['Reem Kufi', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

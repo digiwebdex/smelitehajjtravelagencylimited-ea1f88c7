@@ -125,11 +125,11 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="font-heading text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight"
+            className="font-arabic text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight tracking-wide"
           >
             {content.title}
             {content.subtitle && (
-              <span className="block text-gradient-gold mt-2">{content.subtitle}</span>
+              <span className="block text-gradient-gold mt-2 font-kufi">{content.subtitle}</span>
             )}
           </motion.h1>
           
@@ -207,7 +207,7 @@ const HeroSection = () => {
                   transition={{ delay: 0.9 + index * 0.1, duration: 0.5 }}
                   className="text-center group"
                 >
-                  <div className="font-heading text-4xl md:text-5xl font-bold text-secondary mb-2 group-hover:scale-110 transition-transform">
+                  <div className="font-kufi text-4xl md:text-5xl font-bold text-secondary mb-2 group-hover:scale-110 transition-transform">
                     {stat.number}
                   </div>
                   <div className="text-primary-foreground/80 text-sm md:text-base">
