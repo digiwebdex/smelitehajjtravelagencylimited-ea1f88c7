@@ -27,7 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Search, Eye, CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, Clock, AlertCircle, Download } from "lucide-react";
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/currency";
 
@@ -188,6 +188,72 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
     );
   };
 
+  const exportToCSV = () => {
+    const headers = [
+      "Booking ID",
+      "Customer Name",
+      "Email",
+      "Phone",
+      "Customer Type",
+      "Package",
+      "Package Type",
+      "Passengers",
+      "Travel Date",
+      "Total Amount",
+      "Status",
+      "Booking Date",
+      "Notes"
+    ];
+
+    const csvData = filteredBookings.map((booking) => {
+      const customerInfo = getCustomerInfo(booking);
+      return [
+        booking.id.slice(0, 8).toUpperCase(),
+        customerInfo.name,
+        customerInfo.email,
+        customerInfo.phone,
+        customerInfo.isGuest ? "Guest" : "Registered",
+        booking.packages.title,
+        booking.packages.type,
+        booking.passenger_count,
+        booking.travel_date ? new Date(booking.travel_date).toLocaleDateString() : "Not set",
+        booking.total_price,
+        booking.status,
+        new Date(booking.created_at).toLocaleDateString(),
+        booking.notes || ""
+      ];
+    });
+
+    const csvContent = [
+      headers.join(","),
+      ...csvData.map(row => 
+        row.map(cell => {
+          const cellStr = String(cell);
+          // Escape quotes and wrap in quotes if contains comma or quote
+          if (cellStr.includes(",") || cellStr.includes('"') || cellStr.includes("\n")) {
+            return `"${cellStr.replace(/"/g, '""')}"`;
+          }
+          return cellStr;
+        }).join(",")
+      )
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `bookings-${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Export Successful",
+      description: `${filteredBookings.length} bookings exported to CSV`,
+    });
+  };
+
   if (loading) {
     return (
       <Card>
@@ -204,6 +270,16 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>All Bookings ({bookings.length})</span>
+            <Button 
+              onClick={exportToCSV} 
+              variant="outline" 
+              size="sm"
+              disabled={filteredBookings.length === 0}
+              className="gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Export CSV
+            </Button>
           </CardTitle>
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
             <div className="relative flex-1">
