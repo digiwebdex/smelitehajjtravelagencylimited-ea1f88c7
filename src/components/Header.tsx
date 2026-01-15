@@ -54,6 +54,23 @@ const Header = () => {
     }
   };
 
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const targetId = href.replace('#', '');
+    const element = document.getElementById(targetId);
+    if (element) {
+      const headerOffset = 120; // Account for fixed header
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+    setIsMenuOpen(false);
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
@@ -98,7 +115,8 @@ const Header = () => {
               <a
                 key={link.id}
                 href={link.href}
-                className="text-foreground hover:text-primary font-medium transition-colors relative group"
+                onClick={(e) => handleSmoothScroll(e, link.href)}
+                className="text-foreground hover:text-primary font-medium transition-colors relative group cursor-pointer"
               >
                 {link.label}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
@@ -158,7 +176,7 @@ const Header = () => {
                   key={link.id}
                   href={link.href}
                   className="text-foreground hover:text-primary font-medium py-2"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={(e) => handleSmoothScroll(e, link.href)}
                 >
                   {link.label}
                 </a>
