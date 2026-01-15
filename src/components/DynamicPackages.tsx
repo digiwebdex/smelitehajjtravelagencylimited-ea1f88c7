@@ -91,7 +91,7 @@ const DynamicPackages = ({ type }: DynamicPackagesProps) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1 }}
-          className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] max-w-sm"
+          className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] max-w-sm flex"
           >
             <Card className="h-full flex flex-col overflow-hidden hover:shadow-elegant transition-all duration-300 group border-border/50">
               {/* Header with gradient */}
