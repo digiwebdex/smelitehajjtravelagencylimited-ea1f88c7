@@ -169,23 +169,7 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
             </div>
           </div>
 
-          {/* Mobile Number - Mandatory */}
-          <div className="space-y-2">
-            <Label htmlFor="guestPhone" className="flex items-center gap-2">
-              <Phone className="w-4 h-4" /> Mobile Number <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="guestPhone"
-              type="tel"
-              placeholder="+880 1XXX-XXXXXX"
-              value={formData.guestPhone}
-              onChange={(e) => setFormData({ ...formData, guestPhone: e.target.value })}
-              required
-              className="border-primary/30 focus:border-primary"
-            />
-          </div>
-
-          {/* Contact Info */}
+          {/* Contact Info - Name and Email */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="guestName" className="flex items-center gap-2">
@@ -213,16 +197,19 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
             </div>
           </div>
 
+          {/* Mobile Number - Mandatory */}
           <div className="space-y-2">
-            <Label htmlFor="passengerName">Primary Passenger Name</Label>
+            <Label htmlFor="guestPhone" className="flex items-center gap-2">
+              <Phone className="w-4 h-4" /> Mobile Number <span className="text-destructive">*</span>
+            </Label>
             <Input
-              id="passengerName"
-              placeholder="As per passport"
-              value={formData.passengerDetails.name}
-              onChange={(e) => setFormData({
-                ...formData,
-                passengerDetails: { ...formData.passengerDetails, name: e.target.value }
-              })}
+              id="guestPhone"
+              type="tel"
+              placeholder="+880 1XXX-XXXXXX"
+              value={formData.guestPhone}
+              onChange={(e) => setFormData({ ...formData, guestPhone: e.target.value })}
+              required
+              className="border-primary/30 focus:border-primary"
             />
           </div>
 
