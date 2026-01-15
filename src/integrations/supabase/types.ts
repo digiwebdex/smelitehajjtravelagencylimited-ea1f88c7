@@ -360,6 +360,45 @@ export type Database = {
         }
         Relationships: []
       }
+      office_locations: {
+        Row: {
+          address: string
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          map_query: string | null
+          name: string
+          order_index: number
+          phones: string[]
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          map_query?: string | null
+          name: string
+          order_index?: number
+          phones?: string[]
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          map_query?: string | null
+          name?: string
+          order_index?: number
+          phones?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       packages: {
         Row: {
           created_at: string

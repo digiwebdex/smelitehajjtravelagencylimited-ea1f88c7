@@ -18,6 +18,17 @@ interface ContactInfo {
   order_index: number;
 }
 
+interface OfficeLocation {
+  id: string;
+  name: string;
+  address: string;
+  phones: string[];
+  email: string | null;
+  map_query: string | null;
+  order_index: number;
+  is_active: boolean;
+}
+
 const iconMap: Record<string, LucideIcon> = {
   Phone,
   Mail,
@@ -29,6 +40,7 @@ const ContactSection = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactInfo, setContactInfo] = useState<ContactInfo[]>([]);
+  const [officeLocations, setOfficeLocations] = useState<OfficeLocation[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -39,6 +51,7 @@ const ContactSection = () => {
 
   useEffect(() => {
     fetchContactInfo();
+    fetchOfficeLocations();
   }, []);
 
   const fetchContactInfo = async () => {
@@ -61,6 +74,18 @@ const ContactSection = () => {
         { id: "3", icon_name: "MapPin", title: "Visit Us", details: ["Savar, Dhaka", "Bangladesh"], type: "address", order_index: 2 },
         { id: "4", icon_name: "Clock", title: "Office Hours", details: ["Sat - Thu: 9AM - 8PM", "Friday: Closed"], type: "hours", order_index: 3 },
       ]);
+    }
+  };
+
+  const fetchOfficeLocations = async () => {
+    const { data } = await supabase
+      .from("office_locations")
+      .select("*")
+      .eq("is_active", true)
+      .order("order_index");
+
+    if (data) {
+      setOfficeLocations(data as OfficeLocation[]);
     }
   };
 
@@ -149,97 +174,59 @@ const ContactSection = () => {
             </div>
 
             {/* Office Locations */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="grid sm:grid-cols-2 gap-6 mb-8"
-            >
-              {/* Head Office */}
-              <div className="bg-card rounded-2xl p-6 shadow-elegant hover:shadow-lg transition-all duration-300 group">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-elegant">
-                    <Building2 className="w-6 h-6 text-primary-foreground" />
+            {officeLocations.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="grid sm:grid-cols-2 gap-6 mb-8"
+              >
+                {officeLocations.map((office) => (
+                  <div 
+                    key={office.id}
+                    className="bg-card rounded-2xl p-6 shadow-elegant hover:shadow-lg transition-all duration-300 group"
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-elegant">
+                        <Building2 className="w-6 h-6 text-primary-foreground" />
+                      </div>
+                      <h3 className="font-heading font-bold text-lg text-secondary">{office.name}</h3>
+                    </div>
+                    <div className="space-y-3">
+                      <a 
+                        href={`https://maps.google.com/?q=${office.map_query || encodeURIComponent(office.address)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-start gap-2 text-muted-foreground hover:text-primary transition-colors group/link"
+                      >
+                        <MapPin className="w-4 h-4 mt-1 flex-shrink-0 group-hover/link:text-secondary" />
+                        <span className="text-sm">{office.address}</span>
+                      </a>
+                      {office.phones.map((phone, idx) => (
+                        <a 
+                          key={idx}
+                          href={`tel:${phone}`}
+                          className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          <Phone className="w-4 h-4 flex-shrink-0" />
+                          <span className="text-sm">{phone}</span>
+                        </a>
+                      ))}
+                      {office.email && (
+                        <a 
+                          href={`mailto:${office.email}`}
+                          className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          <Mail className="w-4 h-4 flex-shrink-0" />
+                          <span className="text-sm">{office.email}</span>
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  <h3 className="font-heading font-bold text-lg text-secondary">Head Office</h3>
-                </div>
-                <div className="space-y-3">
-                  <a 
-                    href="https://maps.google.com/?q=House+37+Block+C+Road+6+Banani+Dhaka+1213"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-start gap-2 text-muted-foreground hover:text-primary transition-colors group/link"
-                  >
-                    <MapPin className="w-4 h-4 mt-1 flex-shrink-0 group-hover/link:text-secondary" />
-                    <span className="text-sm">House # 37, Block # C, Road # 6, Banani, Dhaka-1213.</span>
-                  </a>
-                  <a 
-                    href="tel:+8801867666888"
-                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <Phone className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-sm">+8801867666888</span>
-                  </a>
-                  <a 
-                    href="tel:+8801619959625"
-                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <Phone className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-sm">+8801619959625</span>
-                  </a>
-                  <a 
-                    href="mailto:info@smelitehajj.com"
-                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <Mail className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-sm">info@smelitehajj.com</span>
-                  </a>
-                </div>
-              </div>
-
-              {/* Savar Office */}
-              <div className="bg-card rounded-2xl p-6 shadow-elegant hover:shadow-lg transition-all duration-300 group">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-elegant">
-                    <Building2 className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <h3 className="font-heading font-bold text-lg text-secondary">Savar Office</h3>
-                </div>
-                <div className="space-y-3">
-                  <a 
-                    href="https://maps.google.com/?q=Al-Baraka+Super+Market+Savar+Bazar+Bus-Stand+Savar+Dhaka+1340"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-start gap-2 text-muted-foreground hover:text-primary transition-colors group/link"
-                  >
-                    <MapPin className="w-4 h-4 mt-1 flex-shrink-0 group-hover/link:text-secondary" />
-                    <span className="text-sm">B-25/4, Al-Baraka Super Market, Savar Bazar Bus-Stand, Savar, Dhaka-1340.</span>
-                  </a>
-                  <a 
-                    href="tel:+8802224446664"
-                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <Phone className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-sm">+8802224446664</span>
-                  </a>
-                  <a 
-                    href="tel:+8801619959626"
-                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <Phone className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-sm">+8801619959626</span>
-                  </a>
-                  <a 
-                    href="mailto:info@smelitehajj.com"
-                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <Mail className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-sm">info@smelitehajj.com</span>
-                  </a>
-                </div>
-              </div>
-            </motion.div>
+                ))}
+              </motion.div>
+            )}
 
             {/* Map */}
             <motion.div

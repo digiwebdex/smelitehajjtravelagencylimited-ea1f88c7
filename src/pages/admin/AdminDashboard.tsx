@@ -20,7 +20,8 @@ import {
   Globe,
   Phone,
   FileText,
-  Wallet
+  Wallet,
+  Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -39,6 +40,7 @@ import AdminFooter from "@/components/admin/AdminFooter";
 import AdminSettings from "@/components/admin/AdminSettings";
 import AdminNotifications from "@/components/admin/AdminNotifications";
 import AdminLegalPages from "@/components/admin/AdminLegalPages";
+import AdminOfficeLocations from "@/components/admin/AdminOfficeLocations";
 import { formatCurrency } from "@/lib/currency";
 import { Bell, Scale } from "lucide-react";
 
@@ -171,6 +173,7 @@ const AdminDashboard = () => {
     { value: "faq", label: "FAQ", icon: HelpCircle },
     { value: "visa", label: "Visa", icon: Globe },
     { value: "contact", label: "Contact", icon: Phone },
+    { value: "offices", label: "Offices", icon: Building2 },
     { value: "footer", label: "Footer", icon: FileText },
     { value: "legal", label: "Legal Pages", icon: Scale },
     { value: "settings", label: "Settings", icon: Settings },
@@ -291,6 +294,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="contact">
             <AdminContact />
+          </TabsContent>
+
+          <TabsContent value="offices">
+            <AdminOfficeLocations />
           </TabsContent>
 
           <TabsContent value="footer">
