@@ -1,9 +1,20 @@
 import { useState } from "react";
-import { Menu, X, Phone, Mail } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, X, Phone, Mail, User, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isAdmin, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const navLinks = [
     { name: "Home", href: "#home" },
@@ -13,6 +24,11 @@ const Header = () => {
     { name: "Our Team", href: "#team" },
     { name: "Contact", href: "#contact" },
   ];
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md shadow-elegant">
@@ -63,12 +79,43 @@ const Header = () => {
           </div>
 
           <div className="hidden lg:flex items-center gap-4">
-            <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-              Get Quote
-            </Button>
-            <Button className="bg-gradient-primary hover:opacity-90 shadow-gold">
-              Book Now
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <User className="w-4 h-4" />
+                    Account
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => navigate("/my-bookings")}>
+                    My Bookings
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate("/admin")}>
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Admin Panel
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/auth">
+                <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                  Sign In
+                </Button>
+              </Link>
+            )}
+            <a href="#hajj">
+              <Button className="bg-gradient-primary hover:opacity-90 shadow-gold">
+                Book Now
+              </Button>
+            </a>
           </div>
 
           {/* Mobile Menu Toggle */}
