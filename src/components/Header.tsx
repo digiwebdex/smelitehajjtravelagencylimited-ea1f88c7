@@ -89,7 +89,7 @@ const Header = () => {
               alt="S.M. Elite Hajj Limited" 
               className="h-12 w-auto object-contain"
             />
-            <span className="font-bold text-lg text-foreground hidden sm:inline">S. M. Elite Hajj</span>
+            <span className="font-calligraphy font-bold text-xl text-foreground hidden sm:inline">S. M. Elite Hajj</span>
           </a>
 
           {/* Desktop Navigation */}
