@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Phone, Mail, MapPin, Clock, Send, MessageSquare, LucideIcon } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Send, MessageSquare, Building2, LucideIcon } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -148,6 +148,99 @@ const ContactSection = () => {
               })}
             </div>
 
+            {/* Office Locations */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="grid sm:grid-cols-2 gap-6 mb-8"
+            >
+              {/* Head Office */}
+              <div className="bg-card rounded-2xl p-6 shadow-elegant hover:shadow-lg transition-all duration-300 group">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-elegant">
+                    <Building2 className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <h3 className="font-heading font-bold text-lg text-secondary">Head Office</h3>
+                </div>
+                <div className="space-y-3">
+                  <a 
+                    href="https://maps.google.com/?q=House+37+Block+C+Road+6+Banani+Dhaka+1213"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-2 text-muted-foreground hover:text-primary transition-colors group/link"
+                  >
+                    <MapPin className="w-4 h-4 mt-1 flex-shrink-0 group-hover/link:text-secondary" />
+                    <span className="text-sm">House # 37, Block # C, Road # 6, Banani, Dhaka-1213.</span>
+                  </a>
+                  <a 
+                    href="tel:+8801867666888"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Phone className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm">+8801867666888</span>
+                  </a>
+                  <a 
+                    href="tel:+8801619959625"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Phone className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm">+8801619959625</span>
+                  </a>
+                  <a 
+                    href="mailto:info@smelitehajj.com"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Mail className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm">info@smelitehajj.com</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Savar Office */}
+              <div className="bg-card rounded-2xl p-6 shadow-elegant hover:shadow-lg transition-all duration-300 group">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-elegant">
+                    <Building2 className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <h3 className="font-heading font-bold text-lg text-secondary">Savar Office</h3>
+                </div>
+                <div className="space-y-3">
+                  <a 
+                    href="https://maps.google.com/?q=Al-Baraka+Super+Market+Savar+Bazar+Bus-Stand+Savar+Dhaka+1340"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-2 text-muted-foreground hover:text-primary transition-colors group/link"
+                  >
+                    <MapPin className="w-4 h-4 mt-1 flex-shrink-0 group-hover/link:text-secondary" />
+                    <span className="text-sm">B-25/4, Al-Baraka Super Market, Savar Bazar Bus-Stand, Savar, Dhaka-1340.</span>
+                  </a>
+                  <a 
+                    href="tel:+8802224446664"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Phone className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm">+8802224446664</span>
+                  </a>
+                  <a 
+                    href="tel:+8801619959626"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Phone className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm">+8801619959626</span>
+                  </a>
+                  <a 
+                    href="mailto:info@smelitehajj.com"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Mail className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm">info@smelitehajj.com</span>
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+
             {/* Map */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -157,14 +250,14 @@ const ContactSection = () => {
               className="bg-card rounded-2xl overflow-hidden shadow-elegant h-72"
             >
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d58399.55577816851!2d90.2227881!3d23.8584712!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755eb3a0a09f5b3%3A0x7dfcceb1c4cc3cbb!2sSavar%2C%20Bangladesh!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3650.5484611458387!2d90.39729221498282!3d23.79416879319868!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c709be6be7b5%3A0x7e53f4e8b8be1a24!2sBanani%2C%20Dhaka!5e0!3m2!1sen!2sbd!4v1700000000000!5m2!1sen!2sbd"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="SM Elite Hajj Location"
+                title="SM Elite Hajj Head Office Location - Banani, Dhaka"
               />
             </motion.div>
           </motion.div>
