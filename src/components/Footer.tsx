@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, ArrowUp } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -256,15 +257,15 @@ const Footer = () => {
             {content.copyright_text}
           </p>
           <div className="flex gap-6 text-sm">
-            <a href="#" className="text-primary-foreground/70 hover:text-secondary transition-colors">
+            <Link to="/legal/privacy-policy" className="text-primary-foreground/70 hover:text-secondary transition-colors">
               Privacy Policy
-            </a>
-            <a href="#" className="text-primary-foreground/70 hover:text-secondary transition-colors">
+            </Link>
+            <Link to="/legal/terms-of-service" className="text-primary-foreground/70 hover:text-secondary transition-colors">
               Terms of Service
-            </a>
-            <a href="#" className="text-primary-foreground/70 hover:text-secondary transition-colors">
+            </Link>
+            <Link to="/legal/refund-policy" className="text-primary-foreground/70 hover:text-secondary transition-colors">
               Refund Policy
-            </a>
+            </Link>
           </div>
         </div>
       </div>
