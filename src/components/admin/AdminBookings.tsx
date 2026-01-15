@@ -40,7 +40,10 @@ interface Booking {
   notes: string | null;
   passenger_details: Record<string, string> | null;
   created_at: string;
-  user_id: string;
+  user_id: string | null;
+  guest_name: string | null;
+  guest_email: string | null;
+  guest_phone: string | null;
   profiles: {
     full_name: string | null;
     email: string | null;
@@ -88,6 +91,9 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
         passenger_details,
         created_at,
         user_id,
+        guest_name,
+        guest_email,
+        guest_phone,
         packages (
           title,
           type
@@ -96,23 +102,43 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      // Fetch profiles separately
-      const userIds = [...new Set(data.map(b => b.user_id))];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, full_name, email, phone")
-        .in("id", userIds);
+      // Fetch profiles separately for registered users
+      const userIds = [...new Set(data.filter(b => b.user_id).map(b => b.user_id))];
+      const { data: profiles } = userIds.length > 0 
+        ? await supabase
+            .from("profiles")
+            .select("id, full_name, email, phone")
+            .in("id", userIds)
+        : { data: [] };
 
-      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      const profileMap = new Map(profiles?.map(p => [p.id, p] as const) || []);
       
       const bookingsWithProfiles = data.map(booking => ({
         ...booking,
-        profiles: profileMap.get(booking.user_id) || null,
+        profiles: booking.user_id ? profileMap.get(booking.user_id) || null : null,
       }));
       
       setBookings(bookingsWithProfiles as Booking[]);
     }
     setLoading(false);
+  };
+
+  // Helper to get customer display info (profile or guest)
+  const getCustomerInfo = (booking: Booking) => {
+    if (booking.profiles) {
+      return {
+        name: booking.profiles.full_name || "N/A",
+        email: booking.profiles.email || "",
+        phone: booking.profiles.phone || "",
+        isGuest: false,
+      };
+    }
+    return {
+      name: booking.guest_name || "Guest",
+      email: booking.guest_email || "",
+      phone: booking.guest_phone || "",
+      isGuest: true,
+    };
   };
 
   const updateBookingStatus = async (bookingId: string, newStatus: "pending" | "confirmed" | "completed" | "cancelled") => {
@@ -138,9 +164,11 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
   };
 
   const filteredBookings = bookings.filter((booking) => {
+    const customerInfo = getCustomerInfo(booking);
     const matchesSearch =
-      booking.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customerInfo.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customerInfo.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customerInfo.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.packages.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.id.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -218,15 +246,25 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredBookings.map((booking) => (
+                {filteredBookings.map((booking) => {
+                  const customerInfo = getCustomerInfo(booking);
+                  return (
                   <TableRow key={booking.id}>
                     <TableCell className="font-mono text-xs">
                       {booking.id.slice(0, 8).toUpperCase()}
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium">{booking.profiles?.full_name || "N/A"}</p>
-                        <p className="text-xs text-muted-foreground">{booking.profiles?.email}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{customerInfo.name}</p>
+                          {customerInfo.isGuest && (
+                            <Badge variant="outline" className="text-xs">Guest</Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">{customerInfo.email}</p>
+                        {customerInfo.phone && (
+                          <p className="text-xs text-muted-foreground">{customerInfo.phone}</p>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -272,7 +310,8 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
@@ -294,7 +333,9 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
               ID: {selectedBooking?.id.slice(0, 8).toUpperCase()}
             </DialogDescription>
           </DialogHeader>
-          {selectedBooking && (
+          {selectedBooking && (() => {
+            const customerInfo = getCustomerInfo(selectedBooking);
+            return (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -302,10 +343,15 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
             >
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Customer</p>
-                  <p className="font-medium">{selectedBooking.profiles?.full_name || "N/A"}</p>
-                  <p className="text-sm">{selectedBooking.profiles?.email}</p>
-                  <p className="text-sm">{selectedBooking.profiles?.phone}</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-sm text-muted-foreground">Customer</p>
+                    {customerInfo.isGuest && (
+                      <Badge variant="outline" className="text-xs">Guest</Badge>
+                    )}
+                  </div>
+                  <p className="font-medium">{customerInfo.name}</p>
+                  {customerInfo.email && <p className="text-sm">{customerInfo.email}</p>}
+                  {customerInfo.phone && <p className="text-sm">{customerInfo.phone}</p>}
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Package</p>
@@ -360,7 +406,8 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
                 {getStatusBadge(selectedBooking.status)}
               </div>
             </motion.div>
-          )}
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </>
