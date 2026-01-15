@@ -12,9 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Users, Plane, Phone, Mail, User } from "lucide-react";
+import { Calendar, Users, Plane, Phone, Mail, User, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/currency";
+import { z } from "zod";
 
 interface Package {
   id: string;
@@ -30,9 +31,27 @@ interface BookingModalProps {
   package_info: Package | null;
 }
 
+const bookingSchema = z.object({
+  guestName: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  guestEmail: z.string().trim().email("Please enter a valid email").max(255).optional().or(z.literal("")),
+  guestPhone: z.string().trim().min(1, "Mobile number is required").regex(/^[+]?[\d\s-]{10,}$/, "Please enter a valid phone number"),
+  passengerCount: z.number().min(1, "At least 1 passenger required").max(10, "Maximum 10 passengers allowed"),
+  travelDate: z.string().optional(),
+  notes: z.string().max(1000, "Notes must be less than 1000 characters").optional(),
+});
+
+interface FormErrors {
+  guestName?: string;
+  guestEmail?: string;
+  guestPhone?: string;
+  passengerCount?: string;
+}
+
 const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [formData, setFormData] = useState({
     guestName: "",
     guestEmail: "",
@@ -48,13 +67,44 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
     },
   });
 
+  const validateField = (field: keyof FormErrors, value: string | number) => {
+    try {
+      const fieldSchema = bookingSchema.shape[field];
+      fieldSchema.parse(value);
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setErrors(prev => ({ ...prev, [field]: error.errors[0].message }));
+      }
+    }
+  };
+
+  const handleBlur = (field: string) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    if (field in bookingSchema.shape) {
+      validateField(field as keyof FormErrors, formData[field as keyof typeof formData] as string | number);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.guestName || !formData.guestPhone) {
+    // Validate all fields
+    const result = bookingSchema.safeParse(formData);
+    
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof FormErrors;
+        if (!fieldErrors[field]) {
+          fieldErrors[field] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      setTouched({ guestName: true, guestEmail: true, guestPhone: true, passengerCount: true });
       toast({
-        title: "Required Fields",
-        description: "Please enter your name and phone number.",
+        title: "Validation Error",
+        description: "Please fix the errors in the form.",
         variant: "destructive",
       });
       return;
@@ -71,9 +121,9 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
       notes: formData.notes || null,
       passenger_details: formData.passengerDetails,
       total_price: package_info.price * formData.passengerCount,
-      guest_name: formData.guestName,
-      guest_email: formData.guestEmail || null,
-      guest_phone: formData.guestPhone,
+      guest_name: formData.guestName.trim(),
+      guest_email: formData.guestEmail.trim() || null,
+      guest_phone: formData.guestPhone.trim(),
     });
 
     if (error) {
@@ -103,6 +153,8 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
           nationality: "Bangladeshi",
         },
       });
+      setErrors({});
+      setTouched({});
     }
     setLoading(false);
   };
@@ -179,9 +231,18 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
                 id="guestName"
                 placeholder="Enter your full name"
                 value={formData.guestName}
-                onChange={(e) => setFormData({ ...formData, guestName: e.target.value })}
-                required
+                onChange={(e) => {
+                  setFormData({ ...formData, guestName: e.target.value });
+                  if (touched.guestName) validateField("guestName", e.target.value);
+                }}
+                onBlur={() => handleBlur("guestName")}
+                className={touched.guestName && errors.guestName ? "border-destructive" : ""}
               />
+              {touched.guestName && errors.guestName && (
+                <p className="text-xs text-destructive flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" /> {errors.guestName}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="guestEmail" className="flex items-center gap-2">
@@ -192,8 +253,18 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
                 type="email"
                 placeholder="your@email.com"
                 value={formData.guestEmail}
-                onChange={(e) => setFormData({ ...formData, guestEmail: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, guestEmail: e.target.value });
+                  if (touched.guestEmail) validateField("guestEmail", e.target.value);
+                }}
+                onBlur={() => handleBlur("guestEmail")}
+                className={touched.guestEmail && errors.guestEmail ? "border-destructive" : ""}
               />
+              {touched.guestEmail && errors.guestEmail && (
+                <p className="text-xs text-destructive flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" /> {errors.guestEmail}
+                </p>
+              )}
             </div>
           </div>
 
@@ -207,10 +278,18 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
               type="tel"
               placeholder="+880 1XXX-XXXXXX"
               value={formData.guestPhone}
-              onChange={(e) => setFormData({ ...formData, guestPhone: e.target.value })}
-              required
-              className="border-primary/30 focus:border-primary"
+              onChange={(e) => {
+                setFormData({ ...formData, guestPhone: e.target.value });
+                if (touched.guestPhone) validateField("guestPhone", e.target.value);
+              }}
+              onBlur={() => handleBlur("guestPhone")}
+              className={`border-primary/30 focus:border-primary ${touched.guestPhone && errors.guestPhone ? "border-destructive" : ""}`}
             />
+            {touched.guestPhone && errors.guestPhone && (
+              <p className="text-xs text-destructive flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" /> {errors.guestPhone}
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
