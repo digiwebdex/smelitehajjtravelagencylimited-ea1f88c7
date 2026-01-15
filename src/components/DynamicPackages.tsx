@@ -83,7 +83,7 @@ const DynamicPackages = ({ type }: DynamicPackagesProps) => {
 
   return (
     <>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="flex flex-wrap justify-center gap-6">
         {packages.map((pkg, index) => (
           <motion.div
             key={pkg.id}
@@ -91,6 +91,7 @@ const DynamicPackages = ({ type }: DynamicPackagesProps) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1 }}
+          className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] max-w-sm"
           >
             <Card className="h-full flex flex-col overflow-hidden hover:shadow-elegant transition-all duration-300 group border-border/50">
               {/* Header with gradient */}
