@@ -8,8 +8,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import ImageUpload from "./ImageUpload";
+import { Plus, Edit, Trash2, User } from "lucide-react";
 
 interface TeamMember {
   id: string;
@@ -30,6 +33,11 @@ const AdminTeam = () => {
   const [editingItem, setEditingItem] = useState<TeamMember | null>(null);
   const [formData, setFormData] = useState({
     name: "", role: "", qualifications: "", avatar_url: "", board_type: "management"
+  });
+
+  const { uploadImage, uploading } = useImageUpload({
+    bucket: "admin-uploads",
+    folder: "team",
   });
 
   useEffect(() => {
@@ -92,6 +100,46 @@ const AdminTeam = () => {
   const managementMembers = members.filter(m => m.board_type === "management");
   const shariahMembers = members.filter(m => m.board_type === "shariah");
 
+  const renderMemberTable = (membersList: TeamMember[], title: string) => (
+    <div>
+      <h4 className="font-medium mb-2">{title} ({membersList.length})</h4>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Avatar</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead>Active</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {membersList.map((item) => (
+            <TableRow key={item.id}>
+              <TableCell>
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={item.avatar_url} alt={item.name} />
+                  <AvatarFallback>
+                    <User className="h-4 w-4" />
+                  </AvatarFallback>
+                </Avatar>
+              </TableCell>
+              <TableCell className="font-medium">{item.name}</TableCell>
+              <TableCell>{item.role}</TableCell>
+              <TableCell><Switch checked={item.is_active} onCheckedChange={() => toggleActive(item)} /></TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}><Edit className="w-4 h-4" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -103,11 +151,18 @@ const AdminTeam = () => {
           <DialogTrigger asChild>
             <Button><Plus className="w-4 h-4 mr-2" />Add Member</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingItem ? "Edit Team Member" : "Add Team Member"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <ImageUpload
+                value={formData.avatar_url}
+                onChange={(url) => setFormData({ ...formData, avatar_url: url })}
+                onUpload={uploadImage}
+                uploading={uploading}
+                label="Avatar Image"
+              />
               <div>
                 <label className="text-sm font-medium">Name *</label>
                 <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
@@ -130,72 +185,16 @@ const AdminTeam = () => {
                 <label className="text-sm font-medium">Qualifications</label>
                 <Textarea value={formData.qualifications} onChange={(e) => setFormData({ ...formData, qualifications: e.target.value })} rows={2} />
               </div>
-              <div>
-                <label className="text-sm font-medium">Avatar URL (optional)</label>
-                <Input value={formData.avatar_url} onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })} placeholder="https://..." />
-              </div>
-              <Button type="submit" className="w-full">{editingItem ? "Update" : "Create"}</Button>
+              <Button type="submit" className="w-full" disabled={uploading}>
+                {editingItem ? "Update" : "Create"}
+              </Button>
             </form>
           </DialogContent>
         </Dialog>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div>
-          <h4 className="font-medium mb-2">Management Board ({managementMembers.length})</h4>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Active</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {managementMembers.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell>{item.role}</TableCell>
-                  <TableCell><Switch checked={item.is_active} onCheckedChange={() => toggleActive(item)} /></TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}><Edit className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        <div>
-          <h4 className="font-medium mb-2">Shariah Board ({shariahMembers.length})</h4>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Active</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {shariahMembers.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell>{item.role}</TableCell>
-                  <TableCell><Switch checked={item.is_active} onCheckedChange={() => toggleActive(item)} /></TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}><Edit className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        {renderMemberTable(managementMembers, "Management Board")}
+        {renderMemberTable(shariahMembers, "Shariah Board")}
       </CardContent>
     </Card>
   );

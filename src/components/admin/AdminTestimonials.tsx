@@ -7,8 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Star } from "lucide-react";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import ImageUpload from "./ImageUpload";
+import { Plus, Edit, Trash2, Star, User } from "lucide-react";
 
 interface Testimonial {
   id: string;
@@ -30,6 +33,11 @@ const AdminTestimonials = () => {
   const [editingItem, setEditingItem] = useState<Testimonial | null>(null);
   const [formData, setFormData] = useState({
     name: "", location: "", package_name: "", rating: 5, quote: "", avatar_url: ""
+  });
+
+  const { uploadImage, uploading } = useImageUpload({
+    bucket: "admin-uploads",
+    folder: "testimonials",
   });
 
   useEffect(() => {
@@ -108,11 +116,18 @@ const AdminTestimonials = () => {
           <DialogTrigger asChild>
             <Button><Plus className="w-4 h-4 mr-2" />Add Testimonial</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingItem ? "Edit Testimonial" : "Add Testimonial"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <ImageUpload
+                value={formData.avatar_url}
+                onChange={(url) => setFormData({ ...formData, avatar_url: url })}
+                onUpload={uploadImage}
+                uploading={uploading}
+                label="Avatar Image"
+              />
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium">Name *</label>
@@ -134,14 +149,12 @@ const AdminTestimonials = () => {
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium">Avatar URL (optional)</label>
-                <Input value={formData.avatar_url} onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })} placeholder="https://..." />
-              </div>
-              <div>
                 <label className="text-sm font-medium">Quote *</label>
                 <Textarea value={formData.quote} onChange={(e) => setFormData({ ...formData, quote: e.target.value })} required rows={4} />
               </div>
-              <Button type="submit" className="w-full">{editingItem ? "Update" : "Create"}</Button>
+              <Button type="submit" className="w-full" disabled={uploading}>
+                {editingItem ? "Update" : "Create"}
+              </Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -150,6 +163,7 @@ const AdminTestimonials = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Avatar</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Package</TableHead>
               <TableHead>Rating</TableHead>
@@ -160,6 +174,14 @@ const AdminTestimonials = () => {
           <TableBody>
             {testimonials.map((item) => (
               <TableRow key={item.id}>
+                <TableCell>
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={item.avatar_url} alt={item.name} />
+                    <AvatarFallback>
+                      <User className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                </TableCell>
                 <TableCell>
                   <div>
                     <div className="font-medium">{item.name}</div>
