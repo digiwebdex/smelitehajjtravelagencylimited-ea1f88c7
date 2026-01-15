@@ -1,10 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Star, Users, Check } from "lucide-react";
+import { Calendar, MapPin, Star, Users, Check, ArrowUpDown, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import BookingModal from "./BookingModal";
 
 interface Package {
@@ -23,11 +30,14 @@ interface DynamicPackagesProps {
   type: "hajj" | "umrah";
 }
 
+type SortOption = "price-asc" | "price-desc" | "duration-asc" | "duration-desc" | "rating-desc";
+
 const DynamicPackages = ({ type }: DynamicPackagesProps) => {
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>("price-asc");
 
   useEffect(() => {
     fetchPackages();
@@ -38,14 +48,32 @@ const DynamicPackages = ({ type }: DynamicPackagesProps) => {
       .from("packages")
       .select("*")
       .eq("type", type)
-      .eq("is_active", true)
-      .order("price", { ascending: true });
+      .eq("is_active", true);
 
     if (!error && data) {
       setPackages(data);
     }
     setLoading(false);
   };
+
+  const sortedPackages = useMemo(() => {
+    return [...packages].sort((a, b) => {
+      switch (sortBy) {
+        case "price-asc":
+          return a.price - b.price;
+        case "price-desc":
+          return b.price - a.price;
+        case "duration-asc":
+          return a.duration_days - b.duration_days;
+        case "duration-desc":
+          return b.duration_days - a.duration_days;
+        case "rating-desc":
+          return (b.hotel_rating || 0) - (a.hotel_rating || 0);
+        default:
+          return 0;
+      }
+    });
+  }, [packages, sortBy]);
 
   const handleBookNow = (pkg: Package) => {
     setSelectedPackage(pkg);
@@ -83,8 +111,27 @@ const DynamicPackages = ({ type }: DynamicPackagesProps) => {
 
   return (
     <>
+      {/* Sort Controls */}
+      <div className="flex justify-end mb-6">
+        <div className="flex items-center gap-2">
+          <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
+          <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
+            <SelectTrigger className="w-[180px] bg-background">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent className="bg-background border">
+              <SelectItem value="price-asc">Price: Low to High</SelectItem>
+              <SelectItem value="price-desc">Price: High to Low</SelectItem>
+              <SelectItem value="duration-asc">Duration: Shortest</SelectItem>
+              <SelectItem value="duration-desc">Duration: Longest</SelectItem>
+              <SelectItem value="rating-desc">Rating: Highest</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <div className="flex flex-wrap justify-center gap-6">
-        {packages.map((pkg, index) => (
+        {sortedPackages.map((pkg, index) => (
           <motion.div
             key={pkg.id}
             initial={{ opacity: 0, y: 30 }}
