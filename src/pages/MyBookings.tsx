@@ -21,10 +21,12 @@ import {
   FileCheck,
   Search,
   Settings,
-  PackageCheck
+  PackageCheck,
+  Upload
 } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
 import OrderTrackingModal from "@/components/OrderTrackingModal";
+import BookingDocumentUpload from "@/components/BookingDocumentUpload";
 import { cn } from "@/lib/utils";
 
 type TrackingStatus = 'order_submitted' | 'documents_received' | 'under_review' | 'approved' | 'processing' | 'completed';
@@ -71,6 +73,7 @@ const MyBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [documentUploadBooking, setDocumentUploadBooking] = useState<Booking | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -281,15 +284,26 @@ const MyBookings = () => {
                         <p className="text-xs text-muted-foreground">
                           Booked on {new Date(booking.created_at).toLocaleDateString()}
                         </p>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="gap-2"
-                          onClick={() => setSelectedBooking(booking)}
-                        >
-                          <MapPin className="w-4 h-4" />
-                          View Details
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => setDocumentUploadBooking(booking)}
+                          >
+                            <Upload className="w-4 h-4" />
+                            Documents
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => setSelectedBooking(booking)}
+                          >
+                            <MapPin className="w-4 h-4" />
+                            View Details
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -307,6 +321,17 @@ const MyBookings = () => {
         onClose={() => setSelectedBooking(null)}
         booking={selectedBooking}
       />
+
+      {/* Document Upload Modal */}
+      {documentUploadBooking && user && (
+        <BookingDocumentUpload
+          isOpen={!!documentUploadBooking}
+          onClose={() => setDocumentUploadBooking(null)}
+          bookingId={documentUploadBooking.id}
+          userId={user.id}
+          packageTitle={documentUploadBooking.packages.title}
+        />
+      )}
     </div>
   );
 };
