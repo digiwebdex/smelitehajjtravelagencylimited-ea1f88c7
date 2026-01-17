@@ -9,7 +9,6 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface HeroContent {
   title: string;
@@ -26,7 +25,6 @@ interface HeroContent {
 }
 
 const HeroSection = () => {
-  const { t, isRTL } = useLanguage();
   const [content, setContent] = useState<HeroContent>({
     title: "Your Sacred Journey",
     subtitle: "Begins Here",
@@ -74,17 +72,14 @@ const HeroSection = () => {
     }
   };
 
-  // Convert YouTube URL to embed format
   const getEmbedUrl = (url: string) => {
     if (!url) return "";
     
-    // YouTube URL patterns
     const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^&\s]+)/);
     if (youtubeMatch) {
       return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1`;
     }
     
-    // Return as-is for direct video URLs
     return url;
   };
 
@@ -122,7 +117,7 @@ const HeroSection = () => {
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 0.15, x: 0 }}
         transition={{ duration: 1.2, delay: 0.5 }}
-        className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-0 h-full w-32 md:w-48 lg:w-64 hidden md:flex flex-col justify-center items-center pointer-events-none`}
+        className="absolute left-0 top-0 h-full w-32 md:w-48 lg:w-64 hidden md:flex flex-col justify-center items-center pointer-events-none"
       >
         <div className="font-arabic text-secondary text-6xl md:text-7xl lg:text-9xl leading-none writing-vertical-rl transform rotate-180 select-none opacity-60">
           بِسْمِ اللَّهِ
@@ -140,13 +135,11 @@ const HeroSection = () => {
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 0.2, x: 0 }}
         transition={{ duration: 1.2, delay: 0.7 }}
-        className={`absolute ${isRTL ? 'left-4' : 'right-4'} top-1/4 hidden lg:flex flex-col items-center pointer-events-none`}
+        className="absolute right-4 top-1/4 hidden lg:flex flex-col items-center pointer-events-none"
       >
-        {/* Allah in ornate calligraphy */}
         <div className="font-thuluth text-secondary text-6xl lg:text-8xl leading-none select-none drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
           ﷲ
         </div>
-        {/* Muhammad in ornate calligraphy */}
         <div className="font-calligraphy text-secondary/80 text-4xl lg:text-6xl leading-none mt-6 select-none drop-shadow-md" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.2)' }}>
           ﷴ
         </div>
@@ -157,7 +150,7 @@ const HeroSection = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 0.1, scale: 1 }}
         transition={{ duration: 1, delay: 0.8 }}
-        className={`absolute top-20 ${isRTL ? 'left-8' : 'right-8'} w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 hidden md:block pointer-events-none`}
+        className="absolute top-20 right-8 w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 hidden md:block pointer-events-none"
       >
         <svg viewBox="0 0 100 100" className="w-full h-full text-secondary fill-current">
           <polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" />
@@ -168,12 +161,12 @@ const HeroSection = () => {
       <motion.div
         animate={{ y: [-10, 10, -10] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className={`absolute top-1/4 ${isRTL ? 'right-[15%]' : 'left-[15%]'} w-20 h-20 border border-secondary/30 rounded-full hidden lg:block`}
+        className="absolute top-1/4 left-[15%] w-20 h-20 border border-secondary/30 rounded-full hidden lg:block"
       />
       <motion.div
         animate={{ y: [10, -10, 10] }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        className={`absolute bottom-1/4 ${isRTL ? 'left-[15%]' : 'right-[15%]'} w-32 h-32 border border-secondary/20 rounded-full hidden lg:block`}
+        className="absolute bottom-1/4 right-[15%] w-32 h-32 border border-secondary/20 rounded-full hidden lg:block"
       />
 
       {/* Bottom Left Calligraphy Accent */}
@@ -181,7 +174,7 @@ const HeroSection = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 0.1, y: 0 }}
         transition={{ duration: 1, delay: 1 }}
-        className={`absolute bottom-20 ${isRTL ? 'right-8' : 'left-8'} hidden lg:block pointer-events-none`}
+        className="absolute bottom-20 left-8 hidden lg:block pointer-events-none"
       >
         <div className="font-arabic text-secondary text-4xl lg:text-6xl select-none">
           عيد مبارك
@@ -201,10 +194,10 @@ const HeroSection = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 bg-secondary/20 backdrop-blur-md rounded-full text-secondary font-medium mb-8 border border-secondary/30 ${isRTL ? 'flex-row-reverse' : ''}`}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary/20 backdrop-blur-md rounded-full text-secondary font-medium mb-8 border border-secondary/30"
             >
               <Star className="w-4 h-4 fill-secondary" />
-              {t('hero.badge')}
+              {content.badge_text}
             </motion.span>
           )}
           
@@ -214,8 +207,8 @@ const HeroSection = () => {
             transition={{ delay: 0.3, duration: 0.6 }}
             className="font-arabic text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight tracking-wide"
           >
-            {t('hero.title')}
-            <span className="block text-gradient-gold mt-2 font-kufi">{t('hero.subtitle')}</span>
+            {content.title}
+            <span className="block text-gradient-gold mt-2 font-kufi">{content.subtitle}</span>
           </motion.h1>
           
           <motion.p
@@ -224,27 +217,27 @@ const HeroSection = () => {
             transition={{ delay: 0.4, duration: 0.6 }}
             className="text-lg md:text-xl text-primary-foreground/90 max-w-2xl mx-auto mb-12 leading-relaxed"
           >
-            {t('hero.description')}
+            {content.description}
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className={`flex flex-col sm:flex-row gap-4 justify-center mb-8 ${isRTL ? 'sm:flex-row-reverse' : ''}`}
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
           >
             <Button
               size="lg"
               onClick={() => scrollToSection(content.primary_button_link || "#hajj")}
-              className={`bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-gold text-lg px-8 py-7 font-semibold group ${isRTL ? 'flex-row-reverse' : ''}`}
+              className="bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-gold text-lg px-8 py-7 font-semibold group"
             >
-              <span>{t('hero.explorePackages')}</span>
+              <span>{content.primary_button_text || "Explore Hajj Packages"}</span>
               <motion.span
-                animate={{ x: isRTL ? [-5, 0, -5] : [0, 5, 0] }}
+                animate={{ x: [0, 5, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
-                className={isRTL ? 'mr-2' : 'ml-2'}
+                className="ml-2"
               >
-                {isRTL ? '←' : '→'}
+                →
               </motion.span>
             </Button>
             <Button
@@ -253,7 +246,7 @@ const HeroSection = () => {
               onClick={() => scrollToSection(content.secondary_button_link || "#umrah")}
               className="border-2 border-primary-foreground/50 text-primary-foreground bg-primary-foreground/10 backdrop-blur-sm hover:bg-primary-foreground/20 text-lg px-8 py-7"
             >
-              {t('hero.watchVideo')}
+              {content.secondary_button_text || "View Umrah Packages"}
             </Button>
           </motion.div>
 
@@ -264,12 +257,12 @@ const HeroSection = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7, duration: 0.6 }}
               onClick={() => setIsVideoOpen(true)}
-              className={`inline-flex items-center gap-3 text-primary-foreground/80 hover:text-primary-foreground transition-colors group ${isRTL ? 'flex-row-reverse' : ''}`}
+              className="inline-flex items-center gap-3 text-primary-foreground/80 hover:text-primary-foreground transition-colors group"
             >
-              <span className={`w-14 h-14 rounded-full bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-primary-foreground/30 transition-all group-hover:scale-110`}>
-                <Play className={`w-5 h-5 fill-current ${isRTL ? 'mr-1' : 'ml-1'}`} />
+              <span className="w-14 h-14 rounded-full bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-primary-foreground/30 transition-all group-hover:scale-110">
+                <Play className="w-5 h-5 fill-current ml-1" />
               </span>
-              <span className="font-medium">{t('hero.watchVideo')}</span>
+              <span className="font-medium">Watch Video</span>
             </motion.button>
           )}
 
@@ -293,9 +286,7 @@ const HeroSection = () => {
                     {stat.number}
                   </div>
                   <div className="text-primary-foreground/80 text-sm md:text-base">
-                    {index === 0 ? t('hero.yearsExperience') : 
-                     index === 1 ? t('hero.happyPilgrims') : 
-                     index === 2 ? t('hero.successRate') : stat.label}
+                    {stat.label}
                   </div>
                 </motion.div>
               ))}
@@ -314,7 +305,7 @@ const HeroSection = () => {
           }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-primary-foreground/70 hover:text-primary-foreground transition-colors"
         >
-          <span className="text-sm font-medium">{t('hero.explorePackages')}</span>
+          <span className="text-sm font-medium">Explore Packages</span>
           <ChevronDown className="w-6 h-6" />
         </motion.a>
       </div>
@@ -322,7 +313,7 @@ const HeroSection = () => {
       {/* Video Modal */}
       <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
         <DialogContent className="max-w-4xl p-0 bg-black border-none">
-          <DialogTitle className="sr-only">{t('hero.watchVideo')}</DialogTitle>
+          <DialogTitle className="sr-only">Watch Video</DialogTitle>
           <div className="relative aspect-video">
             {content.video_url && isYouTubeUrl(content.video_url) ? (
               <iframe

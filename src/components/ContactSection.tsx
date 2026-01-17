@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Phone, Mail, MapPin, Clock, Send, MessageSquare, Building2, LucideIcon } from "lucide-react";
-import * as LucideIcons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import IslamicBorder from "./IslamicBorder";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ContactInfo {
   id: string;
@@ -38,7 +36,6 @@ const iconMap: Record<string, LucideIcon> = {
 };
 
 const ContactSection = () => {
-  const { t, isRTL } = useLanguage();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactInfo, setContactInfo] = useState<ContactInfo[]>([]);
@@ -69,7 +66,6 @@ const ContactSection = () => {
         details: Array.isArray(item.details) ? item.details as string[] : [],
       })));
     } else {
-      // Fallback to default contact info
       setContactInfo([
         { id: "1", icon_name: "Phone", title: "Call Us", details: ["+880 1234-567890", "+880 9876-543210"], type: "phone", order_index: 0 },
         { id: "2", icon_name: "Mail", title: "Email Us", details: ["info@smelitehajj.com", "support@smelitehajj.com"], type: "email", order_index: 1 },
@@ -99,12 +95,11 @@ const ContactSection = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     toast({
-      title: "✅ " + t('common.success'),
-      description: t('contact.description'),
+      title: "✅ Message Sent!",
+      description: "We'll get back to you shortly.",
     });
     setFormData({ name: "", email: "", phone: "", package: "", message: "" });
     setIsSubmitting(false);
@@ -114,37 +109,37 @@ const ContactSection = () => {
     <IslamicBorder variant="top">
       <section id="contact" className="py-24 bg-muted geometric-pattern relative overflow-hidden">
         {/* Decorative elements */}
-        <div className={`absolute top-0 ${isRTL ? 'left-0' : 'right-0'} w-96 h-96 bg-primary/5 rounded-full blur-3xl`} />
-        <div className={`absolute bottom-0 ${isRTL ? 'right-0' : 'left-0'} w-72 h-72 bg-secondary/5 rounded-full blur-3xl`} />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-secondary/5 rounded-full blur-3xl" />
       
       <div className="container relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className={`text-center mb-16 ${isRTL ? 'text-right' : ''}`}
+          className="text-center mb-16"
         >
-          <span className={`inline-flex items-center gap-2 text-secondary font-semibold uppercase tracking-wider ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <span className="inline-flex items-center gap-2 text-secondary font-semibold uppercase tracking-wider">
             <MessageSquare className="w-4 h-4" />
-            {t('contact.subtitle')}
+            Get In Touch
           </span>
           <h2 className="font-calligraphy text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mt-3 mb-2">
-            {t('contact.title')}
+            Contact Us
           </h2>
           <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">اتصل بنا</span>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            {t('contact.description')}
+            Ready to start your sacred journey? Contact us today for personalized assistance with your Hajj or Umrah booking.
           </p>
         </motion.div>
 
-        <div className={`grid lg:grid-cols-2 gap-8 lg:gap-12 items-stretch ${isRTL ? 'lg:grid-flow-col-dense' : ''}`}>
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
           {/* Contact Info */}
           <motion.div
-            initial={{ opacity: 0, x: isRTL ? 50 : -50 }}
+            initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className={`flex flex-col gap-4 ${isRTL ? 'lg:col-start-2' : ''}`}
+            className="flex flex-col gap-4"
           >
             <div className="grid grid-cols-2 gap-4">
               {contactInfo.map((info, index) => {
@@ -157,9 +152,9 @@ const ContactSection = () => {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                     whileHover={{ y: -3 }}
-                    className={`bg-card rounded-xl p-4 shadow-elegant hover:shadow-lg transition-all duration-300 group ${isRTL ? 'text-right' : ''}`}
+                    className="bg-card rounded-xl p-4 shadow-elegant hover:shadow-lg transition-all duration-300 group"
                   >
-                    <div className={`w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-elegant ${isRTL ? 'ml-auto' : ''}`}>
+                    <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-elegant">
                       <Icon className="w-5 h-5 text-primary-foreground" />
                     </div>
                     <h3 className="font-heading font-bold text-sm text-foreground mb-2">
@@ -187,9 +182,9 @@ const ContactSection = () => {
                 {officeLocations.map((office) => (
                   <div 
                     key={office.id}
-                    className={`bg-card rounded-xl p-4 shadow-elegant hover:shadow-lg transition-all duration-300 group ${isRTL ? 'text-right' : ''}`}
+                    className="bg-card rounded-xl p-4 shadow-elegant hover:shadow-lg transition-all duration-300 group"
                   >
-                    <div className={`flex items-center gap-2 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className="flex items-center gap-2 mb-3">
                       <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-elegant">
                         <Building2 className="w-5 h-5 text-primary-foreground" />
                       </div>
@@ -200,7 +195,7 @@ const ContactSection = () => {
                         href={`https://maps.google.com/?q=${office.map_query || encodeURIComponent(office.address)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`flex items-start gap-2 text-muted-foreground hover:text-primary transition-colors group/link ${isRTL ? 'flex-row-reverse' : ''}`}
+                        className="flex items-start gap-2 text-muted-foreground hover:text-primary transition-colors group/link"
                       >
                         <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 group-hover/link:text-secondary" />
                         <span className="text-xs leading-relaxed">{office.address}</span>
@@ -209,7 +204,7 @@ const ContactSection = () => {
                         <a 
                           key={idx}
                           href={`tel:${phone}`}
-                          className={`flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                          className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
                         >
                           <Phone className="w-3.5 h-3.5 flex-shrink-0" />
                           <span className="text-xs">{phone}</span>
@@ -218,7 +213,7 @@ const ContactSection = () => {
                       {office.email && (
                         <a 
                           href={`mailto:${office.email}`}
-                          className={`flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                          className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
                         >
                           <Mail className="w-3.5 h-3.5 flex-shrink-0" />
                           <span className="text-xs">{office.email}</span>
@@ -233,36 +228,35 @@ const ContactSection = () => {
 
           {/* Contact Form */}
           <motion.div
-            initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
+            initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className={`bg-card rounded-2xl p-6 md:p-8 shadow-elegant relative overflow-hidden h-fit ${isRTL ? 'lg:col-start-1 text-right' : ''}`}
+            className="bg-card rounded-2xl p-6 md:p-8 shadow-elegant relative overflow-hidden h-fit"
           >
             {/* Decorative */}
-            <div className={`absolute top-0 ${isRTL ? 'left-0' : 'right-0'} w-24 h-24 bg-gradient-to-br from-primary/10 to-transparent ${isRTL ? 'rounded-br-full' : 'rounded-bl-full'}`} />
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full" />
             
             <h3 className="font-heading text-xl md:text-2xl font-bold text-foreground mb-6 relative z-10">
-              {t('contact.sendMessage')}
+              Send us a Message
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-foreground mb-1.5">
-                    {t('contact.fullName')} *
+                    Full Name *
                   </label>
                   <Input
                     required
-                    placeholder={t('contact.fullName')}
+                    placeholder="Your full name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className={`h-10 ${isRTL ? 'text-right' : ''}`}
-                    dir={isRTL ? 'rtl' : 'ltr'}
+                    className="h-10"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-foreground mb-1.5">
-                    {t('contact.phone')} *
+                    Phone *
                   </label>
                   <Input
                     required
@@ -271,14 +265,13 @@ const ContactSection = () => {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="h-10"
-                    dir="ltr"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-foreground mb-1.5">
-                  {t('contact.email')}
+                  Email
                 </label>
                 <Input
                   type="email"
@@ -286,49 +279,46 @@ const ContactSection = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="h-10"
-                  dir="ltr"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-foreground mb-1.5">
-                  {t('packages.hajj')} / {t('packages.umrah')}
+                  Package Interest
                 </label>
                 <select
-                  className={`w-full h-10 rounded-lg border border-input bg-background px-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all ${isRTL ? 'text-right' : ''}`}
+                  className="w-full h-10 rounded-lg border border-input bg-background px-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all"
                   value={formData.package}
                   onChange={(e) => setFormData({ ...formData, package: e.target.value })}
-                  dir={isRTL ? 'rtl' : 'ltr'}
                 >
-                  <option value="">{t('packages.hajj')} / {t('packages.umrah')}</option>
-                  <optgroup label={t('packages.hajj')}>
+                  <option value="">Select a package</option>
+                  <optgroup label="Hajj Packages">
                     <option value="hajj-economy">Hajj - Super Economy</option>
                     <option value="hajj-classic">Hajj - Classic</option>
                     <option value="hajj-premium">Hajj - Premium</option>
                     <option value="hajj-vip">Hajj - VIP</option>
                   </optgroup>
-                  <optgroup label={t('packages.umrah')}>
+                  <optgroup label="Umrah Packages">
                     <option value="umrah-economy">Umrah - Economy</option>
                     <option value="umrah-etekaf">Umrah - Etekaf</option>
                     <option value="umrah-vip">Umrah - VIP</option>
                   </optgroup>
-                  <optgroup label={t('visa.title')}>
-                    <option value="visa">{t('visa.title')}</option>
+                  <optgroup label="Other Services">
+                    <option value="visa">Visa Processing</option>
                   </optgroup>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-foreground mb-1.5">
-                  {t('contact.message')}
+                  Message
                 </label>
                 <Textarea
-                  placeholder={t('contact.message')}
+                  placeholder="Tell us about your requirements..."
                   rows={3}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className={`resize-none ${isRTL ? 'text-right' : ''}`}
-                  dir={isRTL ? 'rtl' : 'ltr'}
+                  className="resize-none"
                 />
               </div>
 
@@ -336,17 +326,17 @@ const ContactSection = () => {
                 type="submit"
                 size="lg"
                 disabled={isSubmitting}
-                className={`w-full h-12 bg-gradient-primary hover:opacity-90 shadow-gold text-base group ${isRTL ? 'flex-row-reverse' : ''}`}
+                className="w-full h-12 bg-gradient-primary hover:opacity-90 shadow-gold text-base group"
               >
                 {isSubmitting ? (
-                  <span className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                    {t('contact.sending')}
+                    Sending...
                   </span>
                 ) : (
-                  <span className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <Send className={`w-4 h-4 group-hover:translate-x-1 transition-transform ${isRTL ? 'group-hover:-translate-x-1' : ''}`} />
-                    {t('contact.send')}
+                  <span className="flex items-center gap-2">
+                    <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    Send Message
                   </span>
                 )}
               </Button>

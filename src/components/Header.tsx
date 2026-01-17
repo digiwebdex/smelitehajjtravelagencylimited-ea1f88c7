@@ -12,8 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import companyLogo from "@/assets/company-logo.jpeg";
-import LanguageSelector from "./LanguageSelector";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MenuItem {
   id: string;
@@ -28,7 +26,6 @@ const Header = () => {
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const { t, isRTL } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,7 +50,6 @@ const Header = () => {
     if (data && data.length > 0) {
       setMenuItems(data);
     } else {
-      // Fallback to default menu items
       setMenuItems([
         { id: "1", label: "Services", href: "#services", order_index: 0 },
         { id: "2", label: "Hajj Packages", href: "#hajj", order_index: 1 },
@@ -67,33 +63,12 @@ const Header = () => {
     }
   };
 
-  // Map href to translation key
-  const getTranslatedLabel = (href: string, fallbackLabel: string): string => {
-    const translationMap: Record<string, string> = {
-      '#services': 'nav.services',
-      '#hajj': 'nav.hajj',
-      '#umrah': 'nav.umrah',
-      '#visa': 'nav.visa',
-      '#team': 'nav.about',
-      '#testimonials': 'nav.about',
-      '#faq': 'nav.contact',
-      '#contact': 'nav.contact',
-    };
-    
-    const key = translationMap[href];
-    if (key) {
-      const translated = t(key);
-      if (translated !== key) return translated;
-    }
-    return fallbackLabel;
-  };
-
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     const targetId = href.replace('#', '');
     const element = document.getElementById(targetId);
     if (element) {
-      const headerOffset = 120; // Account for fixed header
+      const headerOffset = 120;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
       
@@ -114,29 +89,29 @@ const Header = () => {
     <header className={`fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md shadow-elegant transition-all duration-300 ${isScrolled ? 'shadow-lg' : ''}`}>
       {/* Top Bar - Hide when scrolled */}
       <div className={`bg-primary text-primary-foreground overflow-hidden transition-all duration-300 ${isScrolled ? 'h-0 py-0' : 'h-auto py-2'}`}>
-        <div className={`container flex justify-between items-center text-sm ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <div className={`flex items-center gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <a href="tel:+8801234567890" className={`flex items-center gap-2 hover:text-secondary transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className="container flex justify-between items-center text-sm">
+          <div className="flex items-center gap-6">
+            <a href="tel:+8801234567890" className="flex items-center gap-2 hover:text-secondary transition-colors">
               <Phone className="w-4 h-4" />
               <span className="hidden sm:inline">+880 1234-567890</span>
             </a>
-            <a href="mailto:info@smelitehajj.com" className={`flex items-center gap-2 hover:text-secondary transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <a href="mailto:info@smelitehajj.com" className="flex items-center gap-2 hover:text-secondary transition-colors">
               <Mail className="w-4 h-4" />
               <span className="hidden sm:inline">info@smelitehajj.com</span>
             </a>
           </div>
           <div className="text-secondary font-medium">
-            {t('hero.badge')}
+            Government Approved Hajj & Umrah Agency
           </div>
         </div>
       </div>
 
       {/* Main Nav */}
       <nav className={`container transition-all duration-300 ${isScrolled ? 'py-2' : 'py-4'}`}>
-        <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className="flex items-center justify-between">
           <button 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
-            className={`flex items-center gap-3 group cursor-pointer ${isRTL ? 'flex-row-reverse' : ''}`}
+            className="flex items-center gap-3 group cursor-pointer"
           >
             <img 
               src={companyLogo} 
@@ -147,7 +122,7 @@ const Header = () => {
           </button>
 
           {/* Desktop Navigation */}
-          <div className={`hidden lg:flex items-center gap-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className="hidden lg:flex items-center gap-8">
             {menuItems.map((link) => (
               <a
                 key={link.id}
@@ -156,15 +131,14 @@ const Header = () => {
                 className="text-foreground hover:text-primary font-medium transition-colors relative group cursor-pointer"
               >
                 {link.label}
-                <span className={`absolute -bottom-1 ${isRTL ? 'right-0' : 'left-0'} w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300`} />
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
               </a>
             ))}
           </div>
 
-          <div className={`hidden lg:flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <LanguageSelector />
+          <div className="hidden lg:flex items-center gap-4">
             <Link to="/track-order">
-              <Button variant="ghost" size="sm" className={`gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <Button variant="ghost" size="sm" className="gap-2">
                 <MapPin className="w-4 h-4" />
                 Track Order
               </Button>
@@ -172,32 +146,32 @@ const Header = () => {
             {user && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className={`gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <Button variant="outline" className="gap-2">
                     <User className="w-4 h-4" />
-                    {t('nav.login')}
+                    Account
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align={isRTL ? 'start' : 'end'}>
+                <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => navigate("/my-bookings")}>
-                    {t('nav.myBookings')}
+                    My Bookings
                   </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem onClick={() => navigate("/admin")}>
-                      <LayoutDashboard className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                      {t('nav.adminDashboard')}
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Admin Dashboard
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                    {t('nav.signOut')}
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
             <a href="#hajj">
               <Button className="bg-gradient-primary hover:opacity-90 shadow-gold">
-                {t('nav.bookNow')}
+                Book Now
               </Button>
             </a>
           </div>
@@ -213,13 +187,8 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className={`lg:hidden mt-4 pb-4 border-t border-border pt-4 animate-fade-up ${isRTL ? 'text-right' : ''}`}>
+          <div className="lg:hidden mt-4 pb-4 border-t border-border pt-4 animate-fade-up">
             <div className="flex flex-col gap-4">
-              {/* Mobile Language Selector */}
-              <div className={`pb-4 border-b border-border ${isRTL ? 'flex justify-end' : ''}`}>
-                <LanguageSelector variant="compact" />
-              </div>
-              
               {menuItems.map((link) => (
                 <a
                   key={link.id}
@@ -239,7 +208,7 @@ const Header = () => {
                 </Link>
                 <a href="#hajj">
                   <Button className="bg-gradient-primary w-full">
-                    {t('nav.bookNow')}
+                    Book Now
                   </Button>
                 </a>
               </div>

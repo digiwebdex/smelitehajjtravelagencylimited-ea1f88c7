@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CreditCard, Loader2, CheckCircle2 } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { paymentLogoMap } from "./PaymentLogos";
 import { Badge } from "@/components/ui/badge";
 
@@ -24,7 +23,6 @@ interface PaymentMethodSelectorProps {
 const PaymentMethodSelector = ({ selectedMethod, onSelect }: PaymentMethodSelectorProps) => {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
-  const { isRTL } = useLanguage();
 
   useEffect(() => {
     fetchPaymentMethods();
@@ -101,7 +99,7 @@ const PaymentMethodSelector = ({ selectedMethod, onSelect }: PaymentMethodSelect
               onClick={() => onSelect(method.slug)}
             >
               <CardContent className="p-4">
-                <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className="flex items-center gap-4">
                   <div className="relative">
                     <RadioGroupItem 
                       value={method.slug} 
