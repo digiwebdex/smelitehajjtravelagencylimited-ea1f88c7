@@ -29,11 +29,15 @@ import {
   Youtube,
   Twitter,
   Megaphone,
-  ImageIcon
+  ImageIcon,
+  Sun,
+  Moon,
+  Monitor
 } from "lucide-react";
 import { CURRENCY } from "@/lib/currency";
 import ImageUpload from "./ImageUpload";
 import { useImageUpload } from "@/hooks/useImageUpload";
+import { useTheme } from "next-themes";
 
 interface CompanyInfo {
   name: string;
@@ -61,6 +65,43 @@ interface Appearance {
   show_announcement_bar: boolean;
   announcement_text: string;
 }
+
+// Theme Toggle Icon Component
+const ThemeToggleIcon = () => {
+  const { theme } = useTheme();
+  
+  if (theme === 'dark') return <Moon className="w-5 h-5 text-primary" />;
+  if (theme === 'light') return <Sun className="w-5 h-5 text-primary" />;
+  return <Monitor className="w-5 h-5 text-primary" />;
+};
+
+// Theme Selector Component
+const ThemeSelector = () => {
+  const { theme, setTheme } = useTheme();
+  
+  const themes = [
+    { value: 'light', label: 'Light', icon: Sun },
+    { value: 'dark', label: 'Dark', icon: Moon },
+    { value: 'system', label: 'System', icon: Monitor },
+  ];
+  
+  return (
+    <div className="flex gap-1 p-1 bg-muted rounded-lg">
+      {themes.map((t) => (
+        <Button
+          key={t.value}
+          variant={theme === t.value ? "default" : "ghost"}
+          size="sm"
+          className="gap-2"
+          onClick={() => setTheme(t.value)}
+        >
+          <t.icon className="w-4 h-4" />
+          <span className="hidden sm:inline">{t.label}</span>
+        </Button>
+      ))}
+    </div>
+  );
+};
 
 const AdminSettings = () => {
   const [loading, setLoading] = useState(true);
@@ -481,6 +522,23 @@ const AdminSettings = () => {
                     Note: Theme colors are managed in the design system. This is for reference.
                   </p>
                 </div>
+
+                <Card className="border-dashed">
+                  <CardContent className="pt-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <ThemeToggleIcon />
+                        <div>
+                          <Label className="text-base">Site Theme</Label>
+                          <p className="text-sm text-muted-foreground">
+                            Choose light, dark, or system theme
+                          </p>
+                        </div>
+                      </div>
+                      <ThemeSelector />
+                    </div>
+                  </CardContent>
+                </Card>
 
                 <Card className="border-dashed">
                   <CardContent className="pt-6 space-y-4">
