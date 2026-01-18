@@ -92,7 +92,7 @@ const ExpandablePackageCard = ({
         boxShadow: { duration: 0.2 }
       }}
       className={cn(
-        "w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] max-w-sm flex cursor-pointer relative",
+        "w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] flex cursor-pointer relative",
         isCompareSelected && "ring-2 ring-primary ring-offset-2"
       )}
     >
