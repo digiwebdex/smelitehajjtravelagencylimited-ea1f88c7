@@ -7,7 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Palette, Save, RefreshCw, Type, Moon, Sun } from "lucide-react";
+import { useDynamicTheme } from "@/hooks/useDynamicTheme";
+import { Palette, Save, RefreshCw, Type, Moon, Sun, Eye } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ThemeSettings {
@@ -57,6 +58,7 @@ const BORDER_RADIUS_OPTIONS = [
 
 const AdminThemeSettings = () => {
   const { toast } = useToast();
+  const { refreshTheme } = useDynamicTheme();
   const [theme, setTheme] = useState<ThemeSettings>({
     id: "",
     primary_color: "#1e3a5f",
@@ -71,6 +73,7 @@ const AdminThemeSettings = () => {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
 
   useEffect(() => {
     fetchThemeSettings();
@@ -116,9 +119,12 @@ const AdminThemeSettings = () => {
 
       if (error) throw error;
 
+      // Refresh the theme across the app
+      await refreshTheme();
+
       toast({
         title: "✅ Theme Saved",
-        description: "Global theme settings updated successfully",
+        description: "Global theme settings updated and applied across the website",
       });
     } catch (error) {
       console.error("Error saving theme:", error);
@@ -130,6 +136,13 @@ const AdminThemeSettings = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handlePreview = () => {
+    setPreviewing(true);
+    // Open the homepage in a new tab to preview changes
+    window.open("/", "_blank");
+    setTimeout(() => setPreviewing(false), 1000);
   };
 
   if (loading) {
@@ -150,13 +163,19 @@ const AdminThemeSettings = () => {
               Global Theme Settings
             </CardTitle>
             <CardDescription>
-              Configure colors, fonts, and appearance for the entire website
+              Configure colors, fonts, and appearance for the entire website. Changes apply instantly after saving.
             </CardDescription>
           </div>
-          <Button onClick={handleSave} disabled={saving} className="gap-2">
-            <Save className="w-4 h-4" />
-            {saving ? "Saving..." : "Save Theme"}
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handlePreview} variant="outline" disabled={previewing} className="gap-2">
+              <Eye className="w-4 h-4" />
+              {previewing ? "Opening..." : "Preview"}
+            </Button>
+            <Button onClick={handleSave} disabled={saving} className="gap-2">
+              <Save className="w-4 h-4" />
+              {saving ? "Saving..." : "Save Theme"}
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
