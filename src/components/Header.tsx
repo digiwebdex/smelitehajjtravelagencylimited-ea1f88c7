@@ -21,6 +21,30 @@ interface MenuItem {
   order_index: number;
 }
 
+interface SectionSetting {
+  section_key: string;
+  title: string | null;
+  is_active: boolean;
+  order_index: number | null;
+}
+
+// Map section keys to menu labels and hrefs
+const SECTION_MENU_MAP: Record<string, { label: string; href: string }> = {
+  about: { label: "About Us", href: "#about" },
+  services: { label: "Services", href: "#services" },
+  hajj: { label: "Hajj Packages", href: "#hajj" },
+  umrah: { label: "Umrah Packages", href: "#umrah" },
+  visa: { label: "Visa Services", href: "#visa" },
+  gallery: { label: "Gallery", href: "#gallery" },
+  testimonials: { label: "Testimonials", href: "#testimonials" },
+  team: { label: "Our Team", href: "#team" },
+  faq: { label: "FAQ", href: "#faq" },
+  contact: { label: "Contact", href: "#contact" },
+};
+
+// Sections to exclude from navigation (they don't need menu items)
+const EXCLUDED_SECTIONS = ["hero", "terminal"];
+
 const ANNOUNCEMENT_DISMISSED_KEY = "smEliteHajj_announcementDismissed";
 
 const Header = () => {
@@ -47,19 +71,58 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    fetchMenuItems();
+    fetchDynamicMenu();
   }, []);
 
-  const fetchMenuItems = async () => {
-    const { data } = await supabase
-      .from("menu_items")
-      .select("*")
-      .eq("is_active", true)
-      .order("order_index");
-    
-    if (data && data.length > 0) {
-      setMenuItems(data);
-    } else {
+  const fetchDynamicMenu = async () => {
+    try {
+      // Fetch active sections from section_settings
+      const { data: sections, error } = await supabase
+        .from("section_settings")
+        .select("section_key, title, is_active, order_index")
+        .eq("is_active", true)
+        .order("order_index");
+
+      if (error) throw error;
+
+      if (sections && sections.length > 0) {
+        // Generate menu items from active sections
+        const dynamicMenuItems: MenuItem[] = sections
+          .filter((section) => 
+            !EXCLUDED_SECTIONS.includes(section.section_key) && 
+            SECTION_MENU_MAP[section.section_key]
+          )
+          .map((section, index) => {
+            const menuConfig = SECTION_MENU_MAP[section.section_key];
+            return {
+              id: section.section_key,
+              label: section.title || menuConfig.label,
+              href: menuConfig.href,
+              order_index: section.order_index || index,
+            };
+          })
+          .sort((a, b) => a.order_index - b.order_index);
+
+        if (dynamicMenuItems.length > 0) {
+          setMenuItems(dynamicMenuItems);
+          return;
+        }
+      }
+
+      // Fallback to default menu items if no sections found
+      setMenuItems([
+        { id: "1", label: "Services", href: "#services", order_index: 0 },
+        { id: "2", label: "Hajj Packages", href: "#hajj", order_index: 1 },
+        { id: "3", label: "Umrah Packages", href: "#umrah", order_index: 2 },
+        { id: "4", label: "Visa Services", href: "#visa", order_index: 3 },
+        { id: "5", label: "Our Team", href: "#team", order_index: 4 },
+        { id: "6", label: "Testimonials", href: "#testimonials", order_index: 5 },
+        { id: "7", label: "FAQ", href: "#faq", order_index: 6 },
+        { id: "8", label: "Contact", href: "#contact", order_index: 7 },
+      ]);
+    } catch (error) {
+      console.error("Error fetching dynamic menu:", error);
+      // Fallback to defaults on error
       setMenuItems([
         { id: "1", label: "Services", href: "#services", order_index: 0 },
         { id: "2", label: "Hajj Packages", href: "#hajj", order_index: 1 },
