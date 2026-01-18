@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, MapPin, Star, Users, Check, ArrowUpDown, Filter, ChevronDown, ChevronUp, Eye, GitCompare, X } from "lucide-react";
+import { Star, Check, ArrowUpDown, ChevronUp, Eye, GitCompare, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import MakkahIcon from "./icons/MakkahIcon";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -38,8 +37,6 @@ interface Package {
   stock: number;
   show_view_details: boolean;
   show_book_now: boolean;
-  hotel_image_url: string | null;
-  hotel_map_link: string | null;
 }
 
 interface DynamicPackagesProps {
@@ -98,45 +95,7 @@ const ExpandablePackageCard = ({
         isCompareSelected && "ring-2 ring-primary ring-offset-2"
       )}
     >
-      <Card className="h-full flex overflow-hidden transition-all duration-300 group border-border/50">
-        {/* Hotel Image Side Panel */}
-        {pkg.hotel_image_url && (
-          <div className="relative w-24 md:w-28 flex-shrink-0 bg-gradient-to-b from-primary/10 to-primary/5">
-            {/* Badge at top */}
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-lg bg-secondary/90 flex items-center justify-center shadow-lg">
-                <MakkahIcon className="w-5 h-5 text-secondary-foreground" />
-              </div>
-              <span className="text-[10px] font-semibold text-center text-foreground/80 leading-tight px-1">
-                Hotels Near<br />Masjid al-Haram
-              </span>
-            </div>
-            
-            {/* Hotel Image */}
-            <img 
-              src={pkg.hotel_image_url} 
-              alt="Hotel" 
-              className="w-full h-full object-cover"
-            />
-            
-            {/* Map Link Overlay */}
-            {pkg.hotel_map_link && (
-              <a 
-                href={pkg.hotel_map_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 bg-white/90 hover:bg-white text-primary px-2 py-1 rounded-full text-[10px] font-medium shadow-md transition-all hover:shadow-lg"
-              >
-                <MapPin className="w-3 h-3" />
-                Map
-              </a>
-            )}
-          </div>
-        )}
-
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col">
+      <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 group border-border/50">
           {/* Compare Checkbox */}
           <div className="absolute top-3 right-3 z-20">
             <div 
@@ -265,7 +224,6 @@ const ExpandablePackageCard = ({
             </Button>
           )}
         </CardFooter>
-        </div>
       </Card>
     </motion.div>
   );
