@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
-import { Grid3X3, SlidersHorizontal } from "lucide-react";
+import { Grid3X3, SlidersHorizontal, Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
@@ -10,6 +10,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 interface GalleryImage {
   id: string;
@@ -35,6 +36,14 @@ const GallerySection = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
+
+  // Autoplay plugin with pause on hover
+  const autoplayPlugin = Autoplay({
+    delay: 4000,
+    stopOnInteraction: false,
+    stopOnMouseEnter: true,
+  });
 
   useEffect(() => {
     fetchGalleryData();
@@ -42,7 +51,6 @@ const GallerySection = () => {
 
   const fetchGalleryData = async () => {
     try {
-      // Fetch settings
       const { data: settingsData } = await supabase
         .from("gallery_settings")
         .select("*")
@@ -52,7 +60,6 @@ const GallerySection = () => {
         setSettings(settingsData);
       }
 
-      // Fetch images
       const { data: imagesData } = await supabase
         .from("gallery_images")
         .select("*")
@@ -69,7 +76,6 @@ const GallerySection = () => {
     }
   };
 
-  // Don't render if gallery is disabled or no images
   if (!loading && (!settings?.is_enabled || images.length === 0)) {
     return null;
   }
@@ -85,6 +91,15 @@ const GallerySection = () => {
       </section>
     );
   }
+
+  const toggleAutoplay = () => {
+    if (isAutoplayPaused) {
+      autoplayPlugin.play();
+    } else {
+      autoplayPlugin.stop();
+    }
+    setIsAutoplayPaused(!isAutoplayPaused);
+  };
 
   return (
     <>
@@ -147,6 +162,26 @@ const GallerySection = () => {
               <SlidersHorizontal className="w-4 h-4" />
               Carousel
             </Button>
+            {viewMode === "carousel" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleAutoplay}
+                className="gap-2"
+              >
+                {isAutoplayPaused ? (
+                  <>
+                    <Play className="w-4 h-4" />
+                    Play
+                  </>
+                ) : (
+                  <>
+                    <Pause className="w-4 h-4" />
+                    Pause
+                  </>
+                )}
+              </Button>
+            )}
           </motion.div>
 
           {/* Grid View */}
@@ -168,7 +203,6 @@ const GallerySection = () => {
                     loading="lazy"
                     className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
                   />
-                  {/* Hover overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       {image.caption && (
@@ -178,7 +212,6 @@ const GallerySection = () => {
                       )}
                     </div>
                   </div>
-                  {/* Glow effect on hover */}
                   <div className="absolute -inset-[2px] rounded-xl bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover:opacity-60 blur-sm transition-opacity duration-500 -z-10" />
                 </motion.div>
               ))}
@@ -197,6 +230,7 @@ const GallerySection = () => {
                   align: "start",
                   loop: true,
                 }}
+                plugins={[autoplayPlugin]}
                 className="w-full"
               >
                 <CarouselContent className="-ml-4">
@@ -212,7 +246,6 @@ const GallerySection = () => {
                           loading="lazy"
                           className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
                         />
-                        {/* Overlay with caption */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           <div className="absolute bottom-0 left-0 right-0 p-6">
                             {image.caption && (
@@ -222,7 +255,6 @@ const GallerySection = () => {
                             )}
                           </div>
                         </div>
-                        {/* Border glow effect */}
                         <div className="absolute -inset-[2px] rounded-xl bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover:opacity-70 blur-sm transition-opacity duration-500 -z-10" />
                       </div>
                     </CarouselItem>
@@ -232,10 +264,16 @@ const GallerySection = () => {
                 <CarouselNext className="hidden md:flex -right-12 bg-card/80 backdrop-blur-sm hover:bg-card border-primary/20" />
               </Carousel>
 
-              {/* Mobile swipe hint */}
-              <p className="text-center text-sm text-muted-foreground mt-4 md:hidden">
-                ← Swipe to explore →
-              </p>
+              {/* Autoplay indicator & mobile hint */}
+              <div className="flex flex-col items-center gap-2 mt-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span className={`w-2 h-2 rounded-full ${isAutoplayPaused ? 'bg-muted-foreground' : 'bg-primary animate-pulse'}`} />
+                  {isAutoplayPaused ? 'Paused' : 'Auto-playing'}
+                </div>
+                <p className="text-sm text-muted-foreground md:hidden">
+                  ← Swipe to explore →
+                </p>
+              </div>
             </motion.div>
           )}
         </div>
