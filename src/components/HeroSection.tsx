@@ -175,20 +175,30 @@ const HeroSection = () => {
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image with Slide Transition */}
+      {/* Background Image with Ken Burns Effect */}
       <AnimatePresence mode="wait">
         <motion.div
           key={`bg-${currentSlide}`}
-          initial={{ opacity: 0, scale: 1.1 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.05 }}
-          transition={{ duration: 1, ease: "easeOut" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] as const }}
           className="absolute inset-0"
         >
-          <img
+          {/* Ken Burns zoom effect on the image */}
+          <motion.img
+            key={`img-${currentSlide}`}
             src={backgroundImage}
             alt="Hero background"
             className="w-full h-full object-cover"
+            initial={{ scale: 1 }}
+            animate={{ 
+              scale: 1.15,
+              transition: { 
+                duration: 8, 
+                ease: "linear"
+              }
+            }}
           />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-0 opacity-20">
