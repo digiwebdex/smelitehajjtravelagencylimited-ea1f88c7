@@ -36,6 +36,9 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminMobileNav from "@/components/admin/AdminMobileNav";
 import AdminOverview from "@/components/admin/AdminOverview";
 import AdminGallery from "@/components/admin/AdminGallery";
+import AdminSectionManager from "@/components/admin/AdminSectionManager";
+import AdminThemeSettings from "@/components/admin/AdminThemeSettings";
+import AdminTerminal from "@/components/admin/AdminTerminal";
 import { formatCurrency } from "@/lib/currency";
 
 interface Stats {
@@ -160,6 +163,10 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case "overview":
         return <AdminOverview />;
+      case "sections":
+        return <AdminSectionManager />;
+      case "theme":
+        return <AdminThemeSettings />;
       case "bookings":
         return <AdminBookings onUpdate={fetchStats} />;
       case "packages":
@@ -186,6 +193,8 @@ const AdminDashboard = () => {
         return <AdminFAQ />;
       case "gallery":
         return <AdminGallery />;
+      case "terminal":
+        return <AdminTerminal />;
       case "visa":
         return <AdminVisa />;
       case "contact":
