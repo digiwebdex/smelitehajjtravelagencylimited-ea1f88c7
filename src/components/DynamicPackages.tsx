@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, MapPin, Star, Users, Check, ArrowUpDown, Filter, ChevronDown, ChevronUp, Eye } from "lucide-react";
+import { Calendar, MapPin, Star, Users, Check, ArrowUpDown, Filter, ChevronDown, ChevronUp, Eye, GitCompare, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import BookingModal from "./BookingModal";
 import PackageDetailsModal from "./PackageDetailsModal";
+import PackageComparisonDrawer from "./PackageComparisonDrawer";
 import { formatCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
@@ -50,12 +52,18 @@ const ExpandablePackageCard = ({
   pkg, 
   index, 
   onBookNow,
-  onViewDetails
+  onViewDetails,
+  isCompareSelected,
+  onCompareToggle,
+  compareDisabled
 }: { 
   pkg: Package; 
   index: number; 
   onBookNow: (pkg: Package) => void;
   onViewDetails: (pkg: Package) => void;
+  isCompareSelected: boolean;
+  onCompareToggle: (pkg: Package) => void;
+  compareDisabled: boolean;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const features = pkg.includes || [];
@@ -82,9 +90,37 @@ const ExpandablePackageCard = ({
         y: { duration: 0.2 },
         boxShadow: { duration: 0.2 }
       }}
-      className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] max-w-sm flex cursor-pointer"
+      className={cn(
+        "w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] max-w-sm flex cursor-pointer",
+        isCompareSelected && "ring-2 ring-primary ring-offset-2"
+      )}
     >
       <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 group border-border/50">
+        {/* Compare Checkbox */}
+        <div className="absolute top-3 left-3 z-20">
+          <div 
+            className={cn(
+              "flex items-center gap-1.5 bg-white/90 dark:bg-background/90 backdrop-blur-sm rounded-md px-2 py-1 shadow-sm transition-opacity",
+              !isCompareSelected && "opacity-0 group-hover:opacity-100"
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Checkbox
+              id={`compare-${pkg.id}`}
+              checked={isCompareSelected}
+              onCheckedChange={() => onCompareToggle(pkg)}
+              disabled={compareDisabled && !isCompareSelected}
+              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+            />
+            <label 
+              htmlFor={`compare-${pkg.id}`} 
+              className="text-xs font-medium cursor-pointer text-foreground"
+            >
+              Compare
+            </label>
+          </div>
+        </div>
+        
         {/* Header with gradient */}
         <CardHeader className="relative bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-6 pb-14">
           <div className="relative z-10">
@@ -199,7 +235,11 @@ const DynamicPackages = ({ type }: DynamicPackagesProps) => {
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
+  const [comparePackages, setComparePackages] = useState<Package[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("price-asc");
+
+  const MAX_COMPARE = 3;
 
   useEffect(() => {
     fetchPackages();
@@ -253,6 +293,29 @@ const DynamicPackages = ({ type }: DynamicPackagesProps) => {
     setIsBookingModalOpen(true);
   };
 
+  const handleCompareToggle = (pkg: Package) => {
+    setComparePackages(prev => {
+      const isSelected = prev.some(p => p.id === pkg.id);
+      if (isSelected) {
+        return prev.filter(p => p.id !== pkg.id);
+      }
+      if (prev.length >= MAX_COMPARE) {
+        return prev;
+      }
+      return [...prev, pkg];
+    });
+  };
+
+  const handleRemoveFromCompare = (id: string) => {
+    setComparePackages(prev => prev.filter(p => p.id !== id));
+  };
+
+  const handleBookFromComparison = (pkg: Package) => {
+    setIsComparisonOpen(false);
+    setSelectedPackage(pkg);
+    setIsBookingModalOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -284,15 +347,71 @@ const DynamicPackages = ({ type }: DynamicPackagesProps) => {
 
   return (
     <>
+      {/* Compare Bar - Fixed at bottom when packages selected */}
+      <AnimatePresence>
+        {comparePackages.length > 0 && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg p-4"
+          >
+            <div className="container mx-auto flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Badge variant="secondary" className="text-sm">
+                  {comparePackages.length}/{MAX_COMPARE} selected
+                </Badge>
+                <div className="flex items-center gap-2">
+                  {comparePackages.map((pkg) => (
+                    <div key={pkg.id} className="flex items-center gap-1 bg-muted rounded-full pl-3 pr-1 py-1">
+                      <span className="text-sm font-medium truncate max-w-[100px]">{pkg.title}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 hover:bg-destructive/20"
+                        onClick={() => handleRemoveFromCompare(pkg.id)}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setComparePackages([])}
+                >
+                  Clear All
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => setIsComparisonOpen(true)}
+                  disabled={comparePackages.length < 2}
+                  className="bg-gradient-primary"
+                >
+                  <GitCompare className="w-4 h-4 mr-2" />
+                  Compare ({comparePackages.length})
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Sort Controls */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="flex justify-end mb-6"
+        className="flex justify-between items-center mb-6"
       >
-        <div className="flex items-center gap-2">
+        <p className="text-sm text-muted-foreground hidden sm:block">
+          Select packages to compare (max {MAX_COMPARE})
+        </p>
+        <div className="flex items-center gap-2 ml-auto">
           <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
           <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
             <SelectTrigger className="w-[180px] bg-background">
@@ -309,7 +428,10 @@ const DynamicPackages = ({ type }: DynamicPackagesProps) => {
         </div>
       </motion.div>
 
-      <div className="flex flex-wrap justify-center gap-6">
+      <div className={cn(
+        "flex flex-wrap justify-center gap-6",
+        comparePackages.length > 0 && "pb-24"
+      )}>
         {sortedPackages.map((pkg, index) => (
           <ExpandablePackageCard
             key={pkg.id}
@@ -317,6 +439,9 @@ const DynamicPackages = ({ type }: DynamicPackagesProps) => {
             index={index}
             onBookNow={handleBookNow}
             onViewDetails={handleViewDetails}
+            isCompareSelected={comparePackages.some(p => p.id === pkg.id)}
+            onCompareToggle={handleCompareToggle}
+            compareDisabled={comparePackages.length >= MAX_COMPARE}
           />
         ))}
       </div>
@@ -332,6 +457,14 @@ const DynamicPackages = ({ type }: DynamicPackagesProps) => {
         onClose={() => setIsDetailsModalOpen(false)}
         package_info={selectedPackage}
         onBookNow={handleBookFromDetails}
+      />
+
+      <PackageComparisonDrawer
+        isOpen={isComparisonOpen}
+        onClose={() => setIsComparisonOpen(false)}
+        packages={comparePackages}
+        onRemove={handleRemoveFromCompare}
+        onBookNow={handleBookFromComparison}
       />
     </>
   );
