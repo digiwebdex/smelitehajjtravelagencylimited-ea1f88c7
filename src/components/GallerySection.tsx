@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { Grid3X3, SlidersHorizontal, Pause, Play } from "lucide-react";
@@ -9,6 +9,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 
@@ -37,6 +38,8 @@ const GallerySection = () => {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   // Autoplay plugin with pause on hover
   const autoplayPlugin = Autoplay({
@@ -99,6 +102,26 @@ const GallerySection = () => {
       autoplayPlugin.stop();
     }
     setIsAutoplayPaused(!isAutoplayPaused);
+  };
+
+  const onSelect = useCallback(() => {
+    if (!carouselApi) return;
+    setCurrentSlide(carouselApi.selectedScrollSnap());
+  }, [carouselApi]);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+    onSelect();
+    carouselApi.on("select", onSelect);
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi, onSelect]);
+
+  const scrollToSlide = (index: number) => {
+    if (carouselApi) {
+      carouselApi.scrollTo(index);
+    }
   };
 
   return (
@@ -231,6 +254,7 @@ const GallerySection = () => {
                   loop: true,
                 }}
                 plugins={[autoplayPlugin]}
+                setApi={setCarouselApi}
                 className="w-full"
               >
                 <CarouselContent className="-ml-4">
@@ -263,6 +287,27 @@ const GallerySection = () => {
                 <CarouselPrevious className="hidden md:flex -left-12 bg-card/80 backdrop-blur-sm hover:bg-card border-primary/20" />
                 <CarouselNext className="hidden md:flex -right-12 bg-card/80 backdrop-blur-sm hover:bg-card border-primary/20" />
               </Carousel>
+
+              {/* Thumbnail Navigation */}
+              <div className="flex justify-center gap-2 mt-6 overflow-x-auto pb-2 px-4">
+                {images.map((image, index) => (
+                  <button
+                    key={image.id}
+                    onClick={() => scrollToSlide(index)}
+                    className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all duration-300 ${
+                      currentSlide === index 
+                        ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-105' 
+                        : 'opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img
+                      src={image.image_url}
+                      alt={image.alt_text || `Thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
 
               {/* Autoplay indicator & mobile hint */}
               <div className="flex flex-col items-center gap-2 mt-4">
