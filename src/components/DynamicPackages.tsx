@@ -92,11 +92,15 @@ const ExpandablePackageCard = ({
         boxShadow: { duration: 0.2 }
       }}
       className={cn(
-        "w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] max-w-sm flex cursor-pointer",
+        "w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] max-w-sm flex cursor-pointer relative",
         isCompareSelected && "ring-2 ring-primary ring-offset-2"
       )}
     >
-      <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 group border-border/50">
+      {/* Gradient glow effect on hover */}
+      <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500 -z-10" />
+      <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover:opacity-70 transition-opacity duration-500 -z-10" />
+      
+      <Card className="h-full w-full flex flex-col overflow-hidden transition-all duration-300 group border-border/50 bg-card relative z-10">
           {/* Compare Checkbox */}
           <div className="absolute top-3 right-3 z-20">
             <div 
