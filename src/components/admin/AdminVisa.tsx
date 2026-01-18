@@ -7,7 +7,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, FileText, ClipboardList } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface VisaCountry {
   id: string;
@@ -17,6 +20,10 @@ interface VisaCountry {
   price: number;
   order_index: number;
   is_active: boolean;
+  requirements: string[] | null;
+  documents_needed: string[] | null;
+  description: string | null;
+  validity_period: string | null;
 }
 
 const AdminVisa = () => {
@@ -26,7 +33,8 @@ const AdminVisa = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<VisaCountry | null>(null);
   const [formData, setFormData] = useState({
-    country_name: "", flag_emoji: "", processing_time: "", price: 0
+    country_name: "", flag_emoji: "", processing_time: "", price: 0,
+    requirements: "", documents_needed: "", description: "", validity_period: ""
   });
 
   useEffect(() => {
@@ -42,13 +50,24 @@ const AdminVisa = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    const dataToSubmit = {
+      country_name: formData.country_name,
+      flag_emoji: formData.flag_emoji,
+      processing_time: formData.processing_time,
+      price: formData.price,
+      description: formData.description || null,
+      validity_period: formData.validity_period || null,
+      requirements: formData.requirements ? formData.requirements.split('\n').filter(r => r.trim()) : [],
+      documents_needed: formData.documents_needed ? formData.documents_needed.split('\n').filter(d => d.trim()) : []
+    };
+    
     if (editingItem) {
-      const { error } = await supabase.from("visa_countries").update(formData).eq("id", editingItem.id);
+      const { error } = await supabase.from("visa_countries").update(dataToSubmit).eq("id", editingItem.id);
       if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
       else toast({ title: "Success", description: "Country updated" });
     } else {
       const maxOrder = Math.max(...countries.map(c => c.order_index), 0);
-      const { error } = await supabase.from("visa_countries").insert({ ...formData, order_index: maxOrder + 1 });
+      const { error } = await supabase.from("visa_countries").insert({ ...dataToSubmit, order_index: maxOrder + 1 });
       if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
       else toast({ title: "Success", description: "Country created" });
     }
@@ -60,14 +79,23 @@ const AdminVisa = () => {
   };
 
   const resetForm = () => {
-    setFormData({ country_name: "", flag_emoji: "", processing_time: "", price: 0 });
+    setFormData({ 
+      country_name: "", flag_emoji: "", processing_time: "", price: 0,
+      requirements: "", documents_needed: "", description: "", validity_period: ""
+    });
   };
 
   const handleEdit = (item: VisaCountry) => {
     setEditingItem(item);
     setFormData({
-      country_name: item.country_name, flag_emoji: item.flag_emoji,
-      processing_time: item.processing_time, price: item.price
+      country_name: item.country_name, 
+      flag_emoji: item.flag_emoji,
+      processing_time: item.processing_time, 
+      price: item.price,
+      requirements: item.requirements?.join('\n') || "",
+      documents_needed: item.documents_needed?.join('\n') || "",
+      description: item.description || "",
+      validity_period: item.validity_period || ""
     });
     setIsDialogOpen(true);
   };
@@ -97,31 +125,85 @@ const AdminVisa = () => {
           <DialogTrigger asChild>
             <Button><Plus className="w-4 h-4 mr-2" />Add Country</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingItem ? "Edit Country" : "Add Country"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium">Country Name *</label>
-                  <Input value={formData.country_name} onChange={(e) => setFormData({ ...formData, country_name: e.target.value })} required />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Flag Emoji *</label>
-                  <Input value={formData.flag_emoji} onChange={(e) => setFormData({ ...formData, flag_emoji: e.target.value })} placeholder="🇧🇩" required />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium">Processing Time *</label>
-                  <Input value={formData.processing_time} onChange={(e) => setFormData({ ...formData, processing_time: e.target.value })} placeholder="e.g., 5-7 days" required />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Price (BDT) *</label>
-                  <Input type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })} required />
-                </div>
-              </div>
+              <Tabs defaultValue="basic" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="basic">Basic Info</TabsTrigger>
+                  <TabsTrigger value="details">Requirements & Documents</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="basic" className="space-y-4 mt-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium">Country Name *</label>
+                      <Input value={formData.country_name} onChange={(e) => setFormData({ ...formData, country_name: e.target.value })} required />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Flag Emoji *</label>
+                      <Input value={formData.flag_emoji} onChange={(e) => setFormData({ ...formData, flag_emoji: e.target.value })} placeholder="🇧🇩" required />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium">Processing Time *</label>
+                      <Input value={formData.processing_time} onChange={(e) => setFormData({ ...formData, processing_time: e.target.value })} placeholder="e.g., 5-7 days" required />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Price (BDT) *</label>
+                      <Input type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })} required />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium">Validity Period</label>
+                      <Input value={formData.validity_period} onChange={(e) => setFormData({ ...formData, validity_period: e.target.value })} placeholder="e.g., 30 days" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Description</label>
+                    <Textarea 
+                      value={formData.description} 
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+                      placeholder="Brief description about visa processing for this country..."
+                      rows={3}
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="details" className="space-y-4 mt-4">
+                  <div>
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <ClipboardList className="w-4 h-4" />
+                      Requirements (one per line)
+                    </label>
+                    <Textarea 
+                      value={formData.requirements} 
+                      onChange={(e) => setFormData({ ...formData, requirements: e.target.value })} 
+                      placeholder="Valid passport with 6 months validity&#10;Passport-size photographs&#10;Bank statement&#10;Employment letter"
+                      rows={5}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">Enter each requirement on a new line</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Documents Needed (one per line)
+                    </label>
+                    <Textarea 
+                      value={formData.documents_needed} 
+                      onChange={(e) => setFormData({ ...formData, documents_needed: e.target.value })} 
+                      placeholder="Original Passport&#10;2 Passport Photos&#10;Bank Statement (3 months)&#10;Employment Certificate"
+                      rows={5}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">Enter each document on a new line</p>
+                  </div>
+                </TabsContent>
+              </Tabs>
+              
               <Button type="submit" className="w-full">{editingItem ? "Update" : "Create"}</Button>
             </form>
           </DialogContent>
@@ -135,6 +217,8 @@ const AdminVisa = () => {
               <TableHead>Country</TableHead>
               <TableHead>Processing Time</TableHead>
               <TableHead>Price</TableHead>
+              <TableHead>Requirements</TableHead>
+              <TableHead>Documents</TableHead>
               <TableHead>Active</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -146,6 +230,16 @@ const AdminVisa = () => {
                 <TableCell className="font-medium">{item.country_name}</TableCell>
                 <TableCell>{item.processing_time}</TableCell>
                 <TableCell>৳{item.price.toLocaleString()}</TableCell>
+                <TableCell>
+                  <Badge variant="secondary" className="text-xs">
+                    {item.requirements?.length || 0} items
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="secondary" className="text-xs">
+                    {item.documents_needed?.length || 0} items
+                  </Badge>
+                </TableCell>
                 <TableCell><Switch checked={item.is_active} onCheckedChange={() => toggleActive(item)} /></TableCell>
                 <TableCell>
                   <div className="flex gap-2">
