@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Check, X, Star, Calendar, Hotel, Plane, Bus, FileText, MapPin } from "lucide-react";
+import { Check, X, Star, Calendar, Hotel, Plane, Bus, FileText } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -25,8 +25,6 @@ interface PackageDetails {
   special_notes: string | null;
   stock: number;
   show_book_now: boolean;
-  hotel_image_url?: string | null;
-  hotel_map_link?: string | null;
 }
 
 interface PackageDetailsModalProps {
@@ -125,43 +123,14 @@ const PackageDetailsModal = ({ isOpen, onClose, package_info, onBookNow }: Packa
                   )}
                 </div>
 
-                {/* Hotel Section with Image */}
-                {(package_info.hotel_type || package_info.hotel_image_url) && (
+                {/* Accommodation Info */}
+                {package_info.hotel_type && (
                   <div className="space-y-3">
                     <h4 className="font-semibold text-sm text-muted-foreground flex items-center gap-2">
                       <Hotel className="w-4 h-4" />
                       Accommodation
                     </h4>
-                    
-                    {package_info.hotel_image_url && (
-                      <div className="relative rounded-lg overflow-hidden">
-                        <img 
-                          src={package_info.hotel_image_url} 
-                          alt="Hotel" 
-                          className="w-full h-48 object-cover"
-                        />
-                        <div className="absolute top-2 left-2">
-                          <Badge className="bg-primary/90 text-primary-foreground text-xs">
-                            Hotels Near Masjid al-Haram
-                          </Badge>
-                        </div>
-                        {package_info.hotel_map_link && (
-                          <a 
-                            href={package_info.hotel_map_link} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-white/95 hover:bg-white text-primary px-3 py-2 rounded-full text-sm font-medium shadow-lg transition-all hover:shadow-xl"
-                          >
-                            <MapPin className="w-4 h-4" />
-                            View on Map
-                          </a>
-                        )}
-                      </div>
-                    )}
-                    
-                    {package_info.hotel_type && (
-                      <p className="text-foreground">{package_info.hotel_type}</p>
-                    )}
+                    <p className="text-foreground">{package_info.hotel_type}</p>
                   </div>
                 )}
 
