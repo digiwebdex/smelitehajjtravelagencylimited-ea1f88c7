@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChevronDown, Play, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-kaaba.jpg";
 import { motion, AnimatePresence } from "framer-motion";
@@ -58,6 +59,7 @@ const HeroSection = () => {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchHeroContent();
@@ -87,6 +89,7 @@ const HeroSection = () => {
   }, [isAutoPlaying, slides.length]);
 
   const fetchHeroContent = async () => {
+    setIsLoading(true);
     const { data } = await supabase
       .from("hero_content")
       .select("*")
@@ -112,7 +115,72 @@ const HeroSection = () => {
       }));
       setSlides(formattedSlides);
     }
+    setIsLoading(false);
   };
+
+  // Loading skeleton component
+  const HeroSkeleton = () => (
+    <div className="relative z-10 container text-center pt-32 pb-20">
+      <div className="max-w-4xl mx-auto">
+        {/* Badge skeleton */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex justify-center mb-8"
+        >
+          <Skeleton className="h-10 w-64 rounded-full bg-primary-foreground/10" />
+        </motion.div>
+        
+        {/* Title skeleton */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="space-y-4 mb-8"
+        >
+          <Skeleton className="h-16 md:h-20 w-3/4 mx-auto bg-primary-foreground/10" />
+          <Skeleton className="h-12 md:h-16 w-1/2 mx-auto bg-secondary/20" />
+        </motion.div>
+        
+        {/* Description skeleton */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-3 mb-12"
+        >
+          <Skeleton className="h-6 w-full max-w-2xl mx-auto bg-primary-foreground/10" />
+          <Skeleton className="h-6 w-4/5 max-w-xl mx-auto bg-primary-foreground/10" />
+        </motion.div>
+        
+        {/* Button skeletons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
+        >
+          <Skeleton className="h-14 w-56 mx-auto sm:mx-0 bg-secondary/30" />
+          <Skeleton className="h-14 w-48 mx-auto sm:mx-0 bg-primary-foreground/10" />
+        </motion.div>
+        
+        {/* Stats skeleton */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 pt-12 border-t border-primary-foreground/20"
+        >
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="text-center space-y-2">
+              <Skeleton className="h-10 w-20 mx-auto bg-secondary/20" />
+              <Skeleton className="h-4 w-24 mx-auto bg-primary-foreground/10" />
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </div>
+  );
 
   const goToSlide = useCallback((index: number) => {
     setCurrentSlide(index);
@@ -384,16 +452,19 @@ const HeroSection = () => {
       )}
 
       {/* Content */}
-      <div className="relative z-10 container text-center text-primary-foreground pt-32 pb-20">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`content-${currentSlide}`}
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="max-w-4xl mx-auto"
-          >
+      {isLoading ? (
+        <HeroSkeleton />
+      ) : (
+        <div className="relative z-10 container text-center text-primary-foreground pt-32 pb-20">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`content-${currentSlide}`}
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="max-w-4xl mx-auto"
+            >
             {content.badge_text && (
               <motion.span
                 variants={textVariants}
@@ -507,7 +578,8 @@ const HeroSection = () => {
           <span className="text-sm font-medium">Explore Packages</span>
           <ChevronDown className="w-6 h-6" />
         </motion.a>
-      </div>
+        </div>
+      )}
 
       {/* Video Modal */}
       <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
