@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
 import { SiteSettingsProvider } from "@/hooks/useSiteSettings";
-import { DynamicThemeProvider } from "@/hooks/useDynamicTheme";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import MyBookings from "./pages/MyBookings";
@@ -20,31 +19,29 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} storageKey="sm-elite-hajj-theme">
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem storageKey="sm-elite-hajj-theme">
       <AuthProvider>
         <SiteSettingsProvider>
-          <DynamicThemeProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/my-bookings" element={<MyBookings />} />
-                  <Route path="/track-order" element={<TrackOrder />} />
-                  <Route path="/admin" element={<AdminDashboard />} />
-                  <Route path="/legal/:pageKey" element={<LegalPage />} />
-                  <Route path="/payment/success" element={<PaymentResult />} />
-                  <Route path="/payment/failed" element={<PaymentResult />} />
-                  <Route path="/payment/cancelled" element={<PaymentResult />} />
-                  <Route path="/payment/callback" element={<PaymentResult />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </TooltipProvider>
-          </DynamicThemeProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/my-bookings" element={<MyBookings />} />
+                <Route path="/track-order" element={<TrackOrder />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/legal/:pageKey" element={<LegalPage />} />
+                <Route path="/payment/success" element={<PaymentResult />} />
+                <Route path="/payment/failed" element={<PaymentResult />} />
+                <Route path="/payment/cancelled" element={<PaymentResult />} />
+                <Route path="/payment/callback" element={<PaymentResult />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
         </SiteSettingsProvider>
       </AuthProvider>
     </ThemeProvider>
