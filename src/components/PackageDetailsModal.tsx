@@ -1,12 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Check, X, Star, Calendar, Hotel, Plane, Bus, FileText, MapPin } from "lucide-react";
+import { Check, X, Star, Calendar, Hotel, Plane, Bus, FileText, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface PackageDetails {
   id: string;
@@ -27,6 +28,7 @@ interface PackageDetails {
   show_book_now: boolean;
   hotel_image_url?: string | null;
   hotel_map_link?: string | null;
+  hotel_images?: string[] | null;
 }
 
 interface PackageDetailsModalProps {
@@ -37,6 +39,22 @@ interface PackageDetailsModalProps {
 }
 
 const PackageDetailsModal = ({ isOpen, onClose, package_info, onBookNow }: PackageDetailsModalProps) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Get all hotel images (combine hotel_images array with legacy hotel_image_url)
+  const hotelImages = package_info 
+    ? (package_info.hotel_images && package_info.hotel_images.length > 0 
+        ? package_info.hotel_images 
+        : (package_info.hotel_image_url ? [package_info.hotel_image_url] : []))
+    : [];
+
+  // Reset image index when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentImageIndex(0);
+    }
+  }, [isOpen]);
+
   // Lock body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -55,6 +73,14 @@ const PackageDetailsModal = ({ isOpen, onClose, package_info, onBookNow }: Packa
       onBookNow(package_info);
     }
     onClose();
+  };
+
+  const goToPrevious = () => {
+    setCurrentImageIndex((prev) => (prev === 0 ? hotelImages.length - 1 : prev - 1));
+  };
+
+  const goToNext = () => {
+    setCurrentImageIndex((prev) => (prev === hotelImages.length - 1 ? 0 : prev + 1));
   };
 
   return (
@@ -125,26 +151,83 @@ const PackageDetailsModal = ({ isOpen, onClose, package_info, onBookNow }: Packa
                   )}
                 </div>
 
-                {/* Hotel Section with Image */}
-                {(package_info.hotel_type || package_info.hotel_image_url) && (
+                {/* Hotel Section with Gallery Carousel */}
+                {(package_info.hotel_type || hotelImages.length > 0) && (
                   <div className="space-y-3">
                     <h4 className="font-semibold text-sm text-muted-foreground flex items-center gap-2">
                       <Hotel className="w-4 h-4" />
                       Accommodation
+                      {hotelImages.length > 1 && (
+                        <span className="text-xs text-muted-foreground/70">
+                          ({currentImageIndex + 1}/{hotelImages.length})
+                        </span>
+                      )}
                     </h4>
                     
-                    {package_info.hotel_image_url && (
-                      <div className="relative rounded-lg overflow-hidden">
-                        <img 
-                          src={package_info.hotel_image_url} 
-                          alt="Hotel" 
-                          className="w-full h-48 object-cover"
-                        />
+                    {hotelImages.length > 0 && (
+                      <div className="relative rounded-lg overflow-hidden group">
+                        {/* Main Image */}
+                        <AnimatePresence mode="wait">
+                          <motion.img 
+                            key={currentImageIndex}
+                            src={hotelImages[currentImageIndex]} 
+                            alt={`Hotel ${currentImageIndex + 1}`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="w-full h-56 object-cover"
+                          />
+                        </AnimatePresence>
+
+                        {/* Badge */}
                         <div className="absolute top-2 left-2">
                           <Badge className="bg-primary/90 text-primary-foreground text-xs">
                             Hotels Near Masjid al-Haram
                           </Badge>
                         </div>
+
+                        {/* Navigation Arrows */}
+                        {hotelImages.length > 1 && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/80 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full shadow"
+                              onClick={goToPrevious}
+                            >
+                              <ChevronLeft className="w-5 h-5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/80 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full shadow"
+                              onClick={goToNext}
+                            >
+                              <ChevronRight className="w-5 h-5" />
+                            </Button>
+                          </>
+                        )}
+
+                        {/* Dots Indicator */}
+                        {hotelImages.length > 1 && (
+                          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-1.5">
+                            {hotelImages.map((_, index) => (
+                              <button
+                                key={index}
+                                onClick={() => setCurrentImageIndex(index)}
+                                className={cn(
+                                  "w-2 h-2 rounded-full transition-all",
+                                  index === currentImageIndex
+                                    ? "bg-white w-4"
+                                    : "bg-white/50 hover:bg-white/75"
+                                )}
+                              />
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Map Link */}
                         {package_info.hotel_map_link && (
                           <a 
                             href={package_info.hotel_map_link} 
@@ -156,6 +239,26 @@ const PackageDetailsModal = ({ isOpen, onClose, package_info, onBookNow }: Packa
                             View on Map
                           </a>
                         )}
+                      </div>
+                    )}
+
+                    {/* Thumbnail Strip */}
+                    {hotelImages.length > 1 && (
+                      <div className="flex gap-2 overflow-x-auto pb-1">
+                        {hotelImages.map((url, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setCurrentImageIndex(index)}
+                            className={cn(
+                              "w-16 h-12 rounded-md overflow-hidden flex-shrink-0 border-2 transition-all",
+                              index === currentImageIndex 
+                                ? "border-primary ring-1 ring-primary" 
+                                : "border-transparent opacity-70 hover:opacity-100"
+                            )}
+                          >
+                            <img src={url} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover" />
+                          </button>
+                        ))}
                       </div>
                     )}
                     
