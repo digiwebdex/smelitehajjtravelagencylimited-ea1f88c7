@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
+import { Grid3X3, SlidersHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface GalleryImage {
   id: string;
@@ -18,11 +27,14 @@ interface GallerySettings {
   is_enabled: boolean;
 }
 
+type ViewMode = "grid" | "carousel";
+
 const GallerySection = () => {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [settings, setSettings] = useState<GallerySettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
   useEffect(() => {
     fetchGalleryData();
@@ -94,7 +106,7 @@ const GallerySection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            className="text-center mb-8"
           >
             <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
               📸 Photo Gallery
@@ -109,39 +121,123 @@ const GallerySection = () => {
             )}
           </motion.div>
 
-          {/* Gallery Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {images.map((image, index) => (
-              <motion.div
-                key={image.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
-                className="group relative aspect-square overflow-hidden rounded-xl cursor-pointer bg-muted"
-                onClick={() => setSelectedImage(image)}
-              >
-                <img
-                  src={image.image_url}
-                  alt={image.alt_text || "Gallery image"}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
-                />
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    {image.caption && (
-                      <p className="text-white text-sm font-medium line-clamp-2">
-                        {image.caption}
-                      </p>
-                    )}
+          {/* View Mode Toggle */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="flex justify-center gap-2 mb-8"
+          >
+            <Button
+              variant={viewMode === "grid" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("grid")}
+              className="gap-2"
+            >
+              <Grid3X3 className="w-4 h-4" />
+              Grid
+            </Button>
+            <Button
+              variant={viewMode === "carousel" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("carousel")}
+              className="gap-2"
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              Carousel
+            </Button>
+          </motion.div>
+
+          {/* Grid View */}
+          {viewMode === "grid" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {images.map((image, index) => (
+                <motion.div
+                  key={image.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                  className="group relative aspect-square overflow-hidden rounded-xl cursor-pointer bg-muted"
+                  onClick={() => setSelectedImage(image)}
+                >
+                  <img
+                    src={image.image_url}
+                    alt={image.alt_text || "Gallery image"}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+                  />
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      {image.caption && (
+                        <p className="text-white text-sm font-medium line-clamp-2">
+                          {image.caption}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-                {/* Glow effect on hover */}
-                <div className="absolute -inset-[2px] rounded-xl bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover:opacity-60 blur-sm transition-opacity duration-500 -z-10" />
-              </motion.div>
-            ))}
-          </div>
+                  {/* Glow effect on hover */}
+                  <div className="absolute -inset-[2px] rounded-xl bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover:opacity-60 blur-sm transition-opacity duration-500 -z-10" />
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {/* Carousel View */}
+          {viewMode === "carousel" && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4 }}
+            >
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-4">
+                  {images.map((image) => (
+                    <CarouselItem key={image.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                      <div 
+                        className="group relative aspect-[4/3] overflow-hidden rounded-xl cursor-pointer bg-muted"
+                        onClick={() => setSelectedImage(image)}
+                      >
+                        <img
+                          src={image.image_url}
+                          alt={image.alt_text || "Gallery image"}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+                        />
+                        {/* Overlay with caption */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="absolute bottom-0 left-0 right-0 p-6">
+                            {image.caption && (
+                              <p className="text-white text-base font-medium">
+                                {image.caption}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        {/* Border glow effect */}
+                        <div className="absolute -inset-[2px] rounded-xl bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover:opacity-70 blur-sm transition-opacity duration-500 -z-10" />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden md:flex -left-12 bg-card/80 backdrop-blur-sm hover:bg-card border-primary/20" />
+                <CarouselNext className="hidden md:flex -right-12 bg-card/80 backdrop-blur-sm hover:bg-card border-primary/20" />
+              </Carousel>
+
+              {/* Mobile swipe hint */}
+              <p className="text-center text-sm text-muted-foreground mt-4 md:hidden">
+                ← Swipe to explore →
+              </p>
+            </motion.div>
+          )}
         </div>
       </section>
 
