@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface VisaCountry {
   id: string;
@@ -39,6 +41,8 @@ const VisaServices = () => {
   const [processingTimeFilter, setProcessingTimeFilter] = useState<ProcessingTimeFilter>("all");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
   const [showFilters, setShowFilters] = useState(false);
+  const [showAllCountries, setShowAllCountries] = useState(false);
+  const [isAllCountriesModalOpen, setIsAllCountriesModalOpen] = useState(false);
 
   useEffect(() => {
     fetchCountries();
@@ -456,6 +460,7 @@ const VisaServices = () => {
             size="lg"
             variant="outline"
             className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground group"
+            onClick={() => setIsAllCountriesModalOpen(true)}
           >
             <span>View All Countries</span>
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -463,6 +468,58 @@ const VisaServices = () => {
         </motion.div>
       </div>
       </section>
+
+      {/* All Countries Modal */}
+      <Dialog open={isAllCountriesModalOpen} onOpenChange={setIsAllCountriesModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <Globe className="w-6 h-6 text-primary" />
+              All Visa Processing Countries
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-[60vh] pr-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {countries.map((country) => (
+                <div
+                  key={country.id}
+                  className="group bg-muted rounded-xl p-4 hover:bg-muted/80 transition-all cursor-pointer relative"
+                  onClick={() => {
+                    setIsAllCountriesModalOpen(false);
+                    setSelectedCountry(country);
+                    setIsDetailsModalOpen(true);
+                  }}
+                >
+                  {country.is_featured && (
+                    <Badge className="absolute top-2 right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 text-xs">
+                      ⭐ Popular
+                    </Badge>
+                  )}
+                  <div className="flex items-center gap-3 mb-2">
+                    <img 
+                      src={`https://flagcdn.com/w40/${getCountryCode(country.country_name)}.png`}
+                      alt={`${country.country_name} flag`}
+                      className="w-8 h-6 object-cover rounded shadow-sm"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        target.parentElement!.innerHTML = country.flag_emoji;
+                      }}
+                    />
+                    <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                      {country.country_name}
+                    </h4>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">⏱️ {country.processing_time}</span>
+                    <span className="font-semibold text-secondary">৳{country.price.toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
 
       <VisaApplicationModal
         isOpen={isModalOpen}
