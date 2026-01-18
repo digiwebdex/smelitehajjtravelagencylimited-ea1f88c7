@@ -44,6 +44,7 @@ const menuItems = [
   { value: "revenue", label: "Revenue", icon: Wallet },
   { value: "payments", label: "Payments", icon: Wallet },
   { value: "notifications", label: "Notifications", icon: Bell },
+  { value: "sections", label: "Section Visibility", icon: Layers },
   { value: "menu", label: "Menu", icon: Menu },
   { value: "hero", label: "Hero", icon: Image },
   { value: "services", label: "Services", icon: Settings },

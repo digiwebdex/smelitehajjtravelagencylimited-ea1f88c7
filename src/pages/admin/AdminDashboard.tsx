@@ -36,6 +36,7 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminMobileNav from "@/components/admin/AdminMobileNav";
 import AdminOverview from "@/components/admin/AdminOverview";
 import AdminGallery from "@/components/admin/AdminGallery";
+import AdminSectionVisibility from "@/components/admin/AdminSectionVisibility";
 import { formatCurrency } from "@/lib/currency";
 
 interface Stats {
@@ -172,6 +173,8 @@ const AdminDashboard = () => {
         return <AdminPaymentMethods />;
       case "notifications":
         return <AdminNotifications />;
+      case "sections":
+        return <AdminSectionVisibility />;
       case "menu":
         return <AdminMenu />;
       case "hero":
