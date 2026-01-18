@@ -131,12 +131,7 @@ const TestimonialsSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                    whileHover={{ 
-                      scale: 1.02, 
-                      y: -4,
-                      boxShadow: "0 12px 32px -8px rgba(0, 0, 0, 0.15)"
-                    }}
-                    className="bg-card rounded-2xl p-6 shadow-elegant h-full flex flex-col relative group transition-colors duration-300 cursor-pointer"
+                    className="bg-card rounded-2xl p-6 shadow-elegant h-full flex flex-col relative group"
                   >
                     <Quote className="w-10 h-10 text-secondary/30 absolute top-4 right-4" />
                     
@@ -183,8 +178,8 @@ const TestimonialsSection = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex -left-12" />
-            <CarouselNext className="hidden md:flex -right-12" />
+            <CarouselPrevious className="-left-4 md:-left-12" />
+            <CarouselNext className="-right-4 md:-right-12" />
           </Carousel>
         </motion.div>
       </div>
