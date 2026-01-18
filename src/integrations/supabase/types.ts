@@ -283,61 +283,112 @@ export type Database = {
         Row: {
           alt_text: string
           caption: string | null
+          category: string | null
           created_at: string
           id: string
           image_url: string
           is_active: boolean
           order_index: number
+          tags: string[] | null
           updated_at: string
         }
         Insert: {
           alt_text?: string
           caption?: string | null
+          category?: string | null
           created_at?: string
           id?: string
           image_url: string
           is_active?: boolean
           order_index?: number
+          tags?: string[] | null
           updated_at?: string
         }
         Update: {
           alt_text?: string
           caption?: string | null
+          category?: string | null
           created_at?: string
           id?: string
           image_url?: string
           is_active?: boolean
           order_index?: number
+          tags?: string[] | null
           updated_at?: string
         }
         Relationships: []
       }
       gallery_settings: {
         Row: {
+          autoplay_carousel: boolean | null
+          autoplay_speed: number | null
           background_color: string | null
+          columns_desktop: number | null
+          columns_mobile: number | null
+          columns_tablet: number | null
           created_at: string
+          default_view: string | null
+          hover_effect: string | null
           id: string
+          image_aspect_ratio: string | null
+          image_border_radius: string | null
           is_enabled: boolean
+          lightbox_enabled: boolean | null
+          overlay_color: string | null
+          show_captions: boolean | null
+          show_thumbnails: boolean | null
           subtitle: string | null
+          subtitle_color: string | null
           title: string
+          title_color: string | null
           updated_at: string
         }
         Insert: {
+          autoplay_carousel?: boolean | null
+          autoplay_speed?: number | null
           background_color?: string | null
+          columns_desktop?: number | null
+          columns_mobile?: number | null
+          columns_tablet?: number | null
           created_at?: string
+          default_view?: string | null
+          hover_effect?: string | null
           id?: string
+          image_aspect_ratio?: string | null
+          image_border_radius?: string | null
           is_enabled?: boolean
+          lightbox_enabled?: boolean | null
+          overlay_color?: string | null
+          show_captions?: boolean | null
+          show_thumbnails?: boolean | null
           subtitle?: string | null
+          subtitle_color?: string | null
           title?: string
+          title_color?: string | null
           updated_at?: string
         }
         Update: {
+          autoplay_carousel?: boolean | null
+          autoplay_speed?: number | null
           background_color?: string | null
+          columns_desktop?: number | null
+          columns_mobile?: number | null
+          columns_tablet?: number | null
           created_at?: string
+          default_view?: string | null
+          hover_effect?: string | null
           id?: string
+          image_aspect_ratio?: string | null
+          image_border_radius?: string | null
           is_enabled?: boolean
+          lightbox_enabled?: boolean | null
+          overlay_color?: string | null
+          show_captions?: boolean | null
+          show_thumbnails?: boolean | null
           subtitle?: string | null
+          subtitle_color?: string | null
           title?: string
+          title_color?: string | null
           updated_at?: string
         }
         Relationships: []
