@@ -109,6 +109,7 @@ const AdminTeam = () => {
             <TableHead>Avatar</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Role</TableHead>
+            <TableHead className="max-w-[200px]">Qualifications</TableHead>
             <TableHead>Active</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -126,6 +127,9 @@ const AdminTeam = () => {
               </TableCell>
               <TableCell className="font-medium">{item.name}</TableCell>
               <TableCell>{item.role}</TableCell>
+              <TableCell className="max-w-[200px]">
+                <p className="text-sm text-muted-foreground line-clamp-2">{item.qualifications || "—"}</p>
+              </TableCell>
               <TableCell><Switch checked={item.is_active} onCheckedChange={() => toggleActive(item)} /></TableCell>
               <TableCell>
                 <div className="flex gap-2">
@@ -182,8 +186,14 @@ const AdminTeam = () => {
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium">Qualifications</label>
-                <Textarea value={formData.qualifications} onChange={(e) => setFormData({ ...formData, qualifications: e.target.value })} rows={2} />
+                <label className="text-sm font-medium">Qualifications / Bio</label>
+                <Textarea 
+                  value={formData.qualifications} 
+                  onChange={(e) => setFormData({ ...formData, qualifications: e.target.value })} 
+                  rows={3} 
+                  placeholder="e.g., Honours Islamic Studies, National University, Bangladesh"
+                />
+                <p className="text-xs text-muted-foreground mt-1">This appears on hover overlay on the team section</p>
               </div>
               <Button type="submit" className="w-full" disabled={uploading}>
                 {editingItem ? "Update" : "Create"}
