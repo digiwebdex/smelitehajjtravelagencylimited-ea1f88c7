@@ -55,6 +55,8 @@ interface Package {
   image_url: string | null;
   show_view_details: boolean;
   show_book_now: boolean;
+  hotel_image_url: string | null;
+  hotel_map_link: string | null;
 }
 
 interface AdminPackagesProps {
@@ -90,6 +92,8 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
     image_url: "",
     show_view_details: true,
     show_book_now: true,
+    hotel_image_url: "",
+    hotel_map_link: "",
   });
 
   useEffect(() => {
@@ -128,6 +132,8 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
       image_url: "",
       show_view_details: true,
       show_book_now: true,
+      hotel_image_url: "",
+      hotel_map_link: "",
     });
     setEditingPackage(null);
   };
@@ -153,6 +159,8 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
       image_url: pkg.image_url || "",
       show_view_details: pkg.show_view_details ?? true,
       show_book_now: pkg.show_book_now ?? true,
+      hotel_image_url: pkg.hotel_image_url || "",
+      hotel_map_link: pkg.hotel_map_link || "",
     });
     setIsDialogOpen(true);
   };
@@ -179,6 +187,8 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
       image_url: formData.image_url || null,
       show_view_details: formData.show_view_details,
       show_book_now: formData.show_book_now,
+      hotel_image_url: formData.hotel_image_url || null,
+      hotel_map_link: formData.hotel_map_link || null,
     };
 
     let error;
@@ -450,6 +460,27 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
                   label="Package Image"
                   placeholder="https://example.com/package-image.jpg"
                 />
+
+                <div className="space-y-3 p-3 bg-secondary/10 rounded-lg border border-secondary/20">
+                  <h4 className="font-medium text-sm text-secondary">Hotel Image & Map</h4>
+                  <ImageUpload
+                    value={formData.hotel_image_url}
+                    onChange={(url) => setFormData({ ...formData, hotel_image_url: url })}
+                    onUpload={uploadImage}
+                    uploading={uploading}
+                    label="Hotel Image (shown on card side)"
+                    placeholder="https://example.com/hotel-image.jpg"
+                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="hotel_map_link">Hotel Map Link (Google Maps)</Label>
+                    <Input
+                      id="hotel_map_link"
+                      value={formData.hotel_map_link}
+                      onChange={(e) => setFormData({ ...formData, hotel_map_link: e.target.value })}
+                      placeholder="https://maps.google.com/..."
+                    />
+                  </div>
+                </div>
 
                 <div className="space-y-3 p-3 bg-muted/50 rounded-lg">
                   <h4 className="font-medium text-sm">Visibility Controls</h4>
