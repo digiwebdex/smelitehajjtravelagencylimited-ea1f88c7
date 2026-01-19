@@ -686,12 +686,40 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
                     if (touched.paymentMethod) {
                       setErrors(prev => ({ ...prev, paymentMethod: undefined }));
                     }
+                    // Clear bank transfer errors when switching away
+                    if (method !== "bank_transfer") {
+                      setErrors(prev => ({ ...prev, transactionNumber: undefined, screenshot: undefined }));
+                      setBankTransactionNumber("");
+                      setBankScreenshot(null);
+                    }
                   }}
                 />
                 {touched.paymentMethod && errors.paymentMethod && (
                   <p className="text-xs text-destructive flex items-center gap-1 mt-2">
                     <AlertCircle className="w-3 h-3" /> {errors.paymentMethod}
                   </p>
+                )}
+
+                {/* Bank Transfer Details for Installment */}
+                {formData.paymentMethod === "bank_transfer" && bankDetails && (
+                  <BankTransferDetails
+                    bankDetails={bankDetails}
+                    transactionNumber={bankTransactionNumber}
+                    onTransactionNumberChange={(value) => {
+                      setBankTransactionNumber(value);
+                      if (errors.transactionNumber) {
+                        setErrors(prev => ({ ...prev, transactionNumber: undefined }));
+                      }
+                    }}
+                    screenshotFile={bankScreenshot}
+                    onScreenshotChange={(file) => {
+                      setBankScreenshot(file);
+                      if (errors.screenshot) {
+                        setErrors(prev => ({ ...prev, screenshot: undefined }));
+                      }
+                    }}
+                    error={errors.transactionNumber || errors.screenshot}
+                  />
                 )}
               </motion.div>
             )}
