@@ -496,132 +496,211 @@ const HeroSection = () => {
         </div>
       )}
 
-      {/* Main Content */}
+      {/* Split-Screen Layout */}
       {isLoading ? (
         <HeroSkeleton />
       ) : (
-        <div className="relative z-10 container text-center text-primary-foreground pt-32 pb-20">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`content-${currentSlide}`}
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="max-w-4xl mx-auto"
-            >
-              {/* Badge */}
-              {content.badge_text && (
-                <motion.div variants={itemVariants} className="mb-8">
-                  <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary/15 backdrop-blur-md rounded-full text-secondary font-medium border border-secondary/25 shadow-lg shadow-secondary/10">
-                    <Star className="w-4 h-4 fill-secondary" />
-                    {content.badge_text}
-                  </span>
-                </motion.div>
-              )}
-              
-              {/* Title */}
-              <motion.h1
-                variants={itemVariants}
-                className="font-arabic text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-normal tracking-wide overflow-visible"
-              >
-                <span className="inline-block">{content.title}</span>
-                {content.subtitle && (
-                  <motion.span 
-                    variants={itemVariants}
-                    className="block text-gradient-gold mt-2 font-kufi pb-2"
-                  >
-                    {content.subtitle}
-                  </motion.span>
-                )}
-              </motion.h1>
-              
-              {/* Description */}
-              <motion.p
-                variants={itemVariants}
-                className="text-lg md:text-xl text-primary-foreground/85 max-w-2xl mx-auto mb-12 leading-relaxed"
-              >
-                {content.description}
-              </motion.p>
-
-              {/* Buttons */}
-              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-                <Button
-                  size="lg"
-                  onClick={() => scrollToSection(content.primary_button_link || "#hajj")}
-                  className="bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-lg shadow-secondary/25 text-lg px-8 py-7 font-semibold group relative overflow-hidden"
-                >
-                  <span className="relative z-10 flex items-center">
-                    {content.primary_button_text || "Explore Hajj Packages"}
-                    <motion.span
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      className="ml-2"
-                    >
-                      →
-                    </motion.span>
-                  </span>
-                  <motion.div 
-                    className="absolute inset-0 bg-gradient-to-r from-secondary via-amber-400 to-secondary"
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: "100%" }}
-                    transition={{ duration: 0.6 }}
-                  />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  onClick={() => scrollToSection(content.secondary_button_link || "#umrah")}
-                  className="border-2 border-primary-foreground/30 text-primary-foreground bg-primary-foreground/5 backdrop-blur-md hover:bg-primary-foreground/15 hover:border-primary-foreground/50 text-lg px-8 py-7 transition-all duration-300"
-                >
-                  {content.secondary_button_text || "View Umrah Packages"}
-                </Button>
-              </motion.div>
-
-              {/* Video CTA */}
-              {content.video_url && (
-                <motion.button
-                  variants={itemVariants}
-                  onClick={() => setIsVideoOpen(true)}
-                  className="inline-flex items-center gap-3 text-primary-foreground/80 hover:text-primary-foreground transition-colors group"
-                >
-                  <span className="w-14 h-14 rounded-full bg-primary-foreground/10 backdrop-blur-md border border-primary-foreground/20 flex items-center justify-center group-hover:bg-primary-foreground/20 group-hover:border-secondary/40 transition-all group-hover:scale-110">
-                    <Play className="w-5 h-5 fill-current ml-1" />
-                  </span>
-                  <span className="font-medium">Watch Video</span>
-                </motion.button>
-              )}
-
-              {/* Stats */}
-              {content.stats && content.stats.length > 0 && (
+        <div className="relative z-10 w-full min-h-screen flex items-center">
+          <div className="container">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+              {/* Left Side - Content */}
+              <AnimatePresence mode="wait">
                 <motion.div
-                  variants={itemVariants}
-                  className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 pt-12 border-t border-primary-foreground/15"
+                  key={`content-${currentSlide}`}
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  className="text-left text-primary-foreground pt-24 lg:pt-0 order-2 lg:order-1"
                 >
-                  {content.stats.map((stat, index) => (
-                    <motion.div
-                      key={stat.label}
-                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
-                      className="text-center group cursor-default"
-                    >
-                      <motion.div 
-                        className="font-kufi text-4xl md:text-5xl font-bold text-secondary mb-2"
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ type: "spring", stiffness: 400 }}
-                      >
-                        {stat.number}
-                      </motion.div>
-                      <div className="text-primary-foreground/70 text-sm md:text-base">
-                        {stat.label}
-                      </div>
+                  {/* Badge */}
+                  {content.badge_text && (
+                    <motion.div variants={itemVariants} className="mb-6">
+                      <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/15 backdrop-blur-md rounded-full text-secondary text-sm font-medium border border-secondary/25 shadow-lg shadow-secondary/10">
+                        <Star className="w-3.5 h-3.5 fill-secondary" />
+                        {content.badge_text}
+                      </span>
                     </motion.div>
-                  ))}
+                  )}
+                  
+                  {/* Title */}
+                  <motion.h1
+                    variants={itemVariants}
+                    className="font-arabic text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 leading-normal tracking-wide overflow-visible"
+                  >
+                    <span className="inline-block">{content.title}</span>
+                    {content.subtitle && (
+                      <motion.span 
+                        variants={itemVariants}
+                        className="block text-gradient-gold mt-1 font-kufi pb-1 text-3xl md:text-4xl lg:text-5xl xl:text-6xl"
+                      >
+                        {content.subtitle}
+                      </motion.span>
+                    )}
+                  </motion.h1>
+                  
+                  {/* Description */}
+                  <motion.p
+                    variants={itemVariants}
+                    className="text-base md:text-lg text-primary-foreground/85 max-w-lg mb-8 leading-relaxed"
+                  >
+                    {content.description}
+                  </motion.p>
+
+                  {/* Buttons */}
+                  <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3 mb-6">
+                    <Button
+                      size="lg"
+                      onClick={() => scrollToSection(content.primary_button_link || "#hajj")}
+                      className="bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-lg shadow-secondary/25 text-base px-6 py-6 font-semibold group relative overflow-hidden"
+                    >
+                      <span className="relative z-10 flex items-center">
+                        {content.primary_button_text || "Explore Hajj Packages"}
+                        <motion.span
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                          className="ml-2"
+                        >
+                          →
+                        </motion.span>
+                      </span>
+                      <motion.div 
+                        className="absolute inset-0 bg-gradient-to-r from-secondary via-amber-400 to-secondary"
+                        initial={{ x: "-100%" }}
+                        whileHover={{ x: "100%" }}
+                        transition={{ duration: 0.6 }}
+                      />
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      onClick={() => scrollToSection(content.secondary_button_link || "#umrah")}
+                      className="border-2 border-primary-foreground/30 text-primary-foreground bg-primary-foreground/5 backdrop-blur-md hover:bg-primary-foreground/15 hover:border-primary-foreground/50 text-base px-6 py-6 transition-all duration-300"
+                    >
+                      {content.secondary_button_text || "View Umrah Packages"}
+                    </Button>
+                  </motion.div>
+
+                  {/* Video CTA */}
+                  {content.video_url && (
+                    <motion.button
+                      variants={itemVariants}
+                      onClick={() => setIsVideoOpen(true)}
+                      className="inline-flex items-center gap-3 text-primary-foreground/80 hover:text-primary-foreground transition-colors group mb-8"
+                    >
+                      <span className="w-12 h-12 rounded-full bg-primary-foreground/10 backdrop-blur-md border border-primary-foreground/20 flex items-center justify-center group-hover:bg-primary-foreground/20 group-hover:border-secondary/40 transition-all group-hover:scale-110">
+                        <Play className="w-4 h-4 fill-current ml-0.5" />
+                      </span>
+                      <span className="font-medium text-sm">Watch Video</span>
+                    </motion.button>
+                  )}
+
+                  {/* Stats - Compact */}
+                  {content.stats && content.stats.length > 0 && (
+                    <motion.div
+                      variants={itemVariants}
+                      className="flex flex-wrap gap-6 pt-6 border-t border-primary-foreground/15"
+                    >
+                      {content.stats.slice(0, 3).map((stat, index) => (
+                        <motion.div
+                          key={stat.label}
+                          initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
+                          className="text-left group cursor-default"
+                        >
+                          <motion.div 
+                            className="font-kufi text-2xl md:text-3xl font-bold text-secondary mb-1"
+                            whileHover={{ scale: 1.05 }}
+                            transition={{ type: "spring", stiffness: 400 }}
+                          >
+                            {stat.number}
+                          </motion.div>
+                          <div className="text-primary-foreground/70 text-xs md:text-sm">
+                            {stat.label}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )}
                 </motion.div>
-              )}
-            </motion.div>
-          </AnimatePresence>
+              </AnimatePresence>
+
+              {/* Right Side - Image */}
+              <div className="relative order-1 lg:order-2 hidden lg:block">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`split-image-${currentSlide}`}
+                    initial={{ opacity: 0, scale: 0.9, x: 50 }}
+                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, x: -30 }}
+                    transition={{ duration: transitionDuration, ease: [0.25, 0.46, 0.45, 0.94] as const }}
+                    className="relative"
+                  >
+                    {/* Decorative frame */}
+                    <div className="absolute -inset-4 border-2 border-secondary/20 rounded-3xl transform rotate-2" />
+                    <div className="absolute -inset-4 border border-secondary/10 rounded-3xl transform -rotate-1" />
+                    
+                    {/* Main image container */}
+                    <motion.div
+                      className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/30"
+                      style={{ x: parallaxX, y: parallaxY }}
+                    >
+                      {/* Image */}
+                      <motion.img
+                        src={backgroundImage}
+                        alt="Hero feature"
+                        className="w-full h-[500px] xl:h-[600px] object-cover"
+                        initial={{ scale: 1.1 }}
+                        animate={{ scale: 1 }}
+                        transition={{ duration: transitionDuration * 1.2 }}
+                        draggable={false}
+                      />
+                      
+                      {/* Gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/40 via-transparent to-transparent" />
+                      
+                      {/* Floating badge on image */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="absolute bottom-6 left-6 right-6 p-4 bg-primary/80 backdrop-blur-md rounded-xl border border-secondary/20"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
+                            <MakkahIcon size={24} className="text-secondary" />
+                          </div>
+                          <div>
+                            <p className="text-secondary font-semibold text-sm">Premium Experience</p>
+                            <p className="text-primary-foreground/70 text-xs">5-Star Hotels & VIP Services</p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+
+                    {/* Floating elements around image */}
+                    <motion.div
+                      animate={{ y: [-10, 10, -10] }}
+                      transition={{ duration: 4, repeat: Infinity }}
+                      className="absolute -top-8 -right-8 w-20 h-20 bg-secondary/10 backdrop-blur-sm rounded-2xl border border-secondary/20 flex items-center justify-center"
+                    >
+                      <Star className="w-8 h-8 text-secondary fill-secondary/30" />
+                    </motion.div>
+                    
+                    <motion.div
+                      animate={{ y: [10, -10, 10] }}
+                      transition={{ duration: 5, repeat: Infinity }}
+                      className="absolute -bottom-6 -left-6 w-16 h-16 bg-primary-foreground/10 backdrop-blur-sm rounded-xl border border-primary-foreground/10 flex items-center justify-center"
+                    >
+                      <MadinahIcon size={32} className="text-primary-foreground/60" />
+                    </motion.div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
 
           {/* Scroll Indicator */}
           <motion.a
