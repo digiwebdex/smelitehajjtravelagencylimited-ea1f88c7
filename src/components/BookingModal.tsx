@@ -579,7 +579,7 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
                   </div>
                   <Separator />
                   <div className="flex justify-between text-base">
-                    <span className="font-semibold">Monthly Installment:</span>
+                    <span className="font-semibold">Due Installment:</span>
                     <span className="font-bold text-primary">
                       {formatCurrency(Math.ceil(((package_info.price * formData.passengerCount) - advanceAmount) / numberOfInstallments))}
                     </span>
@@ -631,7 +631,7 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
             )}
             {paymentType === "installment" && (
               <p className="text-xs text-muted-foreground mt-1">
-                + {numberOfInstallments} monthly installments of {formatCurrency(Math.ceil(((package_info.price * formData.passengerCount) - advanceAmount) / numberOfInstallments))}
+                + {numberOfInstallments} due installments of {formatCurrency(Math.ceil(((package_info.price * formData.passengerCount) - advanceAmount) / numberOfInstallments))}
               </p>
             )}
           </div>

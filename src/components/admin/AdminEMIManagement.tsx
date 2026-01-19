@@ -503,7 +503,7 @@ const AdminEMIManagement = ({
                     </div>
                     <Separator />
                     <div className="flex justify-between text-lg">
-                      <span className="font-medium">Monthly Installment:</span>
+                      <span className="font-medium">Due Installment:</span>
                       <span className="font-bold text-primary">{formatCurrency(calculatedEmi)}</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
