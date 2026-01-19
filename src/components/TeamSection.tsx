@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Users, Phone } from "lucide-react";
+import { Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import IslamicBorder from "./IslamicBorder";
-
+import WhatsAppIcon from "./icons/WhatsAppIcon";
 interface TeamMember {
   id: string;
   name: string;
@@ -157,9 +157,9 @@ const TeamSection = () => {
                       href={`https://wa.me/${member.whatsapp_number.replace(/[^0-9]/g, '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm text-accent hover:text-accent/80 transition-colors font-medium"
+                      className="inline-flex items-center gap-2 text-sm text-[#25D366] hover:text-[#128C7E] transition-colors font-medium"
                     >
-                      <Phone className="w-4 h-4" />
+                      <WhatsAppIcon size={18} />
                       {member.whatsapp_number}
                     </a>
                   )}
