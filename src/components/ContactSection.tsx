@@ -163,7 +163,7 @@ const ContactSection = () => {
                       {info.title}
                     </h3>
                     {info.details.map((detail, idx) => (
-                      <p key={idx} className="inline-flex items-baseline text-muted-foreground text-xs leading-relaxed font-mono tracking-tight">
+                      <p key={idx} className="text-muted-foreground text-xs leading-relaxed">
                         {detail}
                       </p>
                     ))}
