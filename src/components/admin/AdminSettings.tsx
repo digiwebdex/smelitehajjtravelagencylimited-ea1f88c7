@@ -429,20 +429,33 @@ const AdminSettings = () => {
                     onChange={(e) => setContactDetails({ ...contactDetails, google_map_embed_url: e.target.value })}
                     placeholder="https://www.google.com/maps/embed?pb=..."
                     rows={3}
+                    className={
+                      contactDetails.google_map_embed_url && 
+                      !contactDetails.google_map_embed_url.match(/^https:\/\/(www\.)?google\.com\/maps\/embed\?pb=/) 
+                        ? "border-destructive" 
+                        : ""
+                    }
                   />
+                  {contactDetails.google_map_embed_url && 
+                   !contactDetails.google_map_embed_url.match(/^https:\/\/(www\.)?google\.com\/maps\/embed\?pb=/) && (
+                    <p className="text-xs text-destructive flex items-center gap-1">
+                      ⚠️ Invalid format. URL must start with "https://www.google.com/maps/embed?pb="
+                    </p>
+                  )}
                   <p className="text-xs text-muted-foreground">
                     Go to Google Maps → Search your location → Click "Share" → "Embed a map" → Copy the src URL from the iframe code
                   </p>
                 </div>
                 
-                {/* Map Preview */}
-                {contactDetails.google_map_embed_url && (
+                {/* Map Preview - only show if valid URL */}
+                {contactDetails.google_map_embed_url && 
+                 contactDetails.google_map_embed_url.match(/^https:\/\/(www\.)?google\.com\/maps\/embed\?pb=/) && (
                   <div className="space-y-2">
-                    <Label className="flex items-center gap-2 text-sm font-medium">
+                    <Label className="flex items-center gap-2 text-sm font-medium text-green-600">
                       <Eye className="w-4 h-4" />
-                      Map Preview
+                      Map Preview ✓
                     </Label>
-                    <div className="rounded-lg overflow-hidden border border-border">
+                    <div className="rounded-lg overflow-hidden border border-green-200">
                       <iframe
                         src={contactDetails.google_map_embed_url}
                         width="100%"
