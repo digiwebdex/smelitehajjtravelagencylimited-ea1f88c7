@@ -295,6 +295,7 @@ export type Database = {
         Row: {
           company_description: string | null
           contact_address: string | null
+          contact_address_2: string | null
           contact_email: string | null
           contact_phones: string[] | null
           copyright_text: string | null
@@ -308,6 +309,7 @@ export type Database = {
         Insert: {
           company_description?: string | null
           contact_address?: string | null
+          contact_address_2?: string | null
           contact_email?: string | null
           contact_phones?: string[] | null
           copyright_text?: string | null
@@ -321,6 +323,7 @@ export type Database = {
         Update: {
           company_description?: string | null
           contact_address?: string | null
+          contact_address_2?: string | null
           contact_email?: string | null
           contact_phones?: string[] | null
           copyright_text?: string | null

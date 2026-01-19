@@ -25,6 +25,7 @@ interface FooterContent {
   social_links: SocialLink[];
   copyright_text: string;
   contact_address: string;
+  contact_address_2: string;
   contact_phones: string[];
   contact_email: string;
 }
@@ -41,6 +42,7 @@ const AdminFooter = () => {
     social_links: [],
     copyright_text: "",
     contact_address: "",
+    contact_address_2: "",
     contact_phones: [""],
     contact_email: "",
   });
@@ -61,6 +63,7 @@ const AdminFooter = () => {
         social_links: Array.isArray(data.social_links) ? (data.social_links as unknown as SocialLink[]) : [],
         copyright_text: data.copyright_text || "",
         contact_address: (data as any).contact_address || "",
+        contact_address_2: (data as any).contact_address_2 || "",
         contact_phones: Array.isArray((data as any).contact_phones) ? (data as any).contact_phones : [""],
         contact_email: (data as any).contact_email || "",
       });
@@ -78,6 +81,7 @@ const AdminFooter = () => {
       social_links: footerContent.social_links as unknown as null,
       copyright_text: footerContent.copyright_text,
       contact_address: footerContent.contact_address,
+      contact_address_2: footerContent.contact_address_2,
       contact_phones: footerContent.contact_phones.filter(p => p.trim() !== ""),
       contact_email: footerContent.contact_email,
     };
@@ -228,11 +232,20 @@ const AdminFooter = () => {
           
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Address</label>
+              <label className="text-sm font-medium">Address 1</label>
               <Input
                 value={footerContent.contact_address}
                 onChange={(e) => setFooterContent({ ...footerContent, contact_address: e.target.value })}
-                placeholder="Savar, Dhaka, Bangladesh"
+                placeholder="Primary address"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Address 2</label>
+              <Input
+                value={footerContent.contact_address_2}
+                onChange={(e) => setFooterContent({ ...footerContent, contact_address_2: e.target.value })}
+                placeholder="Secondary address (optional)"
               />
             </div>
 
