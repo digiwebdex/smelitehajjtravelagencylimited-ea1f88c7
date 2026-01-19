@@ -13,11 +13,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Users, Plane, Phone, Mail, User, AlertCircle, Loader2 } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar, Users, Plane, Phone, Mail, User, AlertCircle, Loader2, CreditCard, Banknote } from "lucide-react";
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/currency";
 import { z } from "zod";
 import PaymentMethodSelector from "./PaymentMethodSelector";
+import { Separator } from "@/components/ui/separator";
 
 interface Package {
   id: string;
@@ -57,6 +66,9 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [paymentType, setPaymentType] = useState<"full" | "installment">("full");
+  const [advanceAmount, setAdvanceAmount] = useState<number>(0);
+  const [numberOfInstallments, setNumberOfInstallments] = useState<number>(3);
   const [formData, setFormData] = useState({
     guestName: "",
     guestEmail: "",
@@ -106,8 +118,13 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // For installment payments, payment method is not required
+    const dataToValidate = paymentType === "installment" 
+      ? { ...formData, paymentMethod: "installment" }
+      : formData;
+    
     // Validate all fields
-    const result = bookingSchema.safeParse(formData);
+    const result = bookingSchema.safeParse(dataToValidate);
     
     if (!result.success) {
       const fieldErrors: FormErrors = {};
@@ -117,19 +134,28 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
           fieldErrors[field] = err.message;
         }
       });
-      setErrors(fieldErrors);
-      setTouched({ guestName: true, guestEmail: true, guestPhone: true, passengerCount: true });
-      toast({
-        title: "Validation Error",
-        description: "Please fix the errors in the form.",
-        variant: "destructive",
-      });
-      return;
+      // Don't show payment method error for installment type
+      if (paymentType === "installment") {
+        delete fieldErrors.paymentMethod;
+      }
+      if (Object.keys(fieldErrors).length > 0) {
+        setErrors(fieldErrors);
+        setTouched({ guestName: true, guestEmail: true, guestPhone: true, passengerCount: true });
+        toast({
+          title: "Validation Error",
+          description: "Please fix the errors in the form.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     if (!package_info) return;
 
     setLoading(true);
+    
+    const totalPrice = package_info.price * formData.passengerCount;
+    const isInstallment = paymentType === "installment";
     
     const { data: bookingData, error } = await supabase.from("bookings").insert({
       package_id: package_info.id,
@@ -137,12 +163,12 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
       travel_date: formData.travelDate || null,
       notes: formData.notes || null,
       passenger_details: formData.passengerDetails,
-      total_price: package_info.price * formData.passengerCount,
+      total_price: totalPrice,
       guest_name: formData.guestName.trim(),
       guest_email: formData.guestEmail.trim() || null,
       guest_phone: formData.guestPhone.trim(),
-      payment_method: formData.paymentMethod,
-      payment_status: formData.paymentMethod === 'cash' ? 'pending_cash' : 'pending',
+      payment_method: isInstallment ? "installment" : formData.paymentMethod,
+      payment_status: isInstallment ? "emi_pending" : (formData.paymentMethod === 'cash' ? 'pending_cash' : 'pending'),
     }).select("id").single();
 
     if (error) {
@@ -155,6 +181,61 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
       return;
     }
 
+    // Create installment plan if selected
+    if (isInstallment && bookingData?.id) {
+      const remaining = totalPrice - advanceAmount;
+      const installmentAmount = Math.ceil(remaining / numberOfInstallments);
+
+      // Create installment payment plan
+      const { data: emiData, error: emiError } = await supabase
+        .from("emi_payments")
+        .insert({
+          booking_id: bookingData.id,
+          total_amount: totalPrice,
+          advance_amount: advanceAmount,
+          number_of_emis: numberOfInstallments,
+          emi_amount: installmentAmount,
+          paid_emis: 0,
+          remaining_amount: remaining,
+          is_emi_plan: true,
+        })
+        .select()
+        .single();
+
+      if (emiError) {
+        console.error("Error creating installment plan:", emiError);
+      } else if (emiData) {
+        // Create individual installments
+        const installmentsToCreate = [];
+        const today = new Date();
+        
+        for (let i = 1; i <= numberOfInstallments; i++) {
+          const dueDate = new Date(today);
+          dueDate.setMonth(dueDate.getMonth() + i);
+          
+          installmentsToCreate.push({
+            emi_payment_id: emiData.id,
+            installment_number: i,
+            amount: i === numberOfInstallments ? remaining - (installmentAmount * (numberOfInstallments - 1)) : installmentAmount,
+            due_date: dueDate.toISOString().split('T')[0],
+            status: "pending" as const,
+          });
+        }
+
+        await supabase.from("emi_installments").insert(installmentsToCreate);
+
+        // Send installment plan notification
+        supabase.functions.invoke("send-emi-notification", {
+          body: {
+            bookingId: bookingData.id,
+            notificationType: "emi_plan_created",
+            amount: installmentAmount,
+            totalEmis: numberOfInstallments,
+          }
+        }).catch(err => console.error("Installment notification error:", err));
+      }
+    }
+
     // Process payment based on selected method
     if (bookingData?.id) {
       // Send booking confirmation notifications in background
@@ -162,11 +243,43 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
         body: { bookingId: bookingData.id }
       }).catch(err => console.error("Notification error:", err));
 
-      // Initiate payment
+      // For installment bookings, show success and close
+      if (isInstallment) {
+        toast({
+          title: "Booking Confirmed!",
+          description: `Your installment plan has been created. ${numberOfInstallments} installments of ${formatCurrency(Math.ceil((totalPrice - advanceAmount) / numberOfInstallments))} each.`,
+        });
+        onClose();
+        // Reset form
+        setFormData({
+          guestName: "",
+          guestEmail: "",
+          guestPhone: "",
+          passengerCount: 1,
+          travelDate: "",
+          notes: "",
+          paymentMethod: "",
+          passengerDetails: {
+            name: "",
+            passportNumber: "",
+            dateOfBirth: "",
+            nationality: "Bangladeshi",
+          },
+        });
+        setPaymentType("full");
+        setAdvanceAmount(0);
+        setNumberOfInstallments(3);
+        setErrors({});
+        setTouched({});
+        setLoading(false);
+        return;
+      }
+
+      // Initiate payment for full payment
       const paymentResult = await initiatePayment({
         bookingId: bookingData.id,
         paymentMethod: formData.paymentMethod,
-        amount: package_info.price * formData.passengerCount,
+        amount: totalPrice,
       });
 
       if (paymentResult.success) {
@@ -189,6 +302,9 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
               nationality: "Bangladeshi",
             },
           });
+          setPaymentType("full");
+          setAdvanceAmount(0);
+          setNumberOfInstallments(3);
           setErrors({});
           setTouched({});
         }
@@ -376,34 +492,148 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
             />
           </div>
 
-          {/* Payment Method Selection */}
-          <div className="border-t pt-4">
-            <PaymentMethodSelector
-              selectedMethod={formData.paymentMethod}
-              onSelect={(method) => {
-                setFormData({ ...formData, paymentMethod: method });
-                if (touched.paymentMethod) {
-                  setErrors(prev => ({ ...prev, paymentMethod: undefined }));
-                }
-              }}
-            />
-            {touched.paymentMethod && errors.paymentMethod && (
-              <p className="text-xs text-destructive flex items-center gap-1 mt-2">
-                <AlertCircle className="w-3 h-3" /> {errors.paymentMethod}
-              </p>
+          {/* Payment Type Selection */}
+          <div className="border-t pt-4 space-y-4">
+            <Label className="text-base font-semibold flex items-center gap-2">
+              <CreditCard className="w-4 h-4" /> Payment Option
+            </Label>
+            <RadioGroup
+              value={paymentType}
+              onValueChange={(value: "full" | "installment") => setPaymentType(value)}
+              className="grid grid-cols-2 gap-3"
+            >
+              <div className={`relative flex items-center space-x-3 rounded-lg border p-4 cursor-pointer transition-all ${paymentType === "full" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
+                <RadioGroupItem value="full" id="full" />
+                <Label htmlFor="full" className="cursor-pointer flex-1">
+                  <span className="font-medium">Full Payment</span>
+                  <p className="text-xs text-muted-foreground mt-1">Pay the total amount now</p>
+                </Label>
+              </div>
+              <div className={`relative flex items-center space-x-3 rounded-lg border p-4 cursor-pointer transition-all ${paymentType === "installment" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
+                <RadioGroupItem value="installment" id="installment" />
+                <Label htmlFor="installment" className="cursor-pointer flex-1">
+                  <span className="font-medium">Installment</span>
+                  <p className="text-xs text-muted-foreground mt-1">Pay in easy installments</p>
+                </Label>
+              </div>
+            </RadioGroup>
+
+            {/* Installment Options */}
+            {paymentType === "installment" && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4 bg-muted/50 rounded-lg p-4"
+              >
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="advanceAmount" className="flex items-center gap-2">
+                      <Banknote className="w-4 h-4" /> Advance Payment (৳)
+                    </Label>
+                    <Input
+                      id="advanceAmount"
+                      type="number"
+                      min="0"
+                      max={package_info.price * formData.passengerCount - 1}
+                      value={advanceAmount}
+                      onChange={(e) => setAdvanceAmount(Number(e.target.value))}
+                      placeholder="0"
+                    />
+                    <p className="text-xs text-muted-foreground">Optional upfront payment</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="numberOfInstallments">Number of Installments</Label>
+                    <Select
+                      value={numberOfInstallments.toString()}
+                      onValueChange={(v) => setNumberOfInstallments(Number(v))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <SelectItem key={n} value={n.toString()}>
+                            {n} {n === 1 ? "Installment" : "Installments"}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Total Amount:</span>
+                    <span className="font-medium">{formatCurrency(package_info.price * formData.passengerCount)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Advance Payment:</span>
+                    <span className="font-medium text-green-600">{formatCurrency(advanceAmount)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Remaining:</span>
+                    <span className="font-medium">{formatCurrency((package_info.price * formData.passengerCount) - advanceAmount)}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between text-base">
+                    <span className="font-semibold">Monthly Installment:</span>
+                    <span className="font-bold text-primary">
+                      {formatCurrency(Math.ceil(((package_info.price * formData.passengerCount) - advanceAmount) / numberOfInstallments))}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    × {numberOfInstallments} installment(s)
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Payment Method - Only for full payment */}
+            {paymentType === "full" && (
+              <>
+                <PaymentMethodSelector
+                  selectedMethod={formData.paymentMethod}
+                  onSelect={(method) => {
+                    setFormData({ ...formData, paymentMethod: method });
+                    if (touched.paymentMethod) {
+                      setErrors(prev => ({ ...prev, paymentMethod: undefined }));
+                    }
+                  }}
+                />
+                {touched.paymentMethod && errors.paymentMethod && (
+                  <p className="text-xs text-destructive flex items-center gap-1 mt-2">
+                    <AlertCircle className="w-3 h-3" /> {errors.paymentMethod}
+                  </p>
+                )}
+              </>
             )}
           </div>
 
           <div className="bg-secondary/10 rounded-lg p-4 border border-secondary/20">
             <div className="flex justify-between items-center">
-              <span className="font-medium">Total Amount</span>
+              <span className="font-medium">
+                {paymentType === "installment" ? "Advance to Pay Now" : "Total Amount"}
+              </span>
               <span className="text-2xl font-bold text-secondary">
-                {formatCurrency(package_info.price * formData.passengerCount)}
+                {paymentType === "installment" 
+                  ? formatCurrency(advanceAmount)
+                  : formatCurrency(package_info.price * formData.passengerCount)
+                }
               </span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {formData.passengerCount} passenger(s) × {formatCurrency(package_info.price)}
-            </p>
+            {paymentType === "full" && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {formData.passengerCount} passenger(s) × {formatCurrency(package_info.price)}
+              </p>
+            )}
+            {paymentType === "installment" && (
+              <p className="text-xs text-muted-foreground mt-1">
+                + {numberOfInstallments} monthly installments of {formatCurrency(Math.ceil(((package_info.price * formData.passengerCount) - advanceAmount) / numberOfInstallments))}
+              </p>
+            )}
           </div>
 
           <div className="flex gap-3">
@@ -426,6 +656,8 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   {paymentProcessing ? "Processing Payment..." : "Creating Booking..."}
                 </>
+              ) : paymentType === "installment" ? (
+                "Confirm Booking"
               ) : (
                 "Confirm & Pay"
               )}
