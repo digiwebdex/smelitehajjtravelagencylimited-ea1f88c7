@@ -66,6 +66,39 @@ const AdminBankTransferVerification = ({
 
   if (!booking) return null;
 
+  const sendNotification = async (notificationType: "payment_verified" | "payment_rejected", rejectionReason?: string) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-booking-notification`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            bookingId: booking.id,
+            notificationType,
+            rejectionReason,
+          }),
+        }
+      );
+
+      const result = await response.json();
+      console.log("Notification result:", result);
+      
+      if (result.results?.email?.sent || result.results?.sms?.sent) {
+        toast({
+          title: "Notification Sent",
+          description: "Customer has been notified about the payment status.",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to send notification:", error);
+      // Don't block the main flow if notification fails
+    }
+  };
+
   const handleApprove = async () => {
     setProcessing(true);
     try {
@@ -79,6 +112,9 @@ const AdminBankTransferVerification = ({
         .eq("id", booking.id);
 
       if (error) throw error;
+
+      // Send notification to customer
+      await sendNotification("payment_verified");
 
       toast({
         title: "Payment Verified",
@@ -120,6 +156,9 @@ const AdminBankTransferVerification = ({
         .eq("id", booking.id);
 
       if (error) throw error;
+
+      // Send notification to customer
+      await sendNotification("payment_rejected", rejectionReason);
 
       toast({
         title: "Payment Rejected",

@@ -9,6 +9,8 @@ const corsHeaders = {
 
 interface NotificationRequest {
   bookingId: string;
+  notificationType?: "booking_confirmed" | "payment_verified" | "payment_rejected";
+  rejectionReason?: string;
 }
 
 interface SMSConfig {
@@ -48,6 +50,232 @@ interface BookingDetails {
   };
 }
 
+const getEmailTemplate = (
+  notificationType: string,
+  customerName: string,
+  bookingDetails: BookingDetails,
+  rejectionReason?: string
+): { subject: string; html: string } => {
+  const baseStyles = `
+    <style>
+      body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+      .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+      .header { padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+      .header-success { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+      .header-warning { background: linear-gradient(135deg, #d4a853, #c4963e); color: white; }
+      .header-error { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+      .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+      .booking-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+      .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+      .detail-label { font-weight: bold; color: #666; }
+      .detail-value { color: #333; }
+      .total { font-size: 1.2em; font-weight: bold; }
+      .total-success { color: #22c55e; }
+      .total-warning { color: #d4a853; }
+      .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+      .alert-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 15px; margin: 20px 0; }
+      .alert-text { color: #dc2626; }
+    </style>
+  `;
+
+  if (notificationType === "payment_verified") {
+    return {
+      subject: `Payment Verified - ${bookingDetails.package.title}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Payment Verified</title>
+          ${baseStyles}
+        </head>
+        <body>
+          <div class="container">
+            <div class="header header-success">
+              <h1>Payment Verified! ✓</h1>
+              <p>Your bank transfer has been confirmed</p>
+            </div>
+            <div class="content">
+              <p>Dear ${customerName},</p>
+              <p>Great news! Your bank transfer payment has been verified and your booking is now confirmed.</p>
+              
+              <div class="booking-details">
+                <div class="detail-row">
+                  <span class="detail-label">Package:</span>
+                  <span class="detail-value">${bookingDetails.package.title}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Type:</span>
+                  <span class="detail-value">${bookingDetails.package.type.charAt(0).toUpperCase() + bookingDetails.package.type.slice(1)}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Duration:</span>
+                  <span class="detail-value">${bookingDetails.package.duration_days} Days</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Travel Date:</span>
+                  <span class="detail-value">${bookingDetails.travel_date || "To be confirmed"}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Passengers:</span>
+                  <span class="detail-value">${bookingDetails.passenger_count}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Total Paid:</span>
+                  <span class="detail-value total total-success">$${bookingDetails.total_price.toLocaleString()}</span>
+                </div>
+              </div>
+              
+              <p>We will contact you soon with further details about your trip. If you have any questions, please don't hesitate to reach out.</p>
+              <p>Thank you for choosing us for your spiritual journey!</p>
+            </div>
+            <div class="footer">
+              <p>This is an automated email. Please do not reply directly to this email.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+  }
+
+  if (notificationType === "payment_rejected") {
+    return {
+      subject: `Payment Issue - Action Required - ${bookingDetails.package.title}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Payment Issue</title>
+          ${baseStyles}
+        </head>
+        <body>
+          <div class="container">
+            <div class="header header-error">
+              <h1>Payment Verification Failed</h1>
+              <p>Action required for your booking</p>
+            </div>
+            <div class="content">
+              <p>Dear ${customerName},</p>
+              <p>Unfortunately, we were unable to verify your bank transfer payment for the following booking:</p>
+              
+              <div class="booking-details">
+                <div class="detail-row">
+                  <span class="detail-label">Package:</span>
+                  <span class="detail-value">${bookingDetails.package.title}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Amount:</span>
+                  <span class="detail-value">$${bookingDetails.total_price.toLocaleString()}</span>
+                </div>
+              </div>
+              
+              ${rejectionReason ? `
+              <div class="alert-box">
+                <p><strong>Reason:</strong></p>
+                <p class="alert-text">${rejectionReason}</p>
+              </div>
+              ` : ""}
+              
+              <p>Please contact us to resolve this issue or make a new payment. You can:</p>
+              <ul>
+                <li>Re-submit your bank transfer with correct details</li>
+                <li>Contact our support team for assistance</li>
+                <li>Choose an alternative payment method</li>
+              </ul>
+              
+              <p>We apologize for any inconvenience and are here to help.</p>
+            </div>
+            <div class="footer">
+              <p>This is an automated email. Please do not reply directly to this email.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+  }
+
+  // Default: booking_confirmed
+  return {
+    subject: `Booking Confirmation - ${bookingDetails.package.title}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Booking Confirmation</title>
+        ${baseStyles}
+      </head>
+      <body>
+        <div class="container">
+          <div class="header header-warning">
+            <h1>Booking Confirmed! ✓</h1>
+            <p>Thank you for your reservation</p>
+          </div>
+          <div class="content">
+            <p>Dear ${customerName},</p>
+            <p>We are pleased to confirm your booking. Here are your booking details:</p>
+            
+            <div class="booking-details">
+              <div class="detail-row">
+                <span class="detail-label">Package:</span>
+                <span class="detail-value">${bookingDetails.package.title}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Type:</span>
+                <span class="detail-value">${bookingDetails.package.type.charAt(0).toUpperCase() + bookingDetails.package.type.slice(1)}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Duration:</span>
+                <span class="detail-value">${bookingDetails.package.duration_days} Days</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Travel Date:</span>
+                <span class="detail-value">${bookingDetails.travel_date || "To be confirmed"}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Passengers:</span>
+                <span class="detail-value">${bookingDetails.passenger_count}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Total Amount:</span>
+                <span class="detail-value total total-warning">$${bookingDetails.total_price.toLocaleString()}</span>
+              </div>
+            </div>
+            
+            <p>If you have any questions about your booking, please don't hesitate to contact us.</p>
+            <p>We look forward to serving you!</p>
+          </div>
+          <div class="footer">
+            <p>This is an automated confirmation email. Please do not reply to this email.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  };
+};
+
+const getSmsMessage = (
+  notificationType: string,
+  customerName: string,
+  bookingDetails: BookingDetails,
+  rejectionReason?: string
+): string => {
+  if (notificationType === "payment_verified") {
+    return `Dear ${customerName}, your bank transfer payment for ${bookingDetails.package.title} has been verified! Your booking is now confirmed. Travel Date: ${bookingDetails.travel_date || "TBD"}. Total Paid: $${bookingDetails.total_price}. Thank you!`;
+  }
+
+  if (notificationType === "payment_rejected") {
+    return `Dear ${customerName}, we could not verify your bank transfer for ${bookingDetails.package.title}. ${rejectionReason ? `Reason: ${rejectionReason}. ` : ""}Please contact us to resolve this issue.`;
+  }
+
+  // Default: booking_confirmed
+  return `Dear ${customerName}, your booking for ${bookingDetails.package.title} has been confirmed! Travel Date: ${bookingDetails.travel_date || "TBD"}. Passengers: ${bookingDetails.passenger_count}. Total: $${bookingDetails.total_price}. Thank you for choosing us!`;
+};
+
 const handler = async (req: Request): Promise<Response> => {
   console.log("send-booking-notification function called");
 
@@ -60,8 +288,8 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { bookingId }: NotificationRequest = await req.json();
-    console.log("Processing notification for booking:", bookingId);
+    const { bookingId, notificationType = "booking_confirmed", rejectionReason }: NotificationRequest = await req.json();
+    console.log("Processing notification for booking:", bookingId, "Type:", notificationType);
 
     // Fetch booking details with package info
     const { data: booking, error: bookingError } = await supabase
@@ -130,7 +358,7 @@ const handler = async (req: Request): Promise<Response> => {
         const smsConfig = smsSettings.config as unknown as SMSConfig;
         console.log("Sending SMS to:", customerPhone);
         
-        const smsMessage = `Dear ${customerName}, your booking for ${bookingDetails.package.title} has been confirmed! Travel Date: ${booking.travel_date || "TBD"}. Passengers: ${booking.passenger_count}. Total: $${booking.total_price}. Thank you for choosing us!`;
+        const smsMessage = getSmsMessage(notificationType, customerName, bookingDetails, rejectionReason);
 
         // Make request to Bulk SMS API
         const smsResponse = await fetch(smsConfig.api_url, {
@@ -194,78 +422,13 @@ const handler = async (req: Request): Promise<Response> => {
           },
         });
 
-        const emailHtml = `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <title>Booking Confirmation</title>
-            <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: linear-gradient(135deg, #d4a853, #c4963e); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-              .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-              .booking-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-              .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-              .detail-label { font-weight: bold; color: #666; }
-              .detail-value { color: #333; }
-              .total { font-size: 1.2em; color: #d4a853; font-weight: bold; }
-              .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>Booking Confirmed! ✓</h1>
-                <p>Thank you for your reservation</p>
-              </div>
-              <div class="content">
-                <p>Dear ${customerName},</p>
-                <p>We are pleased to confirm your booking. Here are your booking details:</p>
-                
-                <div class="booking-details">
-                  <div class="detail-row">
-                    <span class="detail-label">Package:</span>
-                    <span class="detail-value">${bookingDetails.package.title}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Type:</span>
-                    <span class="detail-value">${bookingDetails.package.type.charAt(0).toUpperCase() + bookingDetails.package.type.slice(1)}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Duration:</span>
-                    <span class="detail-value">${bookingDetails.package.duration_days} Days</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Travel Date:</span>
-                    <span class="detail-value">${booking.travel_date || "To be confirmed"}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Passengers:</span>
-                    <span class="detail-value">${booking.passenger_count}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Total Amount:</span>
-                    <span class="detail-value total">$${booking.total_price.toLocaleString()}</span>
-                  </div>
-                </div>
-                
-                <p>If you have any questions about your booking, please don't hesitate to contact us.</p>
-                <p>We look forward to serving you!</p>
-              </div>
-              <div class="footer">
-                <p>This is an automated confirmation email. Please do not reply to this email.</p>
-              </div>
-            </div>
-          </body>
-          </html>
-        `;
+        const { subject, html: emailHtml } = getEmailTemplate(notificationType, customerName, bookingDetails, rejectionReason);
 
         await client.send({
           from: `${emailConfig.from_name} <${emailConfig.from_email}>`,
           to: customerEmail,
-          subject: `Booking Confirmation - ${bookingDetails.package.title}`,
-          content: "Your booking has been confirmed!",
+          subject,
+          content: subject,
           html: emailHtml,
         });
 
