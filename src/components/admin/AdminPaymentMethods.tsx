@@ -13,6 +13,7 @@ import {
   Smartphone, 
   Wallet, 
   Banknote, 
+  Building,
   Eye, 
   EyeOff, 
   Save,
@@ -104,6 +105,17 @@ const paymentMethodConfigs: Record<string, {
       { key: 'instructions', label: 'Payment Instructions', type: 'text', placeholder: 'Instructions shown to customer' },
     ],
   },
+  bank_transfer: {
+    hasTestMode: false,
+    fields: [
+      { key: 'bank_name', label: 'Bank Name', type: 'text', placeholder: 'e.g., BRAC Bank Limited', required: true },
+      { key: 'account_name', label: 'Account Name', type: 'text', placeholder: 'e.g., SM Elite Hajj Travel Agency Ltd', required: true },
+      { key: 'account_number', label: 'Account Number', type: 'text', placeholder: 'e.g., 1501204528849001', required: true },
+      { key: 'branch', label: 'Branch Name', type: 'text', placeholder: 'e.g., Gulshan Branch', required: true },
+      { key: 'routing_number', label: 'Routing Number', type: 'text', placeholder: 'e.g., 060261934' },
+      { key: 'swift_code', label: 'SWIFT Code', type: 'text', placeholder: 'e.g., BABORHDHXXX' },
+    ],
+  },
 };
 
 const iconMap: Record<string, React.ElementType> = {
@@ -111,6 +123,7 @@ const iconMap: Record<string, React.ElementType> = {
   Smartphone,
   Wallet,
   Banknote,
+  Building,
 };
 
 const AdminPaymentMethods = () => {
@@ -434,6 +447,21 @@ const AdminPaymentMethods = () => {
                     </p>
                   </TabsContent>
                 </Tabs>
+              ) : selectedMethod.slug === 'bank_transfer' ? (
+                <div className="space-y-4">
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-primary font-medium mb-3">
+                      <Building className="w-5 h-5" />
+                      Bank Account Details
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      These details will be shown to customers when they select Bank Transfer as payment method.
+                    </p>
+                    <div className="grid gap-4">
+                      {paymentMethodConfigs[selectedMethod.slug].fields.map(renderCredentialField)}
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div className="space-y-4">
                   {paymentMethodConfigs[selectedMethod.slug].fields.map(renderCredentialField)}
