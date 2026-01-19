@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Twitter, ArrowUp } from "lucide-react";
+import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Twitter, ArrowUp, Building2, Building } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
@@ -250,19 +250,28 @@ const Footer = () => {
               Contact Info
             </h4>
             <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-secondary" />
-                </div>
-                <div className="text-primary-foreground/80 text-sm pt-2">
-                  <div>{displayAddress}</div>
-                  {displayAddress2 && (
-                    <div className="mt-2 pt-2 border-t border-primary-foreground/10">
-                      {displayAddress2}
-                    </div>
-                  )}
-                </div>
-              </li>
+              {displayAddress && (
+                <li className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-5 h-5 text-secondary" />
+                  </div>
+                  <div className="text-primary-foreground/80 text-sm pt-1">
+                    <span className="text-secondary font-medium text-xs uppercase tracking-wide">Head Office</span>
+                    <div className="mt-1">{displayAddress}</div>
+                  </div>
+                </li>
+              )}
+              {displayAddress2 && (
+                <li className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Building className="w-5 h-5 text-secondary" />
+                  </div>
+                  <div className="text-primary-foreground/80 text-sm pt-1">
+                    <span className="text-secondary font-medium text-xs uppercase tracking-wide">Branch Office</span>
+                    <div className="mt-1">{displayAddress2}</div>
+                  </div>
+                </li>
+              )}
               <li className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Phone className="w-5 h-5 text-secondary" />
