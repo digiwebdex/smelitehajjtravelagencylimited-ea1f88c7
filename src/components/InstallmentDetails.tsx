@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/currency";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -17,8 +18,10 @@ import {
   Clock,
   AlertTriangle,
   Calendar,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import InstallmentPaymentModal from "./InstallmentPaymentModal";
 
 interface InstallmentDetailsProps {
   bookingId: string;
@@ -48,6 +51,8 @@ const InstallmentDetails = ({ bookingId }: InstallmentDetailsProps) => {
   const [emiPayment, setEmiPayment] = useState<EMIPayment | null>(null);
   const [installments, setInstallments] = useState<Installment[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [selectedInstallment, setSelectedInstallment] = useState<Installment | null>(null);
 
   useEffect(() => {
     fetchInstallmentData();
@@ -236,46 +241,82 @@ const InstallmentDetails = ({ bookingId }: InstallmentDetailsProps) => {
           <div className="space-y-2">
             <p className="text-sm font-medium">All Installments</p>
             <div className="divide-y rounded-lg border overflow-hidden">
-              {installments.map((inst) => (
-                <div
-                  key={inst.id}
-                  className={cn(
-                    "flex items-center justify-between p-3 text-sm",
-                    inst.status === "paid" && "bg-green-50/50 dark:bg-green-950/20"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium",
-                        inst.status === "paid"
-                          ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                          : "bg-muted text-muted-foreground"
-                      )}
-                    >
-                      #{inst.installment_number}
-                    </div>
-                    <div>
-                      <p className="font-medium">{formatCurrency(inst.amount)}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {inst.due_date
-                          ? `Due: ${format(new Date(inst.due_date), "dd MMM yyyy")}`
-                          : "No due date"}
-                        {inst.paid_date && (
-                          <span className="text-green-600 ml-2">
-                            • Paid: {format(new Date(inst.paid_date), "dd MMM yyyy")}
-                          </span>
+              {installments.map((inst) => {
+                const isPending = inst.status !== "paid";
+                const isOverdue = isPending && inst.due_date && new Date(inst.due_date) < today;
+
+                return (
+                  <div
+                    key={inst.id}
+                    className={cn(
+                      "flex items-center justify-between p-3 text-sm",
+                      inst.status === "paid" && "bg-green-50/50 dark:bg-green-950/20"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium",
+                          inst.status === "paid"
+                            ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                            : "bg-muted text-muted-foreground"
                         )}
-                      </p>
+                      >
+                        #{inst.installment_number}
+                      </div>
+                      <div>
+                        <p className="font-medium">{formatCurrency(inst.amount)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {inst.due_date
+                            ? `Due: ${format(new Date(inst.due_date), "dd MMM yyyy")}`
+                            : "No due date"}
+                          {inst.paid_date && (
+                            <span className="text-green-600 ml-2">
+                              • Paid: {format(new Date(inst.paid_date), "dd MMM yyyy")}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {isPending && (
+                        <Button
+                          size="sm"
+                          variant={isOverdue ? "destructive" : "default"}
+                          className="gap-1"
+                          onClick={() => {
+                            setSelectedInstallment(inst);
+                            setPaymentModalOpen(true);
+                          }}
+                        >
+                          <Wallet className="w-3 h-3" />
+                          Pay Now
+                        </Button>
+                      )}
+                      {getStatusBadge(inst.status, inst.due_date)}
                     </div>
                   </div>
-                  {getStatusBadge(inst.status, inst.due_date)}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </CollapsibleContent>
       </Collapsible>
+
+      {/* Payment Modal */}
+      <InstallmentPaymentModal
+        isOpen={paymentModalOpen}
+        onClose={() => {
+          setPaymentModalOpen(false);
+          setSelectedInstallment(null);
+        }}
+        installment={selectedInstallment}
+        onPaymentSuccess={() => {
+          setPaymentModalOpen(false);
+          setSelectedInstallment(null);
+          fetchInstallmentData();
+        }}
+      />
     </div>
   );
 };
