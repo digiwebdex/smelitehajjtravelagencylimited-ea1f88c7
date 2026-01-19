@@ -97,7 +97,7 @@ const TeamSection = () => {
               <Users className="w-4 h-4" />
               Meet Our Team
             </span>
-            <h2 className="font-calligraphy text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mt-3 mb-2">
+            <h2 className="font-calligraphy text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mt-3 mb-4">
               Management Board
             </h2>
             <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">فريقنا</span>
@@ -177,10 +177,10 @@ const TeamSection = () => {
                 viewport={{ once: true }}
                 className="text-center mb-12"
               >
-                <h2 className="font-calligraphy text-3xl md:text-4xl font-bold text-foreground mb-2">
+                <h2 className="font-calligraphy text-3xl md:text-4xl font-bold text-foreground mb-4">
                   Shariah Board
                 </h2>
-                <span className="font-thuluth text-secondary/60 text-xl md:text-2xl block mb-4">مجلس الشريعة</span>
+                <span className="font-thuluth text-secondary/60 text-xl md:text-2xl block mb-6">مجلس الشريعة</span>
                 <p className="text-muted-foreground max-w-xl mx-auto">
                   Our Shariah advisors ensure all our services comply with Islamic principles.
                 </p>

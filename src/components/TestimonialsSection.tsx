@@ -100,7 +100,7 @@ const TestimonialsSection = () => {
           <span className="text-secondary font-semibold uppercase tracking-wider">
             Testimonials
           </span>
-          <h2 className="font-calligraphy text-4xl md:text-5xl font-bold text-foreground mt-3 mb-2">
+          <h2 className="font-calligraphy text-4xl md:text-5xl font-bold text-foreground mt-3 mb-4">
             What Our Pilgrims Say
           </h2>
           <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">شهادات</span>
