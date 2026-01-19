@@ -292,37 +292,39 @@ const HeroSection = () => {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* Background Image with Slide from Right to Left (fast 0.5s) */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={`bg-${currentSlide}`}
-          initial={{ opacity: 0, x: 80 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -80 }}
-          transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const }}
-          className="absolute inset-0"
-        >
-          {/* Smooth Ken Burns zoom effect on the image */}
-          <motion.img
-            key={`img-${currentSlide}`}
-            src={backgroundImage}
-            alt="Hero background"
-            className="w-full h-full object-cover"
-            initial={{ scale: 1.02 }}
-            animate={{ 
-              scale: 1.08,
-              transition: { 
-                duration: 4, 
-                ease: "linear"
-              }
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-hero" />
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(0,0,0,0.5)_100%)]" />
-          </div>
-        </motion.div>
-      </AnimatePresence>
+      {/* Background Image with Crossfade Slide Effect */}
+      <div className="absolute inset-0 bg-primary">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={`bg-${currentSlide}`}
+            initial={{ opacity: 0, x: 60 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -60 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const }}
+            className="absolute inset-0"
+          >
+            {/* Smooth Ken Burns zoom effect on the image */}
+            <motion.img
+              key={`img-${currentSlide}`}
+              src={backgroundImage}
+              alt="Hero background"
+              className="w-full h-full object-cover"
+              initial={{ scale: 1.02 }}
+              animate={{ 
+                scale: 1.08,
+                transition: { 
+                  duration: 4, 
+                  ease: "linear"
+                }
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-hero" />
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(0,0,0,0.5)_100%)]" />
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       {/* Floating Islamic Geometric Patterns */}
       <FloatingIslamicPatterns mousePosition={mousePosition} />
