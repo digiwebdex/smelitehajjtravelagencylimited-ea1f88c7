@@ -264,6 +264,109 @@ export type Database = {
         }
         Relationships: []
       }
+      emi_installments: {
+        Row: {
+          amount: number
+          created_at: string
+          due_date: string | null
+          emi_payment_id: string
+          id: string
+          installment_number: number
+          notes: string | null
+          paid_date: string | null
+          payment_method: string | null
+          status: string
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          due_date?: string | null
+          emi_payment_id: string
+          id?: string
+          installment_number: number
+          notes?: string | null
+          paid_date?: string | null
+          payment_method?: string | null
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          due_date?: string | null
+          emi_payment_id?: string
+          id?: string
+          installment_number?: number
+          notes?: string | null
+          paid_date?: string | null
+          payment_method?: string | null
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emi_installments_emi_payment_id_fkey"
+            columns: ["emi_payment_id"]
+            isOneToOne: false
+            referencedRelation: "emi_payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emi_payments: {
+        Row: {
+          advance_amount: number
+          booking_id: string
+          created_at: string
+          emi_amount: number
+          id: string
+          is_emi_plan: boolean
+          number_of_emis: number
+          paid_emis: number
+          remaining_amount: number
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          advance_amount?: number
+          booking_id: string
+          created_at?: string
+          emi_amount: number
+          id?: string
+          is_emi_plan?: boolean
+          number_of_emis: number
+          paid_emis?: number
+          remaining_amount: number
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          advance_amount?: number
+          booking_id?: string
+          created_at?: string
+          emi_amount?: number
+          id?: string
+          is_emi_plan?: boolean
+          number_of_emis?: number
+          paid_emis?: number
+          remaining_amount?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emi_payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       faq_items: {
         Row: {
           answer: string

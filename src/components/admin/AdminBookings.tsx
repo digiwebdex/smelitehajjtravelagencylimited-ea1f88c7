@@ -33,12 +33,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Search, Eye, CheckCircle, XCircle, Clock, AlertCircle, Download, CalendarIcon, X, CreditCard, Banknote, Wallet, MapPin } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, Clock, AlertCircle, Download, CalendarIcon, X, CreditCard, Banknote, Wallet, MapPin, Calculator } from "lucide-react";
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/currency";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import AdminTrackingStatus from "./AdminTrackingStatus";
+import AdminEMIManagement from "./AdminEMIManagement";
 
 type TrackingStatus = 'order_submitted' | 'documents_received' | 'under_review' | 'approved' | 'processing' | 'completed';
 
@@ -84,6 +85,8 @@ const paymentStatusOptions = [
   { value: "pending", label: "Pending", icon: Clock, color: "bg-yellow-500" },
   { value: "pending_cash", label: "Cash Pending", icon: Banknote, color: "bg-orange-500" },
   { value: "paid", label: "Paid", icon: CheckCircle, color: "bg-green-500" },
+  { value: "partial", label: "Partial", icon: Calculator, color: "bg-blue-500" },
+  { value: "emi_pending", label: "EMI Pending", icon: Calculator, color: "bg-purple-500" },
   { value: "failed", label: "Failed", icon: XCircle, color: "bg-red-500" },
   { value: "refunded", label: "Refunded", icon: Wallet, color: "bg-purple-500" },
 ];
@@ -107,6 +110,7 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [trackingBooking, setTrackingBooking] = useState<Booking | null>(null);
+  const [emiBooking, setEmiBooking] = useState<Booking | null>(null);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
 
@@ -520,6 +524,7 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Booking ID</TableHead>
+                  <TableHead>Date</TableHead>
                   <TableHead>Customer</TableHead>
                   <TableHead>Package</TableHead>
                   <TableHead>Passengers</TableHead>
@@ -527,7 +532,6 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
                   <TableHead>Payment</TableHead>
                   <TableHead>Tracking</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -538,6 +542,9 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
                   <TableRow key={booking.id}>
                     <TableCell className="font-mono text-xs">
                       {booking.id.slice(0, 8).toUpperCase()}
+                    </TableCell>
+                    <TableCell className="text-xs whitespace-nowrap">
+                      {format(new Date(booking.created_at), "MMM dd, yyyy")}
                     </TableCell>
                     <TableCell>
                       <div>
@@ -579,6 +586,16 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
                             Mark Paid
                           </Button>
                         )}
+                        {/* EMI Button */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-6 text-xs gap-1 mt-1"
+                          onClick={() => setEmiBooking(booking)}
+                        >
+                          <Calculator className="w-3 h-3" />
+                          EMI
+                        </Button>
                         {booking.transaction_id && (
                           <span className="text-xs text-muted-foreground font-mono">
                             {booking.transaction_id.slice(0, 12)}...
@@ -598,9 +615,6 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
                       </Button>
                     </TableCell>
                     <TableCell>{getStatusBadge(booking.status)}</TableCell>
-                    <TableCell className="text-xs">
-                      {new Date(booking.created_at).toLocaleDateString()}
-                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Button
@@ -766,6 +780,20 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
           onClose={() => setTrackingBooking(null)}
           bookingId={trackingBooking.id}
           currentStatus={trackingBooking.tracking_status}
+          onUpdate={() => {
+            fetchBookings();
+            onUpdate();
+          }}
+        />
+      )}
+
+      {/* EMI Management Modal */}
+      {emiBooking && (
+        <AdminEMIManagement
+          isOpen={!!emiBooking}
+          onClose={() => setEmiBooking(null)}
+          bookingId={emiBooking.id}
+          totalAmount={Number(emiBooking.total_price)}
           onUpdate={() => {
             fetchBookings();
             onUpdate();
