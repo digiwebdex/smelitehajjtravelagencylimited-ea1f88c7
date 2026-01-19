@@ -29,6 +29,7 @@ interface FooterContent {
   services_links: ServiceLink[];
   social_links: SocialLink[];
   contact_address?: string;
+  contact_address_2?: string;
   contact_phones?: string[];
   contact_email?: string;
 }
@@ -58,6 +59,7 @@ const Footer = () => {
     ],
     social_links: [],
     contact_address: "",
+    contact_address_2: "",
     contact_phones: [],
     contact_email: "",
   });
@@ -91,6 +93,7 @@ const Footer = () => {
         services_links: Array.isArray(data.services_links) ? (data.services_links as unknown as ServiceLink[]) : content.services_links,
         social_links: Array.isArray(data.social_links) ? (data.social_links as unknown as SocialLink[]) : [],
         contact_address: (data as Record<string, unknown>).contact_address as string || "",
+        contact_address_2: (data as Record<string, unknown>).contact_address_2 as string || "",
         contact_phones: Array.isArray((data as Record<string, unknown>).contact_phones) ? (data as Record<string, unknown>).contact_phones as string[] : [],
         contact_email: (data as Record<string, unknown>).contact_email as string || "",
       });
@@ -101,6 +104,7 @@ const Footer = () => {
   const displayDescription = content.company_description || companyInfo.tagline;
   const displayCopyright = content.copyright_text || `© ${currentYear} ${companyInfo.name}. All rights reserved.`;
   const displayAddress = content.contact_address || contactDetails.address;
+  const displayAddress2 = content.contact_address_2 || "";
   const displayPhones = content.contact_phones?.length ? content.contact_phones : [contactDetails.phone];
   const displayEmail = content.contact_email || contactDetails.email;
   const displaySocialLinks = content.social_links?.length ? content.social_links : buildSocialLinks();
@@ -250,9 +254,14 @@ const Footer = () => {
                 <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <MapPin className="w-5 h-5 text-secondary" />
                 </div>
-                <span className="text-primary-foreground/80 text-sm pt-2">
-                  {displayAddress}
-                </span>
+                <div className="text-primary-foreground/80 text-sm pt-2">
+                  <div>{displayAddress}</div>
+                  {displayAddress2 && (
+                    <div className="mt-2 pt-2 border-t border-primary-foreground/10">
+                      {displayAddress2}
+                    </div>
+                  )}
+                </div>
               </li>
               <li className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
