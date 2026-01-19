@@ -33,7 +33,8 @@ import {
   Sun,
   Moon,
   Monitor,
-  MousePointerClick
+  MousePointerClick,
+  Eye
 } from "lucide-react";
 import { CURRENCY } from "@/lib/currency";
 import ImageUpload from "./ImageUpload";
@@ -416,21 +417,46 @@ const AdminSettings = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="google_map_embed_url" className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-red-500" />
-                  Google Maps Embed URL
-                </Label>
-                <Textarea
-                  id="google_map_embed_url"
-                  value={contactDetails.google_map_embed_url}
-                  onChange={(e) => setContactDetails({ ...contactDetails, google_map_embed_url: e.target.value })}
-                  placeholder="https://www.google.com/maps/embed?pb=..."
-                  rows={3}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Go to Google Maps → Search your location → Click "Share" → "Embed a map" → Copy the src URL from the iframe code
-                </p>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="google_map_embed_url" className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-red-500" />
+                    Google Maps Embed URL
+                  </Label>
+                  <Textarea
+                    id="google_map_embed_url"
+                    value={contactDetails.google_map_embed_url}
+                    onChange={(e) => setContactDetails({ ...contactDetails, google_map_embed_url: e.target.value })}
+                    placeholder="https://www.google.com/maps/embed?pb=..."
+                    rows={3}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Go to Google Maps → Search your location → Click "Share" → "Embed a map" → Copy the src URL from the iframe code
+                  </p>
+                </div>
+                
+                {/* Map Preview */}
+                {contactDetails.google_map_embed_url && (
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-sm font-medium">
+                      <Eye className="w-4 h-4" />
+                      Map Preview
+                    </Label>
+                    <div className="rounded-lg overflow-hidden border border-border">
+                      <iframe
+                        src={contactDetails.google_map_embed_url}
+                        width="100%"
+                        height="250"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Google Maps Preview"
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.div>
 
