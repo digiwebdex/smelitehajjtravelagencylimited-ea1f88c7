@@ -452,20 +452,6 @@ const HeroSection = () => {
             ))}
           </div>
 
-          {/* Play/Pause Button */}
-          <motion.button
-            onClick={toggleAutoplay}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className={`w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center transition-all
-              ${isLight 
-                ? "bg-white/80 border-slate-200 text-foreground hover:bg-white" 
-                : "bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20"
-              }`}
-            aria-label={isAutoPlaying ? "Pause slideshow" : "Play slideshow"}
-          >
-            {isAutoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
-          </motion.button>
         </div>
       )}
 
@@ -614,26 +600,6 @@ const HeroSection = () => {
             </motion.div>
           </AnimatePresence>
 
-          {/* Scroll Indicator */}
-          <motion.a
-            href="#hajj"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, y: [0, 8, 0] }}
-            transition={{ 
-              opacity: { delay: 1.2, duration: 0.5 },
-              y: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-            }}
-            className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-colors ${textMuted} hover:${textPrimary}`}
-          >
-            <span className="text-sm font-medium tracking-wide">Explore Packages</span>
-            <div className="w-6 h-10 rounded-full border-2 border-current flex items-start justify-center p-1.5">
-              <motion.div
-                animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="w-1.5 h-1.5 rounded-full bg-current"
-              />
-            </div>
-          </motion.a>
         </div>
       ) : (
         /* Split-Screen Layout */
@@ -795,26 +761,6 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* Scroll Indicator */}
-          <motion.a
-            href="#hajj"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, y: [0, 8, 0] }}
-            transition={{ 
-              opacity: { delay: 1.2, duration: 0.5 },
-              y: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-            }}
-            className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-colors ${textMuted}`}
-          >
-            <span className="text-sm font-medium tracking-wide">Explore Packages</span>
-            <div className="w-6 h-10 rounded-full border-2 border-current flex items-start justify-center p-1.5">
-              <motion.div
-                animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="w-1.5 h-1.5 rounded-full bg-current"
-              />
-            </div>
-          </motion.a>
         </div>
       )}
 
