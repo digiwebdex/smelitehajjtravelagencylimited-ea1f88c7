@@ -208,7 +208,7 @@ const Footer = () => {
             )}
           </div>
 
-          {/* Quick Links */}
+          {/* Quick Links - Now shows services */}
           <div>
             <h4 className="font-heading font-semibold text-lg mb-6 flex items-center gap-2">
               <span className="w-8 h-0.5 bg-secondary" />
@@ -252,13 +252,14 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Contact Info - Split into Addresses and Phone/Email */}
           <div>
             <h4 className="font-heading font-semibold text-lg mb-6 flex items-center gap-2">
               <span className="w-8 h-0.5 bg-secondary" />
               Contact Info
             </h4>
             <ul className="space-y-4">
+              {/* Section 1: Addresses Only */}
               {displayAddress && (
                 <li className="flex items-start gap-3">
                   <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -281,12 +282,13 @@ const Footer = () => {
                   </div>
                 </li>
               )}
-              {/* Phone Numbers - Grouped Layout */}
+
+              {/* Section 2: Phone Numbers and Email */}
               {displayPhones.length > 0 && (
-                <li className="space-y-3">
+                <li className="space-y-3 pt-2 border-t border-primary-foreground/10">
                   {/* First group - first 2 phones */}
                   {displayPhones.slice(0, 2).length > 0 && (
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-3 pt-3">
                       <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
                         <Phone className="w-5 h-5 text-secondary" />
                       </div>
@@ -331,9 +333,12 @@ const Footer = () => {
                 <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Mail className="w-5 h-5 text-secondary" />
                 </div>
-                <span className="text-primary-foreground/80 text-sm pt-2">
+                <a 
+                  href={`mailto:${displayEmail}`}
+                  className="text-primary-foreground/80 text-sm pt-2 hover:text-secondary transition-colors"
+                >
                   {displayEmail}
-                </span>
+                </a>
               </li>
             </ul>
           </div>
