@@ -34,7 +34,7 @@ const WhatsAppButton = () => {
       {/* WhatsApp Button - Left Side */}
       <button
         onClick={openWhatsApp}
-        className="fixed bottom-6 left-6 z-50 bg-[#25D366] hover:bg-[#20BA5C] text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
+        className="fixed bottom-20 lg:bottom-6 left-6 z-50 bg-[#25D366] hover:bg-[#20BA5C] text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
         aria-label="Chat on WhatsApp"
       >
         <MessageCircle className="w-7 h-7" />
@@ -46,7 +46,7 @@ const WhatsAppButton = () => {
       {/* Back to Top Button - Right Side */}
       <button
         onClick={scrollToTop}
-        className={`fixed bottom-6 right-6 z-50 bg-primary hover:bg-primary/90 text-primary-foreground p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 ${
+        className={`fixed bottom-20 lg:bottom-6 right-6 z-50 bg-primary hover:bg-primary/90 text-primary-foreground p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 ${
           showBackToTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
         }`}
         aria-label="Back to top"
