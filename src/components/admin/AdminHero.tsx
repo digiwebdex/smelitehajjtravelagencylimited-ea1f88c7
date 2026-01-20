@@ -469,10 +469,12 @@ const AdminHero = () => {
                   <SelectValue placeholder="Select interval" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="4">4 seconds (Fast)</SelectItem>
-                  <SelectItem value="6">6 seconds (Normal)</SelectItem>
-                  <SelectItem value="8">8 seconds (Slow)</SelectItem>
-                  <SelectItem value="10">10 seconds (Very Slow)</SelectItem>
+                  <SelectItem value="2">2 seconds (Very Fast)</SelectItem>
+                  <SelectItem value="3">3 seconds (Fast)</SelectItem>
+                  <SelectItem value="4">4 seconds (Normal)</SelectItem>
+                  <SelectItem value="6">6 seconds (Slow)</SelectItem>
+                  <SelectItem value="8">8 seconds (Very Slow)</SelectItem>
+                  <SelectItem value="10">10 seconds (Ultra Slow)</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">Time before auto-switching to next slide</p>
