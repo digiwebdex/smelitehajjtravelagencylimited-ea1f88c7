@@ -173,7 +173,7 @@ const Footer = () => {
       </motion.button>
 
       <div className="container py-20 relative z-10">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
           {/* About */}
           <div>
             <div className="flex items-center gap-3 mb-6">
@@ -206,29 +206,6 @@ const Footer = () => {
                 })}
               </div>
             )}
-          </div>
-
-          {/* Quick Links - Now shows services */}
-          <div>
-            <h4 className="font-heading font-semibold text-lg mb-6 flex items-center gap-2">
-              <span className="w-8 h-0.5 bg-secondary" />
-              Quick Links
-            </h4>
-            <ul className="space-y-3">
-              {content.quick_links.map((link, index) => (
-                <li key={index}>
-                  <a
-                    href={link.href}
-                    target={link.href.startsWith('http') ? '_blank' : undefined}
-                    rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                    className="text-primary-foreground/80 hover:text-secondary transition-colors text-sm flex items-center gap-2 group"
-                  >
-                    <span className="w-0 group-hover:w-2 h-0.5 bg-secondary transition-all duration-300" />
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
           </div>
 
           {/* Our Services */}
