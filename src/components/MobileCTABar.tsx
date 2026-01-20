@@ -3,9 +3,14 @@ import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const MobileCTABar = () => {
-  const { contactDetails } = useSiteSettings();
+  const { contactDetails, appearance } = useSiteSettings();
 
   const whatsappNumber = contactDetails.whatsapp?.replace(/[^0-9]/g, '') || '8801867666888';
+
+  // Don't render if disabled in settings
+  if (appearance.show_mobile_cta_bar === false) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-card/95 backdrop-blur-md border-t border-border shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.15)]">
