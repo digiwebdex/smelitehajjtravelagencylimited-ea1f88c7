@@ -173,7 +173,7 @@ const Footer = () => {
       </motion.button>
 
       <div className="container py-20 relative z-10">
-        <div className="grid md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr] gap-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* About */}
           <div>
             <div className="flex items-center gap-3 mb-6">
@@ -229,14 +229,13 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact Info - Split into Addresses and Phone/Email */}
+          {/* Contact Info - Addresses */}
           <div>
             <h4 className="font-heading font-semibold text-lg mb-6 flex items-center gap-2">
               <span className="w-8 h-0.5 bg-secondary" />
               Contact Info
             </h4>
             <ul className="space-y-4">
-              {/* Section 1: Addresses Only */}
               {displayAddress && (
                 <li className="flex items-start gap-3">
                   <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -259,13 +258,22 @@ const Footer = () => {
                   </div>
                 </li>
               )}
+            </ul>
+          </div>
 
-              {/* Section 2: Phone Numbers and Email */}
+          {/* Contact Info - Phone & Email */}
+          <div>
+            <h4 className="font-heading font-semibold text-lg mb-6 flex items-center gap-2 invisible">
+              <span className="w-8 h-0.5 bg-secondary" />
+              Contact
+            </h4>
+            <ul className="space-y-4">
+              {/* Phone Numbers */}
               {displayPhones.length > 0 && (
-                <li className="space-y-3 pt-2 border-t border-primary-foreground/10">
+                <>
                   {/* First group - first 2 phones */}
                   {displayPhones.slice(0, 2).length > 0 && (
-                    <div className="flex items-start gap-3 pt-3">
+                    <li className="flex items-start gap-3">
                       <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
                         <Phone className="w-5 h-5 text-secondary" />
                       </div>
@@ -280,11 +288,11 @@ const Footer = () => {
                           </a>
                         ))}
                       </div>
-                    </div>
+                    </li>
                   )}
                   {/* Second group - remaining phones */}
                   {displayPhones.length > 2 && (
-                    <div className="flex items-start gap-3">
+                    <li className="flex items-start gap-3">
                       <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
                         <Phone className="w-5 h-5 text-secondary" />
                       </div>
@@ -302,10 +310,11 @@ const Footer = () => {
                           </span>
                         ))}
                       </div>
-                    </div>
+                    </li>
                   )}
-                </li>
+                </>
               )}
+              {/* Email */}
               <li className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Mail className="w-5 h-5 text-secondary" />
