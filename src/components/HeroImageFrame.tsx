@@ -26,38 +26,38 @@ const HeroImageFrame = ({
     >
       {/* Simple decorative circles */}
       <div className={`
-        absolute -top-16 -right-16 w-32 h-32 rounded-full border-2 opacity-30
+        absolute -top-10 -right-10 w-20 h-20 rounded-full border-2 opacity-30
         ${isLight ? "border-emerald-500" : "border-secondary"}
       `} />
       <div className={`
-        absolute -bottom-12 -left-12 w-24 h-24 rounded-full border opacity-20
+        absolute -bottom-8 -left-8 w-16 h-16 rounded-full border opacity-20
         ${isLight ? "border-amber-500" : "border-secondary"}
       `} />
 
       {/* Accent triangles */}
       <div className={`
-        absolute -top-8 right-8 w-0 h-0 
-        border-l-[20px] border-l-transparent 
-        border-b-[35px] border-r-[20px] border-r-transparent
+        absolute -top-5 right-6 w-0 h-0 
+        border-l-[14px] border-l-transparent 
+        border-b-[24px] border-r-[14px] border-r-transparent
         ${isLight ? "border-b-emerald-500" : "border-b-secondary"}
         opacity-60
       `} />
       <div className={`
-        absolute -bottom-6 left-12 w-0 h-0 
-        border-l-[15px] border-l-transparent 
-        border-t-[25px] border-r-[15px] border-r-transparent
+        absolute -bottom-4 left-8 w-0 h-0 
+        border-l-[10px] border-l-transparent 
+        border-t-[18px] border-r-[10px] border-r-transparent
         ${isLight ? "border-t-amber-400" : "border-t-secondary/70"}
         opacity-50
       `} />
 
       {/* Floating accent circles */}
       <div className={`
-        absolute -top-4 -left-4 w-8 h-8 rounded-full
+        absolute -top-3 -left-3 w-6 h-6 rounded-full
         ${isLight ? "bg-emerald-500" : "bg-secondary"}
         opacity-80 shadow-lg
       `} />
       <div className={`
-        absolute top-1/4 -right-6 w-6 h-6 rounded-full
+        absolute top-1/4 -right-4 w-4 h-4 rounded-full
         ${isLight ? "bg-amber-400" : "bg-secondary/80"}
         opacity-70 shadow-md
       `} />
@@ -68,11 +68,11 @@ const HeroImageFrame = ({
         {frameStyle === "modern" && (
           <>
             <div className={`
-              absolute -inset-3 rounded-[2rem] border-2 transform rotate-2
+              absolute -inset-2 rounded-[1.5rem] border-2 transform rotate-2
               ${isLight ? "border-emerald-200" : "border-secondary/30"}
             `} />
             <div className={`
-              absolute -inset-3 rounded-[2rem] border transform -rotate-1
+              absolute -inset-2 rounded-[1.5rem] border transform -rotate-1
               ${isLight ? "border-amber-200" : "border-secondary/20"}
             `} />
           </>
