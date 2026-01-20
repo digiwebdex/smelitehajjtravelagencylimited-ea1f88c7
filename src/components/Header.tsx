@@ -237,7 +237,7 @@ const Header = () => {
 
           {/* Mobile Navigation */}
           {isMenuOpen && (
-            <div className="lg:hidden mt-4 pb-4 border-t border-border pt-4 animate-fade-up">
+            <div className="lg:hidden mt-4 pb-4 border-t border-border pt-4 animate-fade-up max-h-[70vh] overflow-y-auto">
               <div className="flex flex-col gap-4">
                 {menuItems.map((link) => (
                   <a
@@ -249,15 +249,37 @@ const Header = () => {
                     {link.label}
                   </a>
                 ))}
-                <div className="flex flex-col gap-2 mt-4">
+                <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
                   <Link to="/track-order" onClick={() => setIsMenuOpen(false)}>
                     <Button variant="outline" className="w-full gap-2">
                       <MapPin className="w-4 h-4" />
                       Track Order
                     </Button>
                   </Link>
+                  {user && (
+                    <>
+                      <Link to="/my-bookings" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full gap-2">
+                          <User className="w-4 h-4" />
+                          My Bookings
+                        </Button>
+                      </Link>
+                      {isAdmin && (
+                        <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                          <Button variant="outline" className="w-full gap-2">
+                            <LayoutDashboard className="w-4 h-4" />
+                            Admin Dashboard
+                          </Button>
+                        </Link>
+                      )}
+                      <Button variant="outline" className="w-full gap-2" onClick={handleSignOut}>
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </Button>
+                    </>
+                  )}
                   {appearance.show_book_now_button !== false && (
-                    <a href="#hajj">
+                    <a href="#hajj" onClick={() => setIsMenuOpen(false)}>
                       <Button className="bg-gradient-primary w-full">
                         Book Now
                       </Button>
