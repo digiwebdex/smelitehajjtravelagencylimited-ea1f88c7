@@ -1068,6 +1068,7 @@ export type Database = {
           board_type: string
           created_at: string
           id: string
+          imo_number: string | null
           is_active: boolean
           name: string
           order_index: number
@@ -1081,6 +1082,7 @@ export type Database = {
           board_type?: string
           created_at?: string
           id?: string
+          imo_number?: string | null
           is_active?: boolean
           name: string
           order_index?: number
@@ -1094,6 +1096,7 @@ export type Database = {
           board_type?: string
           created_at?: string
           id?: string
+          imo_number?: string | null
           is_active?: boolean
           name?: string
           order_index?: number

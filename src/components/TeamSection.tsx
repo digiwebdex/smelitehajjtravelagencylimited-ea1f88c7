@@ -4,7 +4,9 @@ import { Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import IslamicBorder from "./IslamicBorder";
 import WhatsAppIcon from "./icons/WhatsAppIcon";
+import IMOIcon from "./icons/IMOIcon";
 import OptimizedImage from "./ui/optimized-image";
+
 interface TeamMember {
   id: string;
   name: string;
@@ -14,6 +16,7 @@ interface TeamMember {
   board_type: string;
   order_index: number;
   whatsapp_number?: string;
+  imo_number?: string;
 }
 
 const TeamSection = () => {
@@ -234,17 +237,32 @@ const TeamSection = () => {
                   <p className="text-secondary font-semibold text-sm uppercase tracking-wide mb-3">
                     {member.role}
                   </p>
-                  {member.whatsapp_number && (
-                    <a
-                      href={`https://wa.me/${member.whatsapp_number.replace(/[^0-9]/g, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm text-[#25D366] hover:text-[#128C7E] transition-colors font-medium"
-                    >
-                      <WhatsAppIcon size={18} />
-                      {member.whatsapp_number}
-                    </a>
-                  )}
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    {member.whatsapp_number && (
+                      <a
+                        href={`https://wa.me/${member.whatsapp_number.replace(/[^0-9]/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs text-[#25D366] hover:text-[#128C7E] transition-colors font-medium"
+                        title="WhatsApp"
+                      >
+                        <WhatsAppIcon size={16} />
+                        <span className="hidden sm:inline">{member.whatsapp_number}</span>
+                      </a>
+                    )}
+                    {member.imo_number && (
+                      <a
+                        href={`https://imo.im/${member.imo_number.replace(/[^0-9]/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs text-[#3B82F6] hover:text-[#2563EB] transition-colors font-medium"
+                        title="IMO"
+                      >
+                        <IMOIcon size={16} />
+                        <span className="hidden sm:inline">{member.imo_number}</span>
+                      </a>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             ))}
