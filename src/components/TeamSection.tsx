@@ -92,7 +92,7 @@ const TeamSection = () => {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-6"
           >
             <span className="inline-flex items-center gap-2 text-secondary font-semibold uppercase tracking-wider">
               <Users className="w-4 h-4" />
