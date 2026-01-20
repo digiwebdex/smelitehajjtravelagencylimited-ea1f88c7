@@ -60,7 +60,7 @@ const HeroSection = () => {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [autoplayInterval, setAutoplayInterval] = useState(6000);
+  const [autoplayInterval, setAutoplayInterval] = useState(3000);
   const [transitionDuration, setTransitionDuration] = useState(0.9);
   const [progress, setProgress] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -263,30 +263,30 @@ const HeroSection = () => {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30, filter: "blur(10px)" },
+    hidden: { opacity: 0, x: 50, filter: "blur(10px)" },
     visible: {
       opacity: 1,
-      y: 0,
+      x: 0,
       filter: "blur(0px)",
       transition: { duration: transitionDuration * 0.7, ease: [0.25, 0.46, 0.45, 0.94] as const },
     },
     exit: {
       opacity: 0,
-      y: -20,
+      x: -50,
       filter: "blur(5px)",
       transition: { duration: transitionDuration * 0.3 },
     },
   };
 
   const imageVariants = {
-    initial: { scale: 1.15, opacity: 0 },
+    initial: { x: 100, opacity: 0 },
     animate: { 
-      scale: 1, 
+      x: 0, 
       opacity: 1,
       transition: { duration: transitionDuration * 1.2, ease: [0.25, 0.46, 0.45, 0.94] as const }
     },
     exit: { 
-      scale: 1.05, 
+      x: -100, 
       opacity: 0,
       transition: { duration: transitionDuration * 0.5 }
     },
