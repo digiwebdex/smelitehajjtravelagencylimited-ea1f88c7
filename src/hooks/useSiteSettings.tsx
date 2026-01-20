@@ -28,6 +28,7 @@ export interface Appearance {
   show_announcement_bar: boolean;
   announcement_text: string;
   show_book_now_button: boolean;
+  show_mobile_cta_bar: boolean;
 }
 
 export interface SiteSettings {
@@ -63,6 +64,7 @@ const defaultSettings: SiteSettings = {
     show_announcement_bar: false,
     announcement_text: "",
     show_book_now_button: true,
+    show_mobile_cta_bar: true,
   },
   loading: true,
 };

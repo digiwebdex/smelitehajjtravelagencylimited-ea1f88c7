@@ -35,7 +35,8 @@ import {
   Monitor,
   MousePointerClick,
   Eye,
-  ExternalLink
+  ExternalLink,
+  Smartphone
 } from "lucide-react";
 import { CURRENCY } from "@/lib/currency";
 import ImageUpload from "./ImageUpload";
@@ -69,6 +70,7 @@ interface Appearance {
   show_announcement_bar: boolean;
   announcement_text: string;
   show_book_now_button: boolean;
+  show_mobile_cta_bar: boolean;
 }
 
 // Theme Toggle Icon Component
@@ -144,6 +146,7 @@ const AdminSettings = () => {
     show_announcement_bar: false,
     announcement_text: "",
     show_book_now_button: true,
+    show_mobile_cta_bar: true,
   });
 
   const [notifications, setNotifications] = useState({
@@ -661,6 +664,26 @@ const AdminSettings = () => {
                       <Switch
                         checked={appearance.show_book_now_button}
                         onCheckedChange={(checked) => setAppearance({ ...appearance, show_book_now_button: checked })}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-dashed">
+                  <CardContent className="pt-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Smartphone className="w-5 h-5 text-primary" />
+                        <div>
+                          <Label className="text-base">Mobile CTA Bar</Label>
+                          <p className="text-sm text-muted-foreground">
+                            Show a sticky Call/Book/Chat bar on mobile devices
+                          </p>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={appearance.show_mobile_cta_bar}
+                        onCheckedChange={(checked) => setAppearance({ ...appearance, show_mobile_cta_bar: checked })}
                       />
                     </div>
                   </CardContent>
