@@ -290,8 +290,8 @@ const Footer = () => {
                         <Phone className="w-5 h-5 text-secondary" />
                       </div>
                       <div className="text-primary-foreground/80 text-sm pt-2">
-                        <div className="flex flex-wrap gap-x-1">
-                          {displayPhones.slice(0, 2).map((phone, idx) => (
+                        <div className="flex flex-wrap">
+                          {displayPhones.slice(0, 2).map((phone, idx, arr) => (
                             <span key={idx}>
                               <a 
                                 href={`tel:${phone.replace(/\s/g, '')}`}
@@ -299,33 +299,40 @@ const Footer = () => {
                               >
                                 {phone}
                               </a>
-                              {idx < displayPhones.slice(0, 2).length - 1 && <span className="text-primary-foreground/50">,</span>}
+                              {idx < arr.length - 1 && <span className="text-primary-foreground/50">,&nbsp;</span>}
                             </span>
                           ))}
                         </div>
                       </div>
                     </li>
                   )}
-                  {/* Second group - next 6 phones (positions 3-8) */}
+                  {/* Second group - next 6 phones (positions 3-8) in rows of 2 */}
                   {displayPhones.length > 2 && (
                     <li className="flex items-start gap-3">
                       <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
                         <Phone className="w-5 h-5 text-secondary" />
                       </div>
-                      <div className="text-primary-foreground/80 text-sm pt-2">
-                        <div className="flex flex-wrap gap-x-1">
-                          {displayPhones.slice(2, 8).map((phone, idx, arr) => (
-                            <span key={idx}>
-                              <a 
-                                href={`tel:${phone.replace(/\s/g, '')}`}
-                                className="hover:text-secondary transition-colors"
-                              >
-                                {phone}
-                              </a>
-                              {idx < arr.length - 1 && <span className="text-primary-foreground/50">,</span>}
-                            </span>
-                          ))}
-                        </div>
+                      <div className="text-primary-foreground/80 text-sm pt-2 space-y-1">
+                        {/* Group phones in pairs (rows of 2) */}
+                        {Array.from({ length: Math.ceil(displayPhones.slice(2, 8).length / 2) }).map((_, pairIndex) => {
+                          const startIdx = pairIndex * 2;
+                          const pair = displayPhones.slice(2, 8).slice(startIdx, startIdx + 2);
+                          return (
+                            <div key={pairIndex} className="flex flex-wrap">
+                              {pair.map((phone, idx, arr) => (
+                                <span key={idx}>
+                                  <a 
+                                    href={`tel:${phone.replace(/\s/g, '')}`}
+                                    className="hover:text-secondary transition-colors"
+                                  >
+                                    {phone}
+                                  </a>
+                                  {idx < arr.length - 1 && <span className="text-primary-foreground/50">,&nbsp;</span>}
+                                </span>
+                              ))}
+                            </div>
+                          );
+                        })}
                       </div>
                     </li>
                   )}
