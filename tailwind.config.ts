@@ -24,7 +24,7 @@ export default {
         kufi: ['Reem Kufi', 'sans-serif'],
         calligraphy: ['Aref Ruqaa', 'serif'],
         thuluth: ['Scheherazade New', 'serif'],
-        pilgrimage: ['Cormorant Garamond', 'serif'],
+        pilgrimage: ['Yellow Peas', 'Cormorant Garamond', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
