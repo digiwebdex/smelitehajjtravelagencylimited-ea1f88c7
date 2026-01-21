@@ -314,7 +314,7 @@ const HeroSection = () => {
   return (
     <section 
       id="home" 
-      className={`relative min-h-[70vh] flex items-center justify-center overflow-hidden ${isLight ? "bg-background" : ""}`}
+      className={`relative h-[70vh] flex items-center justify-center overflow-hidden ${isLight ? "bg-background" : ""}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
