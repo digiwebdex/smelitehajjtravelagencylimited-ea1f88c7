@@ -345,11 +345,7 @@ const GallerySection = () => {
             <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4">
               <span className="text-gradient-gold">{settings?.title || "Our Gallery"}</span>
             </h2>
-            <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">{sectionHeader.arabic_text}</span>
-            </motion.div>
-            <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-              <span className="text-gradient-gold">{settings?.title || "Our Gallery"}</span>
-            </h2>
+            <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-4">{sectionHeader.arabic_text}</span>
             {settings?.subtitle && (
               <p className="text-muted-foreground max-w-2xl mx-auto text-lg md:text-xl leading-relaxed">
                 {settings.subtitle}
