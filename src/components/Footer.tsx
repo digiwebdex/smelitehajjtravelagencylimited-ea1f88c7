@@ -280,8 +280,8 @@ const Footer = () => {
               Phone Numbers
             </h4>
             <ul className="space-y-4">
-              {/* Display only first 2 phone sections */}
-              {displayPhones.slice(0, 2).map((phoneSection, sectionIndex) => {
+              {/* Display each phone section */}
+              {displayPhones.map((phoneSection, sectionIndex) => {
                 // Split the comma-separated phones
                 const phones = phoneSection.split(',').map(p => p.trim()).filter(p => p);
                 if (phones.length === 0) return null;
