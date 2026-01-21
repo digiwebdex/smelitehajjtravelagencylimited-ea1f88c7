@@ -121,31 +121,33 @@ const NoticeBoard = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-6"
           >
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 relative overflow-hidden">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 sm:p-4 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-transparent" />
-              <div className="relative flex items-center gap-4">
-                <div className="flex-shrink-0 p-2 bg-red-500 rounded-lg text-white animate-pulse">
-                  <AlertTriangle className="h-6 w-6" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant="destructive" className="animate-pulse">URGENT</Badge>
-                    <h3 className="font-semibold text-red-700 dark:text-red-400 truncate">
-                      {urgentNotices[currentSlide]?.title}
-                    </h3>
+              <div className="relative flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 p-2 bg-red-500 rounded-lg text-white animate-pulse">
+                    <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6" />
                   </div>
-                  {urgentNotices[currentSlide]?.content && (
-                    <p className="text-sm text-red-600/80 dark:text-red-400/80 mt-1 line-clamp-1">
-                      {urgentNotices[currentSlide].content}
-                    </p>
-                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant="destructive" className="animate-pulse text-xs">URGENT</Badge>
+                      <h3 className="font-semibold text-red-700 dark:text-red-400 text-sm sm:text-base">
+                        {urgentNotices[currentSlide]?.title}
+                      </h3>
+                    </div>
+                    {urgentNotices[currentSlide]?.content && (
+                      <p className="text-xs sm:text-sm text-red-600/80 dark:text-red-400/80 mt-1 line-clamp-2 sm:line-clamp-1">
+                        {urgentNotices[currentSlide].content}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-2 flex-shrink-0 pl-10 sm:pl-0">
                   {urgentNotices[currentSlide]?.external_link && (
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-red-500/30 text-red-600 hover:bg-red-500/10"
+                      className="border-red-500/30 text-red-600 hover:bg-red-500/10 text-xs sm:text-sm h-8"
                       onClick={(e) => {
                         const link = urgentNotices[currentSlide].external_link!;
                         if (link.startsWith('#')) {
@@ -157,19 +159,20 @@ const NoticeBoard = () => {
                         }
                       }}
                     >
-                      <ExternalLink className="h-4 w-4 mr-1" />
-                      {urgentNotices[currentSlide].external_link_text || "View"}
+                      <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                      <span className="hidden xs:inline">{urgentNotices[currentSlide].external_link_text || "View"}</span>
+                      <span className="xs:hidden">View</span>
                     </Button>
                   )}
                   {urgentNotices[currentSlide]?.attachment_url && (
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-red-500/30 text-red-600 hover:bg-red-500/10"
+                      className="border-red-500/30 text-red-600 hover:bg-red-500/10 h-8"
                       asChild
                     >
                       <a href={urgentNotices[currentSlide].attachment_url} target="_blank" rel="noopener noreferrer">
-                        <Download className="h-4 w-4" />
+                        <Download className="h-3 w-3 sm:h-4 sm:w-4" />
                       </a>
                     </Button>
                   )}
@@ -178,7 +181,7 @@ const NoticeBoard = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8"
+                        className="h-7 w-7 sm:h-8 sm:w-8"
                         onClick={() => setCurrentSlide(prev => prev === 0 ? urgentNotices.length - 1 : prev - 1)}
                       >
                         <ChevronLeft className="h-4 w-4" />
@@ -187,7 +190,7 @@ const NoticeBoard = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8"
+                        className="h-7 w-7 sm:h-8 sm:w-8"
                         onClick={() => setCurrentSlide(prev => prev === urgentNotices.length - 1 ? 0 : prev + 1)}
                       >
                         <ChevronRight className="h-4 w-4" />
