@@ -39,6 +39,7 @@ interface SliderSettings {
   showServiceTiles: boolean;
   showFloatingPatterns: boolean;
   heroHeight: "60vh" | "70vh" | "80vh" | "100vh";
+  heroHeightMobile: "50vh" | "60vh" | "70vh" | "80vh" | "100vh";
 }
 
 const defaultSlide: Omit<HeroSlide, "id"> = {
@@ -72,6 +73,7 @@ const AdminHero = () => {
     showServiceTiles: true,
     showFloatingPatterns: true,
     heroHeight: "70vh",
+    heroHeightMobile: "60vh",
   });
   const [savingSettings, setSavingSettings] = useState(false);
   const { uploadImage, uploading } = useImageUpload({
@@ -88,10 +90,10 @@ const AdminHero = () => {
     const { data } = await supabase
       .from("site_settings")
       .select("setting_key, setting_value")
-      .in("setting_key", ["hero_autoplay_interval", "hero_transition_speed", "hero_layout_mode", "hero_theme", "hero_show_service_tiles", "hero_show_floating_patterns", "hero_height"]);
+      .in("setting_key", ["hero_autoplay_interval", "hero_transition_speed", "hero_layout_mode", "hero_theme", "hero_show_service_tiles", "hero_show_floating_patterns", "hero_height", "hero_height_mobile"]);
 
     if (data) {
-      const settings: SliderSettings = { autoplayInterval: "6", transitionSpeed: "normal", layoutMode: "split-screen", heroTheme: "dark", showServiceTiles: true, showFloatingPatterns: true, heroHeight: "70vh" };
+      const settings: SliderSettings = { autoplayInterval: "6", transitionSpeed: "normal", layoutMode: "split-screen", heroTheme: "dark", showServiceTiles: true, showFloatingPatterns: true, heroHeight: "70vh", heroHeightMobile: "60vh" };
       data.forEach((item) => {
         const value = String(item.setting_value).replace(/"/g, "");
         if (item.setting_key === "hero_autoplay_interval") {
@@ -108,6 +110,8 @@ const AdminHero = () => {
           settings.showFloatingPatterns = value !== "false";
         } else if (item.setting_key === "hero_height") {
           settings.heroHeight = (value === "60vh" || value === "70vh" || value === "80vh" || value === "100vh") ? value : "70vh";
+        } else if (item.setting_key === "hero_height_mobile") {
+          settings.heroHeightMobile = (value === "50vh" || value === "60vh" || value === "70vh" || value === "80vh" || value === "100vh") ? value : "60vh";
         }
       });
       setSliderSettings(settings);
@@ -125,6 +129,7 @@ const AdminHero = () => {
       { key: "hero_show_service_tiles", value: String(sliderSettings.showServiceTiles) },
       { key: "hero_show_floating_patterns", value: String(sliderSettings.showFloatingPatterns) },
       { key: "hero_height", value: sliderSettings.heroHeight },
+      { key: "hero_height_mobile", value: sliderSettings.heroHeightMobile },
     ];
 
     for (const setting of settingsToSave) {
@@ -460,7 +465,7 @@ const AdminHero = () => {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Timer className="w-4 h-4" />
@@ -509,7 +514,7 @@ const AdminHero = () => {
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Maximize className="w-4 h-4" />
-                Hero Height
+                Desktop Height
               </Label>
               <Select
                 value={sliderSettings.heroHeight}
@@ -525,15 +530,38 @@ const AdminHero = () => {
                   <SelectItem value="100vh">Full Screen</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">Height of hero banner section</p>
+              <p className="text-xs text-muted-foreground">Height on desktop screens</p>
             </div>
 
-            <div className="flex items-end">
-              <Button onClick={handleSaveSettings} disabled={savingSettings} className="gap-2">
-                <Save className="w-4 h-4" />
-                {savingSettings ? "Saving..." : "Save Settings"}
-              </Button>
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Maximize className="w-4 h-4" />
+                Mobile Height
+              </Label>
+              <Select
+                value={sliderSettings.heroHeightMobile}
+                onValueChange={(value: "50vh" | "60vh" | "70vh" | "80vh" | "100vh") => setSliderSettings({ ...sliderSettings, heroHeightMobile: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select height" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="50vh">50% Screen (Compact)</SelectItem>
+                  <SelectItem value="60vh">60% Screen (Default)</SelectItem>
+                  <SelectItem value="70vh">70% Screen (Medium)</SelectItem>
+                  <SelectItem value="80vh">80% Screen (Large)</SelectItem>
+                  <SelectItem value="100vh">Full Screen</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">Height on mobile screens</p>
             </div>
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <Button onClick={handleSaveSettings} disabled={savingSettings} className="gap-2">
+              <Save className="w-4 h-4" />
+              {savingSettings ? "Saving..." : "Save Settings"}
+            </Button>
           </div>
         </CardContent>
       </Card>
