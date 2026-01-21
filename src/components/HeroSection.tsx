@@ -401,7 +401,7 @@ const HeroSection = () => {
               <img
                 src={backgroundImage}
                 alt=""
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-center"
                 draggable={false}
               />
               <div className="absolute inset-0 bg-gradient-to-l from-transparent to-background" />
@@ -427,7 +427,7 @@ const HeroSection = () => {
               <img
                 src={backgroundImage}
                 alt="Hero background"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-center"
                 draggable={false}
               />
             </motion.div>
