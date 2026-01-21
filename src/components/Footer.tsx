@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Twitter, ArrowUp, Building2, Building } from "lucide-react";
+import { 
+  Phone, Mail, MapPin, Facebook, Instagram, Youtube, Twitter, ArrowUp, Building2, Building,
+  Linkedin, MessageCircle, Send, Music, Globe, ExternalLink, Camera, Video, Rss, Twitch, Github
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
@@ -17,9 +20,13 @@ interface ServiceLink {
   href: string;
 }
 
-interface SocialLink {
-  platform: string;
-  href: string;
+interface SocialNetwork {
+  id: string;
+  platform_name: string;
+  icon_name: string;
+  url: string;
+  is_active: boolean;
+  order_index: number;
 }
 
 interface FooterContent {
@@ -27,12 +34,11 @@ interface FooterContent {
   copyright_text?: string;
   quick_links: FooterLink[];
   services_links: ServiceLink[];
-  social_links: SocialLink[];
   contact_address?: string;
   contact_address_2?: string;
   address_label_1?: string;
   address_label_2?: string;
-  contact_phones?: string[]; // Each string is a section with two comma-separated phone numbers
+  contact_phones?: string[];
   contact_email?: string;
 }
 
@@ -40,6 +46,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { companyInfo, contactDetails, socialLinks } = useSiteSettings();
   
+  const [socialNetworks, setSocialNetworks] = useState<SocialNetwork[]>([]);
   const [content, setContent] = useState<FooterContent>({
     company_description: "",
     copyright_text: "",
@@ -59,7 +66,6 @@ const Footer = () => {
       { label: "Hotel Booking", href: "#" },
       { label: "Travel Insurance", href: "#" },
     ],
-    social_links: [],
     contact_address: "",
     contact_address_2: "",
     address_label_1: "Head Office",
@@ -70,16 +76,19 @@ const Footer = () => {
 
   useEffect(() => {
     fetchFooterContent();
+    fetchSocialNetworks();
   }, []);
 
-  // Build social links from site settings
-  const buildSocialLinks = (): SocialLink[] => {
-    const links: SocialLink[] = [];
-    if (socialLinks.facebook) links.push({ platform: "Facebook", href: socialLinks.facebook });
-    if (socialLinks.instagram) links.push({ platform: "Instagram", href: socialLinks.instagram });
-    if (socialLinks.youtube) links.push({ platform: "Youtube", href: socialLinks.youtube });
-    if (socialLinks.twitter) links.push({ platform: "Twitter", href: socialLinks.twitter });
-    return links;
+  const fetchSocialNetworks = async () => {
+    const { data } = await supabase
+      .from("social_networks")
+      .select("*")
+      .eq("is_active", true)
+      .order("order_index");
+    
+    if (data) {
+      setSocialNetworks(data);
+    }
   };
 
   const fetchFooterContent = async () => {
@@ -96,7 +105,6 @@ const Footer = () => {
         copyright_text: data.copyright_text || "",
         quick_links: Array.isArray(data.quick_links) ? (data.quick_links as unknown as FooterLink[]) : content.quick_links,
         services_links: Array.isArray(data.services_links) ? (data.services_links as unknown as ServiceLink[]) : content.services_links,
-        social_links: Array.isArray(data.social_links) ? (data.social_links as unknown as SocialLink[]) : [],
         contact_address: dataRecord.contact_address as string || "",
         contact_address_2: dataRecord.contact_address_2 as string || "",
         address_label_1: dataRecord.address_label_1 as string || "Head Office",
@@ -116,24 +124,43 @@ const Footer = () => {
   const displayAddressLabel2 = content.address_label_2 || "Branch Office";
   const displayPhones = content.contact_phones?.length ? content.contact_phones : [contactDetails.phone];
   const displayEmail = content.contact_email || contactDetails.email;
-  const displaySocialLinks = content.social_links?.length ? content.social_links : buildSocialLinks();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const getSocialIcon = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case "facebook":
+  const getSocialIcon = (iconName: string) => {
+    switch (iconName) {
+      case "Facebook":
         return Facebook;
-      case "instagram":
+      case "Instagram":
         return Instagram;
-      case "youtube":
+      case "Youtube":
         return Youtube;
-      case "twitter":
+      case "Twitter":
         return Twitter;
+      case "Linkedin":
+        return Linkedin;
+      case "MessageCircle":
+        return MessageCircle;
+      case "Send":
+        return Send;
+      case "Music":
+        return Music;
+      case "Twitch":
+        return Twitch;
+      case "Github":
+        return Github;
+      case "Camera":
+        return Camera;
+      case "Video":
+        return Video;
+      case "Rss":
+        return Rss;
+      case "ExternalLink":
+        return ExternalLink;
       default:
-        return Facebook;
+        return Globe;
     }
   };
 
@@ -186,19 +213,19 @@ const Footer = () => {
             <p className="text-primary-foreground/80 text-sm leading-relaxed mb-6">
               {displayDescription}
             </p>
-            {displaySocialLinks.length > 0 && (
-              <div className="flex gap-3">
-                {displaySocialLinks.map((social) => {
-                  const Icon = getSocialIcon(social.platform);
+            {socialNetworks.length > 0 && (
+              <div className="flex flex-wrap gap-3">
+                {socialNetworks.map((network) => {
+                  const Icon = getSocialIcon(network.icon_name);
                   return (
                     <motion.a
-                      key={social.platform}
-                      href={social.href}
+                      key={network.id}
+                      href={network.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       whileHover={{ scale: 1.1, y: -2 }}
                       className="w-11 h-11 bg-primary-foreground/10 rounded-xl flex items-center justify-center hover:bg-secondary hover:text-secondary-foreground transition-all duration-300"
-                      aria-label={social.platform}
+                      aria-label={network.platform_name}
                     >
                       <Icon className="w-5 h-5" />
                     </motion.a>

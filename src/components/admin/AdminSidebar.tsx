@@ -21,6 +21,7 @@ import {
   Calculator,
   Megaphone,
   UserCog,
+  Share2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -61,6 +62,7 @@ const menuItems = [
   { value: "visa", label: "Visa", icon: Globe },
   { value: "contact", label: "Contact", icon: Phone },
   { value: "offices", label: "Offices", icon: Building2 },
+  { value: "social-networks", label: "Social Networks", icon: Share2 },
   { value: "footer", label: "Footer", icon: FileText },
   { value: "legal", label: "Legal Pages", icon: Scale },
   { value: "settings", label: "Settings", icon: Settings },

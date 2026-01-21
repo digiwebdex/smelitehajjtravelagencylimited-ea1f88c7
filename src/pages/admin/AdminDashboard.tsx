@@ -40,6 +40,7 @@ import AdminSectionVisibility from "@/components/admin/AdminSectionVisibility";
 import AdminEMIReport from "@/components/admin/AdminEMIReport";
 import AdminNotices from "@/components/admin/AdminNotices";
 import AdminStaffManagement from "@/components/admin/AdminStaffManagement";
+import AdminSocialNetworks from "@/components/admin/AdminSocialNetworks";
 import { formatCurrency } from "@/lib/currency";
 
 interface Stats {
@@ -204,6 +205,8 @@ const AdminDashboard = () => {
         return <AdminContact />;
       case "offices":
         return <AdminOfficeLocations />;
+      case "social-networks":
+        return <AdminSocialNetworks />;
       case "footer":
         return <AdminFooter />;
       case "legal":
