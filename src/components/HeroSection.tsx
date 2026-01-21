@@ -68,7 +68,16 @@ const HeroSection = () => {
   const [heroTheme, setHeroTheme] = useState<"dark" | "light">("dark");
   const [showServiceTiles, setShowServiceTiles] = useState(true);
   const [heroHeight, setHeroHeight] = useState<"60vh" | "70vh" | "80vh" | "100vh">("70vh");
+  const [heroHeightMobile, setHeroHeightMobile] = useState<"50vh" | "60vh" | "70vh" | "80vh" | "100vh">("60vh");
+  const [isMobile, setIsMobile] = useState(false);
   const progressRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     fetchHeroContent();
@@ -85,7 +94,8 @@ const HeroSection = () => {
         "hero_layout_mode",
         "hero_theme",
         "hero_show_service_tiles",
-        "hero_height"
+        "hero_height",
+        "hero_height_mobile"
       ]);
 
     if (data) {
@@ -114,6 +124,11 @@ const HeroSection = () => {
           case "hero_height":
             if (value === "60vh" || value === "70vh" || value === "80vh" || value === "100vh") {
               setHeroHeight(value);
+            }
+            break;
+          case "hero_height_mobile":
+            if (value === "50vh" || value === "60vh" || value === "70vh" || value === "80vh" || value === "100vh") {
+              setHeroHeightMobile(value);
             }
             break;
         }
@@ -318,14 +333,14 @@ const HeroSection = () => {
   const textSecondary = isLight ? "text-muted-foreground" : "text-primary-foreground/85";
   const textMuted = isLight ? "text-muted-foreground" : "text-primary-foreground/70";
 
-  // Height classes for dynamic hero height
-  const heightClass = heroHeight === "100vh" ? "h-screen" : `h-[${heroHeight}]`;
+  // Use responsive height
+  const currentHeight = isMobile ? heroHeightMobile : heroHeight;
 
   return (
     <section 
       id="home" 
       className={`relative flex items-center justify-center overflow-hidden ${isLight ? "bg-background" : ""}`}
-      style={{ height: heroHeight }}
+      style={{ height: currentHeight }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
