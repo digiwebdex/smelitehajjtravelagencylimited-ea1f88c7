@@ -33,6 +33,7 @@ interface Service {
   icon_name: string;
   title: string;
   description: string;
+  link_url: string | null;
   order_index: number;
   is_active: boolean;
 }
@@ -116,7 +117,8 @@ const SortableRow = ({ item, onEdit, onDelete, onToggleActive, onMoveUp, onMoveD
       </TableCell>
       <TableCell>{item.icon_name}</TableCell>
       <TableCell className="font-medium">{item.title}</TableCell>
-      <TableCell className="hidden md:table-cell text-muted-foreground truncate max-w-xs">{item.description}</TableCell>
+      <TableCell className="hidden md:table-cell text-muted-foreground truncate max-w-[100px]">{item.link_url || "-"}</TableCell>
+      <TableCell className="hidden lg:table-cell text-muted-foreground truncate max-w-xs">{item.description}</TableCell>
       <TableCell><Switch checked={item.is_active} onCheckedChange={() => onToggleActive(item)} /></TableCell>
       <TableCell>
         <div className="flex gap-2">
@@ -134,7 +136,7 @@ const AdminServices = () => {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Service | null>(null);
-  const [formData, setFormData] = useState({ icon_name: "Star", title: "", description: "" });
+  const [formData, setFormData] = useState({ icon_name: "Star", title: "", description: "", link_url: "" });
   const [parentCompany, setParentCompany] = useState<ParentCompanySettings>({
     button_text: "Visit Parent Company",
     button_link: "",
@@ -375,13 +377,18 @@ const AdminServices = () => {
     
     setIsDialogOpen(false);
     setEditingItem(null);
-    setFormData({ icon_name: "Star", title: "", description: "" });
+    setFormData({ icon_name: "Star", title: "", description: "", link_url: "" });
     fetchServices();
   };
 
   const handleEdit = (item: Service) => {
     setEditingItem(item);
-    setFormData({ icon_name: item.icon_name, title: item.title, description: item.description });
+    setFormData({ 
+      icon_name: item.icon_name, 
+      title: item.title, 
+      description: item.description,
+      link_url: item.link_url || ""
+    });
     setIsDialogOpen(true);
   };
 
@@ -458,7 +465,7 @@ const AdminServices = () => {
           setIsDialogOpen(open);
           if (!open) {
             setEditingItem(null);
-            setFormData({ icon_name: "Star", title: "", description: "" });
+            setFormData({ icon_name: "Star", title: "", description: "", link_url: "" });
           }
         }}>
           <DialogTrigger asChild>
@@ -489,6 +496,17 @@ const AdminServices = () => {
                 />
               </div>
               <div>
+                <label className="text-sm font-medium">Link URL</label>
+                <Input
+                  value={formData.link_url}
+                  onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
+                  placeholder="#hajj, #umrah, #visa, or external URL"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Use section IDs like #hajj, #umrah, #visa, #services, #contact or full URLs
+                </p>
+              </div>
+              <div>
                 <label className="text-sm font-medium">Description</label>
                 <Textarea
                   value={formData.description}
@@ -515,7 +533,8 @@ const AdminServices = () => {
                 <TableHead className="w-20">Order</TableHead>
                 <TableHead>Icon</TableHead>
                 <TableHead>Title</TableHead>
-                <TableHead className="hidden md:table-cell">Description</TableHead>
+                <TableHead className="hidden md:table-cell">Link</TableHead>
+                <TableHead className="hidden lg:table-cell">Description</TableHead>
                 <TableHead>Active</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>

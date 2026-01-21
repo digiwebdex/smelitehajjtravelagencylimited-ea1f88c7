@@ -1066,6 +1066,7 @@ export type Database = {
           icon_name: string
           id: string
           is_active: boolean
+          link_url: string | null
           order_index: number
           title: string
           updated_at: string
@@ -1076,6 +1077,7 @@ export type Database = {
           icon_name: string
           id?: string
           is_active?: boolean
+          link_url?: string | null
           order_index?: number
           title: string
           updated_at?: string
@@ -1086,6 +1088,7 @@ export type Database = {
           icon_name?: string
           id?: string
           is_active?: boolean
+          link_url?: string | null
           order_index?: number
           title?: string
           updated_at?: string

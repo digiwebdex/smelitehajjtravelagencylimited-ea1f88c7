@@ -28,6 +28,7 @@ interface Service {
   icon_name: string;
   title: string;
   description: string;
+  link_url: string | null;
   order_index: number;
 }
 
@@ -151,14 +152,14 @@ const ServicesOverview = () => {
       setServices(data);
     } else {
       setServices([
-        { id: "1", icon_name: "Plane", title: "Flight Booking", description: "Premium airlines with comfortable travel arrangements to Saudi Arabia", order_index: 0 },
-        { id: "2", icon_name: "Hotel", title: "Hotel Accommodation", description: "Hand-picked hotels near Haram for convenient access to worship", order_index: 1 },
-        { id: "3", icon_name: "Shield", title: "Visa Processing", description: "100% success rate in Hajj & Umrah visa processing", order_index: 2 },
-        { id: "4", icon_name: "Users", title: "Expert Guides", description: "Experienced Islamic scholars to guide you through rituals", order_index: 3 },
-        { id: "5", icon_name: "Clock", title: "24/7 Support", description: "Round-the-clock assistance throughout your spiritual journey", order_index: 4 },
-        { id: "6", icon_name: "HeartHandshake", title: "Complete Care", description: "From departure to return, we handle every detail with care", order_index: 5 },
-        { id: "7", icon_name: "Ticket", title: "Air Ticket", description: "Affordable air tickets to destinations worldwide with trusted airlines", order_index: 6 },
-        { id: "8", icon_name: "Map", title: "Tour Package", description: "Exciting tour packages to explore beautiful destinations around the world", order_index: 7 },
+        { id: "1", icon_name: "Plane", title: "Flight Booking", description: "Premium airlines with comfortable travel arrangements to Saudi Arabia", link_url: null, order_index: 0 },
+        { id: "2", icon_name: "Hotel", title: "Hotel Accommodation", description: "Hand-picked hotels near Haram for convenient access to worship", link_url: null, order_index: 1 },
+        { id: "3", icon_name: "Shield", title: "Visa Processing", description: "100% success rate in Hajj & Umrah visa processing", link_url: "#visa", order_index: 2 },
+        { id: "4", icon_name: "Users", title: "Expert Guides", description: "Experienced Islamic scholars to guide you through rituals", link_url: null, order_index: 3 },
+        { id: "5", icon_name: "Clock", title: "24/7 Support", description: "Round-the-clock assistance throughout your spiritual journey", link_url: "#contact", order_index: 4 },
+        { id: "6", icon_name: "HeartHandshake", title: "Complete Care", description: "From departure to return, we handle every detail with care", link_url: null, order_index: 5 },
+        { id: "7", icon_name: "Ticket", title: "Air Ticket", description: "Affordable air tickets to destinations worldwide with trusted airlines", link_url: null, order_index: 6 },
+        { id: "8", icon_name: "Map", title: "Tour Package", description: "Exciting tour packages to explore beautiful destinations around the world", link_url: null, order_index: 7 },
       ]);
     }
     setLoading(false);
@@ -174,6 +175,28 @@ const ServicesOverview = () => {
 
   const isCustomIcon = (iconName: string): boolean => {
     return iconName in customIconMap;
+  };
+
+  const handleServiceClick = (service: Service) => {
+    if (!service.link_url) return;
+    
+    const url = service.link_url;
+    
+    // Handle section links (starting with #)
+    if (url.startsWith('#')) {
+      const element = document.querySelector(url);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } 
+    // Handle external URLs
+    else if (url.startsWith('http://') || url.startsWith('https://')) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+    // Handle relative URLs
+    else {
+      window.location.href = url;
+    }
   };
 
   if (loading) {
@@ -229,7 +252,9 @@ const ServicesOverview = () => {
                   scale: { duration: 0.2 },
                   y: { duration: 0.2 },
                 }}
-                className={`group relative flex items-start gap-4 p-6 rounded-xl transition-all duration-300 cursor-pointer overflow-hidden
+                onClick={() => handleServiceClick(service)}
+                className={`group relative flex items-start gap-4 p-6 rounded-xl transition-all duration-300 overflow-hidden
+                  ${service.link_url ? 'cursor-pointer' : 'cursor-default'}
                   ${index % 2 === 0 ? 'bg-muted/30' : 'bg-card'}
                   hover:bg-gradient-to-br hover:from-primary/5 hover:to-secondary/10
                   before:absolute before:inset-0 before:rounded-xl before:border-2 before:border-transparent before:transition-all before:duration-300
@@ -247,6 +272,11 @@ const ServicesOverview = () => {
                 <div className="relative z-10">
                   <h3 className="font-heading font-semibold text-lg text-foreground mb-2 group-hover:text-primary transition-colors">
                     {service.title}
+                    {service.link_url && (
+                      <span className="inline-block ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        →
+                      </span>
+                    )}
                   </h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     {service.description}
