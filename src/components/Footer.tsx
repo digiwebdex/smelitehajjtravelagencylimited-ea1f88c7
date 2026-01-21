@@ -169,13 +169,14 @@ const Footer = () => {
   return (
     <footer className="bg-primary text-primary-foreground relative overflow-hidden">
       {/* Background Video Animation */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 overflow-hidden">
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover opacity-50"
+          className="w-full h-full object-cover opacity-50 scale-150"
+          style={{ filter: 'blur(1px)' }}
         >
           <source src="/videos/footer-bg.mp4" type="video/mp4" />
         </video>
