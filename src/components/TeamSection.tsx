@@ -164,7 +164,7 @@ const TeamSection = () => {
                       <h3 className="font-pilgrimage font-bold text-xl sm:text-2xl lg:text-3xl text-secondary mb-2">
                         {member.name}
                       </h3>
-                      <p className="text-primary font-semibold text-xs sm:text-sm lg:text-base uppercase tracking-wide">
+                      <p className="text-foreground font-semibold text-xs sm:text-sm lg:text-base capitalize tracking-wide">
                         {member.role}
                       </p>
                     </div>
@@ -234,7 +234,7 @@ const TeamSection = () => {
                   <h3 className="font-pilgrimage font-bold text-2xl text-secondary mb-2">
                     {member.name}
                   </h3>
-                  <p className="text-secondary font-semibold text-sm uppercase tracking-wide mb-3">
+                  <p className="text-foreground font-semibold text-sm capitalize tracking-wide mb-3">
                     {member.role}
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-4">
