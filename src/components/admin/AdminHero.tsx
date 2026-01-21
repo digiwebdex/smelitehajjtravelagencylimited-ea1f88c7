@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Plus, Trash2, GripVertical, ChevronDown, ChevronUp, Image as ImageIcon, Settings, Timer, Zap, LayoutTemplate, Columns, AlignCenter, Sun, Moon, Grid3X3, Sparkles, Maximize } from "lucide-react";
+import { Save, Plus, Trash2, GripVertical, ChevronDown, ChevronUp, Image as ImageIcon, Settings, Timer, Zap, LayoutTemplate, Columns, AlignCenter, Sun, Moon, Grid3X3, Sparkles, Maximize, Focus, MoveVertical } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -40,6 +40,8 @@ interface SliderSettings {
   showFloatingPatterns: boolean;
   heroHeight: "60vh" | "70vh" | "80vh" | "100vh";
   heroHeightMobile: "50vh" | "60vh" | "70vh" | "80vh" | "100vh";
+  imageFocalPoint: "top" | "center" | "bottom";
+  heroTopMargin: "0" | "20" | "40" | "60" | "80";
 }
 
 const defaultSlide: Omit<HeroSlide, "id"> = {
@@ -74,6 +76,8 @@ const AdminHero = () => {
     showFloatingPatterns: true,
     heroHeight: "70vh",
     heroHeightMobile: "60vh",
+    imageFocalPoint: "center",
+    heroTopMargin: "0",
   });
   const [savingSettings, setSavingSettings] = useState(false);
   const { uploadImage, uploading } = useImageUpload({
@@ -90,10 +94,10 @@ const AdminHero = () => {
     const { data } = await supabase
       .from("site_settings")
       .select("setting_key, setting_value")
-      .in("setting_key", ["hero_autoplay_interval", "hero_transition_speed", "hero_layout_mode", "hero_theme", "hero_show_service_tiles", "hero_show_floating_patterns", "hero_height", "hero_height_mobile"]);
+      .in("setting_key", ["hero_autoplay_interval", "hero_transition_speed", "hero_layout_mode", "hero_theme", "hero_show_service_tiles", "hero_show_floating_patterns", "hero_height", "hero_height_mobile", "hero_image_focal_point", "hero_top_margin"]);
 
     if (data) {
-      const settings: SliderSettings = { autoplayInterval: "6", transitionSpeed: "normal", layoutMode: "split-screen", heroTheme: "dark", showServiceTiles: true, showFloatingPatterns: true, heroHeight: "70vh", heroHeightMobile: "60vh" };
+      const settings: SliderSettings = { autoplayInterval: "6", transitionSpeed: "normal", layoutMode: "split-screen", heroTheme: "dark", showServiceTiles: true, showFloatingPatterns: true, heroHeight: "70vh", heroHeightMobile: "60vh", imageFocalPoint: "center", heroTopMargin: "0" };
       data.forEach((item) => {
         const value = String(item.setting_value).replace(/"/g, "");
         if (item.setting_key === "hero_autoplay_interval") {
@@ -112,6 +116,10 @@ const AdminHero = () => {
           settings.heroHeight = (value === "60vh" || value === "70vh" || value === "80vh" || value === "100vh") ? value : "70vh";
         } else if (item.setting_key === "hero_height_mobile") {
           settings.heroHeightMobile = (value === "50vh" || value === "60vh" || value === "70vh" || value === "80vh" || value === "100vh") ? value : "60vh";
+        } else if (item.setting_key === "hero_image_focal_point") {
+          settings.imageFocalPoint = (value === "top" || value === "center" || value === "bottom") ? value : "center";
+        } else if (item.setting_key === "hero_top_margin") {
+          settings.heroTopMargin = (value === "0" || value === "20" || value === "40" || value === "60" || value === "80") ? value : "0";
         }
       });
       setSliderSettings(settings);
@@ -130,6 +138,8 @@ const AdminHero = () => {
       { key: "hero_show_floating_patterns", value: String(sliderSettings.showFloatingPatterns) },
       { key: "hero_height", value: sliderSettings.heroHeight },
       { key: "hero_height_mobile", value: sliderSettings.heroHeightMobile },
+      { key: "hero_image_focal_point", value: sliderSettings.imageFocalPoint },
+      { key: "hero_top_margin", value: sliderSettings.heroTopMargin },
     ];
 
     for (const setting of settingsToSave) {
@@ -554,6 +564,52 @@ const AdminHero = () => {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">Height on mobile screens</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Focus className="w-4 h-4" />
+                Image Focal Point
+              </Label>
+              <Select
+                value={sliderSettings.imageFocalPoint}
+                onValueChange={(value: "top" | "center" | "bottom") => setSliderSettings({ ...sliderSettings, imageFocalPoint: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select focal point" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="top">Top</SelectItem>
+                  <SelectItem value="center">Center (Default)</SelectItem>
+                  <SelectItem value="bottom">Bottom</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">Controls where the image centers vertically</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <MoveVertical className="w-4 h-4" />
+                Hero Top Margin
+              </Label>
+              <Select
+                value={sliderSettings.heroTopMargin}
+                onValueChange={(value: "0" | "20" | "40" | "60" | "80") => setSliderSettings({ ...sliderSettings, heroTopMargin: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select margin" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">None (Default)</SelectItem>
+                  <SelectItem value="20">20px</SelectItem>
+                  <SelectItem value="40">40px</SelectItem>
+                  <SelectItem value="60">60px</SelectItem>
+                  <SelectItem value="80">80px (Header Height)</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">Space above the hero section</p>
             </div>
           </div>
 

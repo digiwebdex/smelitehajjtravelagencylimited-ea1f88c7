@@ -69,6 +69,8 @@ const HeroSection = () => {
   const [showServiceTiles, setShowServiceTiles] = useState(true);
   const [heroHeight, setHeroHeight] = useState<"60vh" | "70vh" | "80vh" | "100vh">("70vh");
   const [heroHeightMobile, setHeroHeightMobile] = useState<"50vh" | "60vh" | "70vh" | "80vh" | "100vh">("60vh");
+  const [imageFocalPoint, setImageFocalPoint] = useState<"top" | "center" | "bottom">("center");
+  const [heroTopMargin, setHeroTopMargin] = useState<string>("0");
   const [isMobile, setIsMobile] = useState(false);
   const progressRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -95,7 +97,9 @@ const HeroSection = () => {
         "hero_theme",
         "hero_show_service_tiles",
         "hero_height",
-        "hero_height_mobile"
+        "hero_height_mobile",
+        "hero_image_focal_point",
+        "hero_top_margin"
       ]);
 
     if (data) {
@@ -130,6 +134,14 @@ const HeroSection = () => {
             if (value === "50vh" || value === "60vh" || value === "70vh" || value === "80vh" || value === "100vh") {
               setHeroHeightMobile(value);
             }
+            break;
+          case "hero_image_focal_point":
+            if (value === "top" || value === "center" || value === "bottom") {
+              setImageFocalPoint(value);
+            }
+            break;
+          case "hero_top_margin":
+            setHeroTopMargin(value);
             break;
         }
       });
@@ -335,12 +347,13 @@ const HeroSection = () => {
 
   // Use responsive height
   const currentHeight = isMobile ? heroHeightMobile : heroHeight;
+  const topMarginStyle = heroTopMargin !== "0" ? `${heroTopMargin}px` : "0";
 
   return (
     <section 
       id="home" 
       className={`relative flex items-center justify-center overflow-hidden ${isLight ? "bg-background" : ""}`}
-      style={{ height: currentHeight }}
+      style={{ height: currentHeight, marginTop: topMarginStyle }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -386,6 +399,7 @@ const HeroSection = () => {
                 src={backgroundImage}
                 alt=""
                 className="w-full h-full object-cover"
+                style={{ objectPosition: imageFocalPoint }}
                 draggable={false}
               />
               <div className="absolute inset-0 bg-gradient-to-l from-transparent to-background" />
@@ -412,6 +426,7 @@ const HeroSection = () => {
                 src={backgroundImage}
                 alt="Hero background"
                 className="w-full h-full object-cover"
+                style={{ objectPosition: imageFocalPoint }}
                 draggable={false}
               />
             </motion.div>
