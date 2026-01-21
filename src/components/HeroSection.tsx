@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { ChevronDown, Play, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-kaaba.jpg";
 import { motion, AnimatePresence } from "framer-motion";
 import HeroServiceTiles from "./HeroServiceTiles";
-import HeroImageFrame from "./HeroImageFrame";
 import {
   Dialog,
   DialogContent,
@@ -61,8 +60,7 @@ const HeroSection = () => {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [autoplayInterval, setAutoplayInterval] = useState(3000);
-  const [transitionDuration, setTransitionDuration] = useState(0.9);
-  const [progress, setProgress] = useState(0);
+  const [transitionDuration, setTransitionDuration] = useState(0.6);
   const [isHovered, setIsHovered] = useState(false);
   const [layoutMode, setLayoutMode] = useState<"centered" | "split-screen">("split-screen");
   const [heroTheme, setHeroTheme] = useState<"dark" | "light">("dark");
@@ -72,7 +70,7 @@ const HeroSection = () => {
   const [imageFocalPoint, setImageFocalPoint] = useState<"top" | "center" | "bottom">("center");
   const [heroTopMargin, setHeroTopMargin] = useState<string>("0");
   const [isMobile, setIsMobile] = useState(false);
-  const progressRef = useRef<NodeJS.Timeout | null>(null);
+  const autoplayRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -111,9 +109,9 @@ const HeroSection = () => {
             break;
           case "hero_transition_speed":
             switch (value) {
-              case "fast": setTransitionDuration(0.5); break;
-              case "slow": setTransitionDuration(1.2); break;
-              default: setTransitionDuration(0.9);
+              case "fast": setTransitionDuration(0.4); break;
+              case "slow": setTransitionDuration(0.8); break;
+              default: setTransitionDuration(0.6);
             }
             break;
           case "hero_layout_mode":
@@ -148,28 +146,19 @@ const HeroSection = () => {
     }
   };
 
-  // Progress bar & auto-slide
+  // Simplified autoplay with single timeout instead of 50ms interval
   useEffect(() => {
     if (!isAutoPlaying || slides.length <= 1 || isHovered) {
-      if (progressRef.current) clearInterval(progressRef.current);
+      if (autoplayRef.current) clearTimeout(autoplayRef.current);
       return;
     }
     
-    setProgress(0);
-    const step = 100 / (autoplayInterval / 50);
-    
-    progressRef.current = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          setCurrentSlide(curr => (curr + 1) % slides.length);
-          return 0;
-        }
-        return prev + step;
-      });
-    }, 50);
+    autoplayRef.current = setTimeout(() => {
+      setCurrentSlide(curr => (curr + 1) % slides.length);
+    }, autoplayInterval);
 
     return () => {
-      if (progressRef.current) clearInterval(progressRef.current);
+      if (autoplayRef.current) clearTimeout(autoplayRef.current);
     };
   }, [isAutoPlaying, slides.length, autoplayInterval, currentSlide, isHovered]);
 
@@ -206,46 +195,38 @@ const HeroSection = () => {
   const HeroSkeleton = () => (
     <div className="relative z-10 container text-center pt-32 pb-20">
       <div className="max-w-4xl mx-auto">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center mb-8">
+        <div className="flex justify-center mb-8">
           <Skeleton className="h-10 w-64 rounded-full bg-primary-foreground/10" />
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="space-y-4 mb-8">
+        </div>
+        <div className="space-y-4 mb-8">
           <Skeleton className="h-16 md:h-20 w-3/4 mx-auto bg-primary-foreground/10" />
           <Skeleton className="h-12 md:h-16 w-1/2 mx-auto bg-secondary/20" />
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="space-y-3 mb-12">
+        </div>
+        <div className="space-y-3 mb-12">
           <Skeleton className="h-6 w-full max-w-2xl mx-auto bg-primary-foreground/10" />
           <Skeleton className="h-6 w-4/5 max-w-xl mx-auto bg-primary-foreground/10" />
-        </motion.div>
+        </div>
       </div>
     </div>
   );
 
   const goToSlide = useCallback((index: number) => {
     setCurrentSlide(index);
-    setProgress(0);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   }, []);
 
   const goToPrevious = useCallback(() => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-    setProgress(0);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   }, [slides.length]);
 
   const goToNext = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
-    setProgress(0);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   }, [slides.length]);
-
-  const toggleAutoplay = useCallback(() => {
-    setIsAutoPlaying(prev => !prev);
-    if (!isAutoPlaying) setProgress(0);
-  }, [isAutoPlaying]);
 
   const minSwipeDistance = 50;
 
@@ -274,71 +255,59 @@ const HeroSection = () => {
 
   const isYouTubeUrl = (url: string) => url?.includes("youtube.com") || url?.includes("youtu.be");
 
-  const scrollToSection = (id: string) => {
-    const sectionId = id.replace("#", "");
-    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
-  };
-
   const content = slides[currentSlide] || defaultSlides[0];
   const backgroundImage = content.background_image_url || heroImage;
   const isLight = heroTheme === "light";
 
-  // Animation variants - slow motion effect
-  const containerVariants = {
+  // Simplified animation variants - GPU-accelerated, minimal properties
+  const containerVariants = useMemo(() => ({
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.15, delayChildren: 0.2 },
+      transition: { staggerChildren: 0.1, delayChildren: 0.1 },
     },
     exit: {
       opacity: 0,
-      transition: { duration: transitionDuration * 0.6 },
+      transition: { duration: transitionDuration * 0.5 },
     },
-  };
+  }), [transitionDuration]);
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: -60 },
+  const itemVariants = useMemo(() => ({
+    hidden: { opacity: 0, y: -30 },
     visible: {
       opacity: 1,
       y: 0,
       transition: { 
-        duration: transitionDuration * 1.5, 
-        ease: [0.16, 1, 0.3, 1] as const,
-        opacity: { duration: transitionDuration * 1.2 }
+        duration: transitionDuration, 
+        ease: "easeOut" as const,
       },
     },
     exit: {
       opacity: 0,
-      y: -40,
-      transition: { 
-        duration: transitionDuration * 0.8, 
-        ease: [0.16, 1, 0.3, 1] as const
-      },
+      transition: { duration: transitionDuration * 0.4 },
     },
-  };
+  }), [transitionDuration]);
 
-  const imageVariants = {
-    initial: { x: 120, opacity: 0, scale: 1.05 },
+  // Simplified image animation - only transform for GPU acceleration
+  const imageVariants = useMemo(() => ({
+    initial: { opacity: 0, x: 60 },
     animate: { 
-      x: 0, 
       opacity: 1,
-      scale: 1,
+      x: 0,
       transition: { 
-        duration: transitionDuration * 1.8, 
-        ease: [0.16, 1, 0.3, 1] as const,
-        opacity: { duration: transitionDuration * 1.4 }
+        duration: transitionDuration * 1.2, 
+        ease: "easeOut" as const,
       }
     },
     exit: { 
-      x: -120, 
       opacity: 0,
-      scale: 0.98,
+      x: -60,
       transition: { 
-        duration: transitionDuration * 1, 
-        ease: [0.16, 1, 0.3, 1] as const
+        duration: transitionDuration * 0.6, 
+        ease: "easeOut" as const,
       }
     },
-  };
+  }), [transitionDuration]);
 
   // Light theme text colors
   const textPrimary = isLight ? "text-foreground" : "text-primary-foreground";
@@ -362,57 +331,42 @@ const HeroSection = () => {
     >
       {/* Background - Conditional based on theme */}
       {isLight ? (
-        /* Light Theme Background */
+        /* Light Theme Background - Static decorations instead of infinite animations */
         <div className="absolute inset-0">
-          {/* Base gradient */}
           <div className="absolute inset-0 bg-hero-light hero-light-pattern" />
           
-          {/* Geometric accents */}
-          <motion.div
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
-            className="absolute -top-32 -right-32 w-96 h-96 border border-emerald-200/40 rounded-full"
-          />
-          <motion.div
-            animate={{ rotate: [360, 0] }}
-            transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
-            className="absolute -bottom-48 -left-48 w-[500px] h-[500px] border border-amber-200/30 rounded-full"
-          />
+          {/* Static geometric accents - removed infinite rotation */}
+          <div className="absolute -top-32 -right-32 w-96 h-96 border border-emerald-200/40 rounded-full" />
+          <div className="absolute -bottom-48 -left-48 w-[500px] h-[500px] border border-amber-200/30 rounded-full" />
 
-          {/* Accent shapes */}
+          {/* Static accent shapes */}
           <div className="absolute top-20 left-[15%] w-0 h-0 border-l-[40px] border-l-transparent border-b-[70px] border-b-emerald-500/20 border-r-[40px] border-r-transparent" />
           <div className="absolute bottom-32 right-[10%] w-0 h-0 border-l-[30px] border-l-transparent border-t-[50px] border-t-amber-400/25 border-r-[30px] border-r-transparent" />
           <div className="absolute top-1/3 right-[5%] w-16 h-16 bg-emerald-500/10 rounded-full" />
           <div className="absolute bottom-1/4 left-[8%] w-12 h-12 bg-amber-400/15 rounded-full" />
           
-          {/* Subtle background image overlay */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`bg-light-${currentSlide}`}
-              variants={imageVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="absolute right-0 top-0 w-1/2 h-full opacity-10"
-            >
-              <img
-                src={backgroundImage}
-                alt=""
-                className="w-full h-full object-cover"
-                style={{ objectPosition: imageFocalPoint }}
-                draggable={false}
-              />
-              <div className="absolute inset-0 bg-gradient-to-l from-transparent to-background" />
-            </motion.div>
-          </AnimatePresence>
+          {/* Background image with CSS transition instead of Framer Motion */}
+          <div 
+            className="absolute right-0 top-0 w-1/2 h-full opacity-10 transition-opacity duration-500"
+            style={{ willChange: 'opacity' }}
+          >
+            <img
+              src={backgroundImage}
+              alt=""
+              className="w-full h-full object-cover"
+              style={{ objectPosition: imageFocalPoint }}
+              draggable={false}
+              loading="eager"
+            />
+            <div className="absolute inset-0 bg-gradient-to-l from-transparent to-background" />
+          </div>
         </div>
       ) : (
         /* Dark Theme Background */
         <div className="absolute inset-0 bg-primary">
-          {/* Base gradient layer */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-emerald-900/90 z-[1]" />
           
-          {/* Background image */}
+          {/* Background image with GPU-accelerated animation */}
           <AnimatePresence mode="wait">
             <motion.div
               key={`bg-${currentSlide}`}
@@ -421,6 +375,7 @@ const HeroSection = () => {
               animate="animate"
               exit="exit"
               className="absolute inset-0 z-[2]"
+              style={{ willChange: 'transform, opacity' }}
             >
               <img
                 src={backgroundImage}
@@ -428,6 +383,7 @@ const HeroSection = () => {
                 className="w-full h-full object-cover"
                 style={{ objectPosition: imageFocalPoint }}
                 draggable={false}
+                loading="eager"
               />
             </motion.div>
           </AnimatePresence>
@@ -437,8 +393,6 @@ const HeroSection = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-transparent to-primary/60 z-[3]" />
         </div>
       )}
-
-
 
       {/* Content - Conditional Layout */}
       {isLoading ? (
@@ -476,12 +430,9 @@ const HeroSection = () => {
               >
                 <span className="inline-block">{content.title}</span>
                 {content.subtitle && (
-                  <motion.span 
-                    variants={itemVariants}
-                    className={`block mt-2 font-kufi pb-2 ${isLight ? "text-emerald-600" : "text-gradient-gold"}`}
-                  >
+                  <span className={`block mt-2 font-kufi pb-2 ${isLight ? "text-emerald-600" : "text-gradient-gold"}`}>
                     {content.subtitle}
-                  </motion.span>
+                  </span>
                 )}
               </motion.h1>
               
@@ -499,7 +450,6 @@ const HeroSection = () => {
                   <HeroServiceTiles theme={heroTheme} />
                 </motion.div>
               )}
-
 
               {/* Video CTA */}
               {content.video_url && (
@@ -525,31 +475,23 @@ const HeroSection = () => {
                   variants={itemVariants}
                   className={`grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 pt-12 border-t ${isLight ? "border-slate-200" : "border-primary-foreground/15"}`}
                 >
-                  {content.stats.map((stat, index) => (
-                    <motion.div
+                  {content.stats.map((stat) => (
+                    <div
                       key={stat.label}
-                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
                       className="text-center group cursor-default"
                     >
-                      <motion.div 
-                        className={`font-kufi text-4xl md:text-5xl font-bold mb-2 ${isLight ? "text-emerald-600" : "text-secondary"}`}
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ type: "spring", stiffness: 400 }}
-                      >
+                      <div className={`font-kufi text-4xl md:text-5xl font-bold mb-2 ${isLight ? "text-emerald-600" : "text-secondary"}`}>
                         {stat.number}
-                      </motion.div>
+                      </div>
                       <div className={`text-sm md:text-base ${textMuted}`}>
                         {stat.label}
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </motion.div>
               )}
             </motion.div>
           </AnimatePresence>
-
         </div>
       ) : (
         /* Split-Screen Layout */
@@ -587,12 +529,9 @@ const HeroSection = () => {
                   >
                     <span className="inline-block">{content.title}</span>
                     {content.subtitle && (
-                      <motion.span 
-                        variants={itemVariants}
-                        className={`block mt-1 font-kufi pb-1 text-3xl md:text-4xl lg:text-5xl xl:text-6xl ${isLight ? "text-emerald-600" : "text-gradient-gold"}`}
-                      >
+                      <span className={`block mt-1 font-kufi pb-1 text-3xl md:text-4xl lg:text-5xl xl:text-6xl ${isLight ? "text-emerald-600" : "text-gradient-gold"}`}>
                         {content.subtitle}
-                      </motion.span>
+                      </span>
                     )}
                   </motion.h1>
                   
@@ -610,7 +549,6 @@ const HeroSection = () => {
                       <HeroServiceTiles theme={heroTheme} />
                     </motion.div>
                   )}
-
 
                   {/* Video CTA */}
                   {content.video_url && (
@@ -636,46 +574,62 @@ const HeroSection = () => {
                       variants={itemVariants}
                       className={`flex flex-wrap gap-6 pt-6 border-t ${isLight ? "border-slate-200" : "border-primary-foreground/15"}`}
                     >
-                      {content.stats.slice(0, 3).map((stat, index) => (
-                        <motion.div
+                      {content.stats.slice(0, 3).map((stat) => (
+                        <div
                           key={stat.label}
-                          initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
                           className="text-left group cursor-default"
                         >
-                          <motion.div 
-                            className={`font-kufi text-2xl md:text-3xl font-bold mb-1 ${isLight ? "text-emerald-600" : "text-secondary"}`}
-                            whileHover={{ scale: 1.05 }}
-                            transition={{ type: "spring", stiffness: 400 }}
-                          >
+                          <div className={`font-kufi text-2xl md:text-3xl font-bold mb-1 ${isLight ? "text-emerald-600" : "text-secondary"}`}>
                             {stat.number}
-                          </motion.div>
+                          </div>
                           <div className={`text-xs md:text-sm ${textMuted}`}>
                             {stat.label}
                           </div>
-                        </motion.div>
+                        </div>
                       ))}
                     </motion.div>
                   )}
                 </motion.div>
               </AnimatePresence>
 
-              {/* Right Side - Image */}
+              {/* Right Side - Image with simplified animation */}
               <div className="relative order-1 lg:order-2 hidden lg:block">
                 <AnimatePresence mode="wait">
-                  <HeroImageFrame
+                  <motion.div
                     key={`frame-${currentSlide}`}
-                    imageSrc={backgroundImage}
-                    alt="Hero feature"
-                    theme={heroTheme}
-                    frameStyle="modern"
-                  />
+                    variants={imageVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    className="relative"
+                    style={{ willChange: 'transform, opacity' }}
+                  >
+                    {/* Simplified Hero Image Frame - inline for better performance */}
+                    <div className={`relative rounded-2xl overflow-hidden shadow-2xl ${isLight ? "shadow-slate-300/50" : "shadow-black/30"}`}>
+                      <div className={`absolute inset-0 border-2 rounded-2xl z-10 ${isLight ? "border-slate-200" : "border-secondary/20"}`} />
+                      <img
+                        src={backgroundImage}
+                        alt="Hero feature"
+                        className="w-full h-auto max-h-[500px] object-cover"
+                        style={{ objectPosition: imageFocalPoint }}
+                        loading="eager"
+                        draggable={false}
+                      />
+                      {/* Simple badge overlay */}
+                      <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-xs font-medium z-20
+                        ${isLight 
+                          ? "bg-white/90 text-emerald-700 border border-emerald-200" 
+                          : "bg-secondary/90 text-primary-foreground"
+                        }`}>
+                        <Star className="w-3 h-3 inline mr-1 fill-current" />
+                        Premium Experience
+                      </div>
+                    </div>
+                  </motion.div>
                 </AnimatePresence>
               </div>
             </div>
           </div>
-
         </div>
       )}
 

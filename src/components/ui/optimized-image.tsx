@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface OptimizedImageProps {
@@ -22,8 +22,9 @@ interface OptimizedImageProps {
  * - Automatic srcset generation for responsive images
  * - Fallback handling for broken images
  * - Blur placeholder while loading
+ * - ForwardRef support for parent components
  */
-const OptimizedImage = ({
+const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(({
   src,
   alt,
   className,
@@ -34,7 +35,7 @@ const OptimizedImage = ({
   onLoad,
   onError,
   fallbackSrc = "/placeholder.svg",
-}: OptimizedImageProps) => {
+}, ref) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -74,7 +75,7 @@ const OptimizedImage = ({
   const imageSrc = hasError ? fallbackSrc : src;
 
   return (
-    <div className={cn("relative overflow-hidden", className)}>
+    <div ref={ref} className={cn("relative overflow-hidden", className)}>
       {/* Blur placeholder while loading */}
       {!isLoaded && !hasError && (
         <div 
@@ -113,6 +114,8 @@ const OptimizedImage = ({
       </picture>
     </div>
   );
-};
+});
+
+OptimizedImage.displayName = "OptimizedImage";
 
 export default OptimizedImage;
