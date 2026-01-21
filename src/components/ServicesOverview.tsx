@@ -37,6 +37,12 @@ interface ParentCompanySettings {
   is_enabled: boolean;
 }
 
+interface SectionHeaderSettings {
+  badge_text: string;
+  title: string;
+  arabic_text: string;
+}
+
 // Extended icon map with more travel/pilgrimage relevant icons
 const iconMap: Record<string, LucideIcon> = {
   Plane,
@@ -88,11 +94,34 @@ const ServicesOverview = () => {
     button_link: "",
     is_enabled: false
   });
+  const [sectionHeader, setSectionHeader] = useState<SectionHeaderSettings>({
+    badge_text: "Why Choose Us",
+    title: "Complete Hajj & Umrah Services",
+    arabic_text: "خدماتنا"
+  });
 
   useEffect(() => {
     fetchServices();
     fetchParentCompanySettings();
+    fetchSectionHeaderSettings();
   }, []);
+
+  const fetchSectionHeaderSettings = async () => {
+    const { data } = await supabase
+      .from("site_settings")
+      .select("*")
+      .eq("setting_key", "services_section_header")
+      .single();
+    
+    if (data?.setting_value) {
+      const settings = data.setting_value as unknown as SectionHeaderSettings;
+      setSectionHeader({
+        badge_text: settings.badge_text || "Why Choose Us",
+        title: settings.title || "Complete Hajj & Umrah Services",
+        arabic_text: settings.arabic_text || "خدماتنا"
+      });
+    }
+  };
 
   const fetchParentCompanySettings = async () => {
     const { data } = await supabase
@@ -169,12 +198,12 @@ const ServicesOverview = () => {
       <div className="container relative z-10">
         <div className="text-center mb-12">
           <span className="text-secondary font-semibold uppercase tracking-wider">
-            Why Choose Us
+            {sectionHeader.badge_text}
           </span>
           <h2 className="font-calligraphy text-4xl md:text-5xl font-bold text-foreground mt-3 mb-4">
-            Complete Hajj & Umrah Services
+            {sectionHeader.title}
           </h2>
-          <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">خدماتنا</span>
+          <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">{sectionHeader.arabic_text}</span>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

@@ -48,6 +48,12 @@ interface ParentCompanySettings {
   is_enabled: boolean;
 }
 
+interface SectionHeaderSettings {
+  badge_text: string;
+  title: string;
+  arabic_text: string;
+}
+
 interface SortableRowProps {
   item: Service;
   onEdit: (item: Service) => void;
@@ -135,6 +141,12 @@ const AdminServices = () => {
     is_enabled: false
   });
   const [savingParentCompany, setSavingParentCompany] = useState(false);
+  const [sectionHeader, setSectionHeader] = useState<SectionHeaderSettings>({
+    badge_text: "Why Choose Us",
+    title: "Complete Hajj & Umrah Services",
+    arabic_text: "خدماتنا"
+  });
+  const [savingSectionHeader, setSavingSectionHeader] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -146,7 +158,70 @@ const AdminServices = () => {
   useEffect(() => {
     fetchServices();
     fetchParentCompanySettings();
+    fetchSectionHeaderSettings();
   }, []);
+
+  const fetchSectionHeaderSettings = async () => {
+    const { data } = await supabase
+      .from("site_settings")
+      .select("*")
+      .eq("setting_key", "services_section_header")
+      .single();
+    
+    if (data?.setting_value) {
+      const settings = data.setting_value as unknown as SectionHeaderSettings;
+      setSectionHeader({
+        badge_text: settings.badge_text || "Why Choose Us",
+        title: settings.title || "Complete Hajj & Umrah Services",
+        arabic_text: settings.arabic_text || "خدماتنا"
+      });
+    }
+  };
+
+  const saveSectionHeaderSettings = async () => {
+    setSavingSectionHeader(true);
+    
+    const settingValue = {
+      badge_text: sectionHeader.badge_text,
+      title: sectionHeader.title,
+      arabic_text: sectionHeader.arabic_text
+    };
+    
+    const { data: existing } = await supabase
+      .from("site_settings")
+      .select("id")
+      .eq("setting_key", "services_section_header")
+      .single();
+    
+    if (existing) {
+      const { error } = await supabase
+        .from("site_settings")
+        .update({ setting_value: settingValue })
+        .eq("setting_key", "services_section_header");
+      
+      if (error) {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Success", description: "Section header settings saved" });
+      }
+    } else {
+      const { error } = await supabase
+        .from("site_settings")
+        .insert([{ 
+          setting_key: "services_section_header", 
+          category: "services",
+          setting_value: settingValue
+        }]);
+      
+      if (error) {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Success", description: "Section header settings saved" });
+      }
+    }
+    
+    setSavingSectionHeader(false);
+  };
 
   const fetchParentCompanySettings = async () => {
     const { data } = await supabase
@@ -331,12 +406,54 @@ const AdminServices = () => {
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Services</CardTitle>
-          <CardDescription>Manage "Why Choose Us" section services. Drag to reorder or use arrow buttons.</CardDescription>
-        </div>
+    <div className="space-y-6">
+      {/* Section Header Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Section Header</CardTitle>
+          <CardDescription>Edit the "Why Choose Us" section title and subtitle</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-3">
+            <div>
+              <label className="text-sm font-medium">Badge Text (Subtitle)</label>
+              <Input
+                value={sectionHeader.badge_text}
+                onChange={(e) => setSectionHeader({ ...sectionHeader, badge_text: e.target.value })}
+                placeholder="Why Choose Us"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Main Title</label>
+              <Input
+                value={sectionHeader.title}
+                onChange={(e) => setSectionHeader({ ...sectionHeader, title: e.target.value })}
+                placeholder="Complete Hajj & Umrah Services"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Arabic Text</label>
+              <Input
+                value={sectionHeader.arabic_text}
+                onChange={(e) => setSectionHeader({ ...sectionHeader, arabic_text: e.target.value })}
+                placeholder="خدماتنا"
+                dir="rtl"
+              />
+            </div>
+          </div>
+          <Button onClick={saveSectionHeaderSettings} disabled={savingSectionHeader}>
+            {savingSectionHeader ? "Saving..." : "Save Section Header"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Services Table */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Services</CardTitle>
+            <CardDescription>Manage individual service items. Drag to reorder or use arrow buttons.</CardDescription>
+          </div>
         <Dialog open={isDialogOpen} onOpenChange={(open) => {
           setIsDialogOpen(open);
           if (!open) {
@@ -462,6 +579,7 @@ const AdminServices = () => {
         </Button>
       </CardContent>
     </Card>
+    </div>
   );
 };
 
