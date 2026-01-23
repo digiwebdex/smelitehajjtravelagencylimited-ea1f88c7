@@ -43,6 +43,7 @@ interface FooterContent {
   video_url?: string;
   video_opacity?: number;
   video_enabled?: boolean;
+  video_speed?: number;
 }
 
 const Footer = () => {
@@ -78,6 +79,7 @@ const Footer = () => {
     video_url: "/videos/footer-bg.mp4",
     video_opacity: 60,
     video_enabled: true,
+    video_speed: 1.0,
   });
 
   useEffect(() => {
@@ -120,6 +122,7 @@ const Footer = () => {
         video_url: dataRecord.video_url as string || "/videos/footer-bg.mp4",
         video_opacity: (dataRecord.video_opacity as number) ?? 60,
         video_enabled: (dataRecord.video_enabled as boolean) ?? true,
+        video_speed: (dataRecord.video_speed as number) ?? 1.0,
       });
     }
   };
@@ -136,6 +139,7 @@ const Footer = () => {
   const videoUrl = content.video_url || "/videos/footer-bg.mp4";
   const videoOpacity = content.video_opacity ?? 60;
   const videoEnabled = content.video_enabled ?? true;
+  const videoSpeed = content.video_speed ?? 1.0;
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -192,6 +196,9 @@ const Footer = () => {
             style={{ 
               filter: 'blur(0.5px)',
               opacity: videoOpacity / 100 
+            }}
+            ref={(el) => {
+              if (el) el.playbackRate = videoSpeed;
             }}
           >
             <source src={videoUrl} type="video/mp4" />
