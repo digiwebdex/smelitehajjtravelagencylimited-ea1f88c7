@@ -419,6 +419,7 @@ export type Database = {
           services_links: Json | null
           social_links: Json | null
           updated_at: string
+          video_blur: number | null
           video_enabled: boolean | null
           video_opacity: number | null
           video_speed: number | null
@@ -439,6 +440,7 @@ export type Database = {
           services_links?: Json | null
           social_links?: Json | null
           updated_at?: string
+          video_blur?: number | null
           video_enabled?: boolean | null
           video_opacity?: number | null
           video_speed?: number | null
@@ -459,6 +461,7 @@ export type Database = {
           services_links?: Json | null
           social_links?: Json | null
           updated_at?: string
+          video_blur?: number | null
           video_enabled?: boolean | null
           video_opacity?: number | null
           video_speed?: number | null

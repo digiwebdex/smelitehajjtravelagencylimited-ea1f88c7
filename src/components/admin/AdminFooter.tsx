@@ -96,6 +96,7 @@ interface FooterContent {
   video_opacity: number;
   video_enabled: boolean;
   video_speed: number;
+  video_blur: number;
 }
 
 const AdminFooter = () => {
@@ -125,6 +126,7 @@ const AdminFooter = () => {
     video_opacity: 60,
     video_enabled: true,
     video_speed: 1.0,
+    video_blur: 0.5,
   });
   const [videoUploading, setVideoUploading] = useState(false);
 
@@ -167,6 +169,7 @@ const AdminFooter = () => {
         video_opacity: (dataRecord.video_opacity as number) ?? 60,
         video_enabled: (dataRecord.video_enabled as boolean) ?? true,
         video_speed: (dataRecord.video_speed as number) ?? 1.0,
+        video_blur: (dataRecord.video_blur as number) ?? 0.5,
       });
     }
     setLoading(false);
@@ -194,6 +197,7 @@ const AdminFooter = () => {
       video_opacity: footerContent.video_opacity,
       video_enabled: footerContent.video_enabled,
       video_speed: footerContent.video_speed,
+      video_blur: footerContent.video_blur,
     };
 
     let error;
@@ -383,6 +387,22 @@ const AdminFooter = () => {
               className="w-full"
             />
             <p className="text-xs text-muted-foreground">Adjust the video animation speed (0.25x - 2x)</p>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-medium">Blur Intensity</label>
+              <span className="text-sm text-muted-foreground">{footerContent.video_blur}px</span>
+            </div>
+            <Slider
+              value={[footerContent.video_blur]}
+              onValueChange={(value) => setFooterContent({ ...footerContent, video_blur: value[0] })}
+              min={0}
+              max={10}
+              step={0.5}
+              className="w-full"
+            />
+            <p className="text-xs text-muted-foreground">Adjust the background blur effect (0px - 10px)</p>
           </div>
         </div>
 
