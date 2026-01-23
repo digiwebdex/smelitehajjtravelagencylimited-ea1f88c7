@@ -101,7 +101,7 @@ const Auth = () => {
     setLoading(true);
     const redirectUrl = `${window.location.origin}/`;
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -132,6 +132,22 @@ const Auth = () => {
         title: "Account Created!",
         description: "You have successfully signed up. Welcome aboard!",
       });
+
+      // Send welcome notification if phone number provided
+      if (phone && data?.user) {
+        try {
+          await supabase.functions.invoke('send-welcome-notification', {
+            body: {
+              userId: data.user.id,
+              fullName: fullName,
+              phone: phone,
+              email: email,
+            },
+          });
+        } catch (err) {
+          console.log("Welcome notification skipped:", err);
+        }
+      }
     }
     setLoading(false);
   };

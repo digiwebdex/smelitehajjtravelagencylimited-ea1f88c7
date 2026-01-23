@@ -36,6 +36,8 @@ interface WhatsAppConfig {
   auth_token: string;
   from_number: string;
   message_template: string;
+  welcome_message_enabled?: boolean;
+  welcome_message_template?: string;
 }
 
 interface NotificationSetting {
@@ -191,11 +193,12 @@ const AdminNotifications = () => {
     });
   };
 
-  const updateWhatsappConfig = (key: keyof WhatsAppConfig, value: string) => {
+  const updateWhatsappConfig = (key: keyof WhatsAppConfig, value: string | boolean) => {
     if (!whatsappSettings) return;
+    const configValue = key === 'welcome_message_enabled' ? (value === "true" || value === true) : value;
     setWhatsappSettings({
       ...whatsappSettings,
-      config: { ...(whatsappSettings.config as WhatsAppConfig), [key]: value },
+      config: { ...(whatsappSettings.config as WhatsAppConfig), [key]: configValue },
     });
   };
 
@@ -412,7 +415,7 @@ const AdminNotifications = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="whatsapp-template">Message Template</Label>
+                <Label htmlFor="whatsapp-template">Status Update Template</Label>
                 <Textarea
                   id="whatsapp-template"
                   placeholder="Hello {{name}}, your booking status has been updated to: {{status}}. Booking ID: {{booking_id}}"
@@ -424,6 +427,39 @@ const AdminNotifications = () => {
                   Available variables: {"{{name}}"}, {"{{status}}"}, {"{{booking_id}}"}, {"{{package}}"}, {"{{notes}}"}
                 </p>
               </div>
+
+              {/* Welcome Message Section */}
+              <div className="border-t pt-4 mt-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h4 className="font-medium">Welcome Message</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Send a welcome WhatsApp message when new customers sign up with their phone number
+                    </p>
+                  </div>
+                  <Switch
+                    id="welcome-enabled"
+                    checked={(whatsappSettings?.config as WhatsAppConfig)?.welcome_message_enabled || false}
+                    onCheckedChange={(checked) =>
+                      updateWhatsappConfig("welcome_message_enabled", checked ? "true" : "")
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="welcome-template">Welcome Message Template</Label>
+                  <Textarea
+                    id="welcome-template"
+                    placeholder="🌟 Assalamu Alaikum {{name}}! Welcome to SM Elite Hajj..."
+                    value={(whatsappSettings?.config as WhatsAppConfig)?.welcome_message_template || ""}
+                    onChange={(e) => updateWhatsappConfig("welcome_message_template", e.target.value)}
+                    rows={3}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Available variables: {"{{name}}"}
+                  </p>
+                </div>
+              </div>
+
               <div className="flex gap-2 pt-4">
                 <Button onClick={saveWhatsappSettings} disabled={saving}>
                   {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Settings className="h-4 w-4 mr-2" />}
