@@ -97,6 +97,7 @@ interface FooterContent {
   video_enabled: boolean;
   video_speed: number;
   video_blur: number;
+  video_scale: number;
 }
 
 const AdminFooter = () => {
@@ -127,6 +128,7 @@ const AdminFooter = () => {
     video_enabled: true,
     video_speed: 1.0,
     video_blur: 0.5,
+    video_scale: 100,
   });
   const [videoUploading, setVideoUploading] = useState(false);
 
@@ -170,6 +172,7 @@ const AdminFooter = () => {
         video_enabled: (dataRecord.video_enabled as boolean) ?? true,
         video_speed: (dataRecord.video_speed as number) ?? 1.0,
         video_blur: (dataRecord.video_blur as number) ?? 0.5,
+        video_scale: (dataRecord.video_scale as number) ?? 100,
       });
     }
     setLoading(false);
@@ -198,6 +201,7 @@ const AdminFooter = () => {
       video_enabled: footerContent.video_enabled,
       video_speed: footerContent.video_speed,
       video_blur: footerContent.video_blur,
+      video_scale: footerContent.video_scale,
     };
 
     let error;
@@ -403,6 +407,22 @@ const AdminFooter = () => {
               className="w-full"
             />
             <p className="text-xs text-muted-foreground">Adjust the background blur effect (0px - 10px)</p>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-medium">Video Scale / Zoom</label>
+              <span className="text-sm text-muted-foreground">{footerContent.video_scale}%</span>
+            </div>
+            <Slider
+              value={[footerContent.video_scale]}
+              onValueChange={(value) => setFooterContent({ ...footerContent, video_scale: value[0] })}
+              min={100}
+              max={800}
+              step={25}
+              className="w-full"
+            />
+            <p className="text-xs text-muted-foreground">Zoom in on the video (100% - 800%)</p>
           </div>
         </div>
 

@@ -422,6 +422,7 @@ export type Database = {
           video_blur: number | null
           video_enabled: boolean | null
           video_opacity: number | null
+          video_scale: number | null
           video_speed: number | null
           video_url: string | null
         }
@@ -443,6 +444,7 @@ export type Database = {
           video_blur?: number | null
           video_enabled?: boolean | null
           video_opacity?: number | null
+          video_scale?: number | null
           video_speed?: number | null
           video_url?: string | null
         }
@@ -464,6 +466,7 @@ export type Database = {
           video_blur?: number | null
           video_enabled?: boolean | null
           video_opacity?: number | null
+          video_scale?: number | null
           video_speed?: number | null
           video_url?: string | null
         }

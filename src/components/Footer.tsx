@@ -45,6 +45,7 @@ interface FooterContent {
   video_enabled?: boolean;
   video_speed?: number;
   video_blur?: number;
+  video_scale?: number;
 }
 
 const Footer = () => {
@@ -82,6 +83,7 @@ const Footer = () => {
     video_enabled: true,
     video_speed: 1.0,
     video_blur: 0.5,
+    video_scale: 100,
   });
 
   useEffect(() => {
@@ -126,6 +128,7 @@ const Footer = () => {
         video_enabled: (dataRecord.video_enabled as boolean) ?? true,
         video_speed: (dataRecord.video_speed as number) ?? 1.0,
         video_blur: (dataRecord.video_blur as number) ?? 0.5,
+        video_scale: (dataRecord.video_scale as number) ?? 100,
       });
     }
   };
@@ -144,6 +147,7 @@ const Footer = () => {
   const videoEnabled = content.video_enabled ?? true;
   const videoSpeed = content.video_speed ?? 1.0;
   const videoBlur = content.video_blur ?? 0.5;
+  const videoScale = content.video_scale ?? 100;
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -199,7 +203,8 @@ const Footer = () => {
             className="w-full h-full object-cover"
             style={{ 
               filter: `blur(${videoBlur}px)`,
-              opacity: videoOpacity / 100 
+              opacity: videoOpacity / 100,
+              transform: `scale(${videoScale / 100})`,
             }}
             ref={(el) => {
               if (el) el.playbackRate = videoSpeed;
