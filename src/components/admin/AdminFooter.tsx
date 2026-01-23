@@ -135,6 +135,7 @@ const AdminFooter = () => {
     video_scale: 100,
   });
   const [videoUploading, setVideoUploading] = useState(false);
+  const [showOriginalVideo, setShowOriginalVideo] = useState(false);
 
   // Generate unique IDs for phone sections (for drag-and-drop)
   const [phoneSections, setPhoneSections] = useState<PhoneSection[]>([]);
@@ -356,15 +357,40 @@ const AdminFooter = () => {
               </label>
             </div>
             {footerContent.video_url && (
-              <div className="mt-2 rounded-lg overflow-hidden border">
-                <video 
-                  src={footerContent.video_url} 
-                  className="w-full h-32 object-cover"
-                  muted
-                  loop
-                  autoPlay
-                  playsInline
-                />
+              <div className="mt-2 space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="show-original" className="text-sm font-medium">Show Original Video</Label>
+                  <Switch
+                    id="show-original"
+                    checked={showOriginalVideo}
+                    onCheckedChange={setShowOriginalVideo}
+                  />
+                </div>
+                <div className="rounded-lg overflow-hidden border relative">
+                  <video 
+                    src={footerContent.video_url} 
+                    className="w-full h-40 object-cover"
+                    style={showOriginalVideo ? {} : {
+                      filter: `blur(${footerContent.video_blur}px)`,
+                      opacity: footerContent.video_opacity / 100,
+                      transform: `scale(${footerContent.video_scale / 100})`,
+                      objectPosition: footerContent.video_position === 'top' ? 'center top' : footerContent.video_position === 'bottom' ? 'center bottom' : 'center center',
+                    }}
+                    muted
+                    loop
+                    autoPlay
+                    playsInline
+                  />
+                  {!showOriginalVideo && (
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{ backgroundColor: footerContent.video_overlay_color }}
+                    />
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {showOriginalVideo ? "Showing original video without effects" : "Preview with current effects applied"}
+                </p>
               </div>
             )}
           </div>
