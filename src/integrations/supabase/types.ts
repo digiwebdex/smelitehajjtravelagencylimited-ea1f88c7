@@ -421,6 +421,7 @@ export type Database = {
           updated_at: string
           video_enabled: boolean | null
           video_opacity: number | null
+          video_speed: number | null
           video_url: string | null
         }
         Insert: {
@@ -440,6 +441,7 @@ export type Database = {
           updated_at?: string
           video_enabled?: boolean | null
           video_opacity?: number | null
+          video_speed?: number | null
           video_url?: string | null
         }
         Update: {
@@ -459,6 +461,7 @@ export type Database = {
           updated_at?: string
           video_enabled?: boolean | null
           video_opacity?: number | null
+          video_speed?: number | null
           video_url?: string | null
         }
         Relationships: []

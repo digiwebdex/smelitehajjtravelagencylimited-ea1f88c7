@@ -95,6 +95,7 @@ interface FooterContent {
   video_url: string;
   video_opacity: number;
   video_enabled: boolean;
+  video_speed: number;
 }
 
 const AdminFooter = () => {
@@ -123,6 +124,7 @@ const AdminFooter = () => {
     video_url: "",
     video_opacity: 60,
     video_enabled: true,
+    video_speed: 1.0,
   });
   const [videoUploading, setVideoUploading] = useState(false);
 
@@ -164,6 +166,7 @@ const AdminFooter = () => {
         video_url: dataRecord.video_url as string || "",
         video_opacity: (dataRecord.video_opacity as number) ?? 60,
         video_enabled: (dataRecord.video_enabled as boolean) ?? true,
+        video_speed: (dataRecord.video_speed as number) ?? 1.0,
       });
     }
     setLoading(false);
@@ -190,6 +193,7 @@ const AdminFooter = () => {
       video_url: footerContent.video_url,
       video_opacity: footerContent.video_opacity,
       video_enabled: footerContent.video_enabled,
+      video_speed: footerContent.video_speed,
     };
 
     let error;
@@ -363,6 +367,22 @@ const AdminFooter = () => {
               className="w-full"
             />
             <p className="text-xs text-muted-foreground">Lower values make the video more subtle</p>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-medium">Playback Speed</label>
+              <span className="text-sm text-muted-foreground">{footerContent.video_speed}x</span>
+            </div>
+            <Slider
+              value={[footerContent.video_speed]}
+              onValueChange={(value) => setFooterContent({ ...footerContent, video_speed: value[0] })}
+              min={0.25}
+              max={2}
+              step={0.25}
+              className="w-full"
+            />
+            <p className="text-xs text-muted-foreground">Adjust the video animation speed (0.25x - 2x)</p>
           </div>
         </div>
 
