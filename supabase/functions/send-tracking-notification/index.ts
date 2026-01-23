@@ -29,6 +29,14 @@ interface EmailConfig {
   from_name: string;
 }
 
+interface WhatsAppConfig {
+  provider: string;
+  account_sid: string;
+  auth_token: string;
+  from_number: string;
+  message_template: string;
+}
+
 const trackingStatusLabels: Record<string, string> = {
   order_submitted: 'Order Submitted',
   documents_received: 'Documents Received',
@@ -48,6 +56,20 @@ const getStatusEmoji = (status: string): string => {
     completed: '🎉',
   };
   return emojis[status] || '📋';
+};
+
+// Helper to format phone number for WhatsApp
+const formatWhatsAppNumber = (phone: string): string => {
+  // Remove all non-digit characters
+  let cleaned = phone.replace(/\D/g, '');
+  
+  // If starts with 0, assume Bangladesh and replace with 880
+  if (cleaned.startsWith('0')) {
+    cleaned = '880' + cleaned.substring(1);
+  }
+  
+  // Add whatsapp: prefix if not present
+  return `whatsapp:+${cleaned}`;
 };
 
 const handler = async (req: Request): Promise<Response> => {
@@ -112,17 +134,89 @@ const handler = async (req: Request): Promise<Response> => {
 
     const smsSettings = settings?.find(s => s.setting_type === "sms");
     const emailSettings = settings?.find(s => s.setting_type === "email");
+    const whatsappSettings = settings?.find(s => s.setting_type === "whatsapp");
 
     console.log("SMS enabled:", smsSettings?.is_enabled);
     console.log("Email enabled:", emailSettings?.is_enabled);
+    console.log("WhatsApp enabled:", whatsappSettings?.is_enabled);
 
     const results = {
       sms: { sent: false, error: null as string | null },
       email: { sent: false, error: null as string | null },
+      whatsapp: { sent: false, error: null as string | null },
     };
 
     const statusLabel = trackingStatusLabels[newStatus] || newStatus;
     const statusEmoji = getStatusEmoji(newStatus);
+
+    // Send WhatsApp if enabled and phone exists
+    if (whatsappSettings?.is_enabled && customerPhone) {
+      try {
+        const whatsappConfig = whatsappSettings.config as unknown as WhatsAppConfig;
+        console.log("Sending WhatsApp to:", customerPhone);
+        
+        // Format the message from template
+        let message = whatsappConfig.message_template || 
+          "Hello {{name}}, your booking status has been updated to: {{status}}. Booking ID: {{booking_id}}";
+        
+        message = message
+          .replace(/\{\{name\}\}/g, customerName)
+          .replace(/\{\{status\}\}/g, `${statusEmoji} ${statusLabel}`)
+          .replace(/\{\{booking_id\}\}/g, booking.id.slice(0, 8).toUpperCase())
+          .replace(/\{\{package\}\}/g, booking.package?.title || 'N/A')
+          .replace(/\{\{notes\}\}/g, notes || '');
+
+        const toNumber = formatWhatsAppNumber(customerPhone);
+        
+        // Use Twilio API to send WhatsApp message
+        const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${whatsappConfig.account_sid}/Messages.json`;
+        
+        const formData = new URLSearchParams();
+        formData.append('To', toNumber);
+        formData.append('From', whatsappConfig.from_number);
+        formData.append('Body', message);
+
+        const authHeader = btoa(`${whatsappConfig.account_sid}:${whatsappConfig.auth_token}`);
+
+        const whatsappResponse = await fetch(twilioUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Authorization": `Basic ${authHeader}`,
+          },
+          body: formData.toString(),
+        });
+
+        if (!whatsappResponse.ok) {
+          const errorData = await whatsappResponse.json();
+          throw new Error(`WhatsApp API error: ${errorData.message || JSON.stringify(errorData)}`);
+        }
+
+        const responseData = await whatsappResponse.json();
+        console.log("WhatsApp message sent, SID:", responseData.sid);
+
+        results.whatsapp.sent = true;
+        console.log("WhatsApp sent successfully");
+
+        await supabase.from("notification_logs").insert({
+          booking_id: bookingId,
+          notification_type: "whatsapp",
+          recipient: customerPhone,
+          status: "sent",
+        });
+      } catch (whatsappError: any) {
+        console.error("WhatsApp sending error:", whatsappError);
+        results.whatsapp.error = whatsappError.message;
+
+        await supabase.from("notification_logs").insert({
+          booking_id: bookingId,
+          notification_type: "whatsapp",
+          recipient: customerPhone,
+          status: "failed",
+          error_message: whatsappError.message,
+        });
+      }
+    }
 
     // Send SMS if enabled and phone exists
     if (smsSettings?.is_enabled && customerPhone) {

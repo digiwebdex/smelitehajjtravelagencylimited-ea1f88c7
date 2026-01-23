@@ -7,10 +7,12 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Mail, MessageSquare, Settings, History, Loader2, Eye, EyeOff, Send, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Mail, MessageSquare, Settings, History, Loader2, Eye, EyeOff, CheckCircle, XCircle, Clock } from "lucide-react";
 import { format } from "date-fns";
+import WhatsAppIcon from "@/components/icons/WhatsAppNotificationIcon";
 
 interface SMSConfig {
   provider: string;
@@ -28,11 +30,19 @@ interface EmailConfig {
   from_name: string;
 }
 
+interface WhatsAppConfig {
+  provider: string;
+  account_sid: string;
+  auth_token: string;
+  from_number: string;
+  message_template: string;
+}
+
 interface NotificationSetting {
   id: string;
   setting_type: string;
   is_enabled: boolean;
-  config: SMSConfig | EmailConfig;
+  config: SMSConfig | EmailConfig | WhatsAppConfig;
 }
 
 interface NotificationLog {
@@ -50,11 +60,11 @@ const AdminNotifications = () => {
   const [saving, setSaving] = useState(false);
   const [smsSettings, setSmsSettings] = useState<NotificationSetting | null>(null);
   const [emailSettings, setEmailSettings] = useState<NotificationSetting | null>(null);
+  const [whatsappSettings, setWhatsappSettings] = useState<NotificationSetting | null>(null);
   const [logs, setLogs] = useState<NotificationLog[]>([]);
   const [showSmsApiKey, setShowSmsApiKey] = useState(false);
   const [showSmtpPassword, setShowSmtpPassword] = useState(false);
-  const [testingSms, setTestingSms] = useState(false);
-  const [testingEmail, setTestingEmail] = useState(false);
+  const [showWhatsappAuthToken, setShowWhatsappAuthToken] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -71,9 +81,11 @@ const AdminNotifications = () => {
 
       const sms = data?.find(s => s.setting_type === "sms");
       const email = data?.find(s => s.setting_type === "email");
+      const whatsapp = data?.find(s => s.setting_type === "whatsapp");
 
       if (sms) setSmsSettings({ ...sms, config: sms.config as unknown as SMSConfig });
       if (email) setEmailSettings({ ...email, config: email.config as unknown as EmailConfig });
+      if (whatsapp) setWhatsappSettings({ ...whatsapp, config: whatsapp.config as unknown as WhatsAppConfig });
     } catch (error: any) {
       console.error("Error fetching settings:", error);
       toast.error("Failed to load notification settings");
@@ -141,6 +153,28 @@ const AdminNotifications = () => {
     }
   };
 
+  const saveWhatsappSettings = async () => {
+    if (!whatsappSettings) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("notification_settings")
+        .update({
+          is_enabled: whatsappSettings.is_enabled,
+          config: whatsappSettings.config as any,
+        })
+        .eq("id", whatsappSettings.id);
+
+      if (error) throw error;
+      toast.success("WhatsApp settings saved successfully");
+    } catch (error: any) {
+      console.error("Error saving WhatsApp settings:", error);
+      toast.error("Failed to save WhatsApp settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const updateSmsConfig = (key: keyof SMSConfig, value: string) => {
     if (!smsSettings) return;
     setSmsSettings({
@@ -157,6 +191,14 @@ const AdminNotifications = () => {
     });
   };
 
+  const updateWhatsappConfig = (key: keyof WhatsAppConfig, value: string) => {
+    if (!whatsappSettings) return;
+    setWhatsappSettings({
+      ...whatsappSettings,
+      config: { ...(whatsappSettings.config as WhatsAppConfig), [key]: value },
+    });
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "sent":
@@ -165,6 +207,19 @@ const AdminNotifications = () => {
         return <Badge className="bg-red-100 text-red-800"><XCircle className="h-3 w-3 mr-1" />Failed</Badge>;
       default:
         return <Badge className="bg-yellow-100 text-yellow-800"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
+    }
+  };
+
+  const getNotificationTypeIcon = (type: string) => {
+    switch (type) {
+      case "sms":
+        return <MessageSquare className="h-3 w-3" />;
+      case "email":
+        return <Mail className="h-3 w-3" />;
+      case "whatsapp":
+        return <WhatsAppIcon className="h-3 w-3" />;
+      default:
+        return <MessageSquare className="h-3 w-3" />;
     }
   };
 
@@ -179,10 +234,14 @@ const AdminNotifications = () => {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="sms" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="sms" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
             SMS Settings
+          </TabsTrigger>
+          <TabsTrigger value="whatsapp" className="flex items-center gap-2">
+            <WhatsAppIcon className="h-4 w-4" />
+            WhatsApp
           </TabsTrigger>
           <TabsTrigger value="email" className="flex items-center gap-2">
             <Mail className="h-4 w-4" />
@@ -266,6 +325,109 @@ const AdminNotifications = () => {
                 <Button onClick={saveSmsSettings} disabled={saving}>
                   {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Settings className="h-4 w-4 mr-2" />}
                   Save SMS Settings
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* WhatsApp Settings Tab */}
+        <TabsContent value="whatsapp">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <WhatsAppIcon className="h-5 w-5" />
+                    WhatsApp Business Configuration
+                  </CardTitle>
+                  <CardDescription>
+                    Configure Twilio WhatsApp API to send booking status notifications via WhatsApp. 
+                    Notifications are automatically sent when booking status changes.
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="whatsapp-enabled">Enable WhatsApp</Label>
+                  <Switch
+                    id="whatsapp-enabled"
+                    checked={whatsappSettings?.is_enabled || false}
+                    onCheckedChange={(checked) =>
+                      setWhatsappSettings(prev => prev ? { ...prev, is_enabled: checked } : null)
+                    }
+                  />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <h4 className="font-medium text-blue-800 mb-2">Setup Instructions</h4>
+                <ol className="text-sm text-blue-700 list-decimal list-inside space-y-1">
+                  <li>Create a Twilio account at <a href="https://www.twilio.com" target="_blank" rel="noopener noreferrer" className="underline">twilio.com</a></li>
+                  <li>Enable WhatsApp in Twilio Console → Messaging → Try It Out → Send a WhatsApp message</li>
+                  <li>Get your Account SID and Auth Token from Twilio Console</li>
+                  <li>Your WhatsApp number will be in format: whatsapp:+14155238886 (Twilio sandbox) or your own number</li>
+                </ol>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="whatsapp-account-sid">Twilio Account SID</Label>
+                  <Input
+                    id="whatsapp-account-sid"
+                    placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    value={(whatsappSettings?.config as WhatsAppConfig)?.account_sid || ""}
+                    onChange={(e) => updateWhatsappConfig("account_sid", e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="whatsapp-from-number">From WhatsApp Number</Label>
+                  <Input
+                    id="whatsapp-from-number"
+                    placeholder="whatsapp:+14155238886"
+                    value={(whatsappSettings?.config as WhatsAppConfig)?.from_number || ""}
+                    onChange={(e) => updateWhatsappConfig("from_number", e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">Include "whatsapp:" prefix</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="whatsapp-auth-token">Twilio Auth Token</Label>
+                <div className="relative">
+                  <Input
+                    id="whatsapp-auth-token"
+                    type={showWhatsappAuthToken ? "text" : "password"}
+                    placeholder="Enter your Twilio Auth Token"
+                    value={(whatsappSettings?.config as WhatsAppConfig)?.auth_token || ""}
+                    onChange={(e) => updateWhatsappConfig("auth_token", e.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3"
+                    onClick={() => setShowWhatsappAuthToken(!showWhatsappAuthToken)}
+                  >
+                    {showWhatsappAuthToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="whatsapp-template">Message Template</Label>
+                <Textarea
+                  id="whatsapp-template"
+                  placeholder="Hello {{name}}, your booking status has been updated to: {{status}}. Booking ID: {{booking_id}}"
+                  value={(whatsappSettings?.config as WhatsAppConfig)?.message_template || ""}
+                  onChange={(e) => updateWhatsappConfig("message_template", e.target.value)}
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Available variables: {"{{name}}"}, {"{{status}}"}, {"{{booking_id}}"}, {"{{package}}"}, {"{{notes}}"}
+                </p>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button onClick={saveWhatsappSettings} disabled={saving}>
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Settings className="h-4 w-4 mr-2" />}
+                  Save WhatsApp Settings
                 </Button>
               </div>
             </CardContent>
@@ -392,7 +554,7 @@ const AdminNotifications = () => {
                 Notification History
               </CardTitle>
               <CardDescription>
-                View all sent and failed notifications
+                View all sent and failed notifications (SMS, Email, WhatsApp)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -416,11 +578,7 @@ const AdminNotifications = () => {
                       <TableRow key={log.id}>
                         <TableCell>
                           <Badge variant="outline" className="flex items-center gap-1 w-fit">
-                            {log.notification_type === "sms" ? (
-                              <MessageSquare className="h-3 w-3" />
-                            ) : (
-                              <Mail className="h-3 w-3" />
-                            )}
+                            {getNotificationTypeIcon(log.notification_type)}
                             {log.notification_type.toUpperCase()}
                           </Badge>
                         </TableCell>
