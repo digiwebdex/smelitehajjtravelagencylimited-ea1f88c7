@@ -348,23 +348,23 @@ const Footer = () => {
               <span className="w-8 h-0.5 bg-secondary" />
               Phone Numbers
             </h4>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {displayPhones.map((phoneSection, sectionIndex) => {
                 const phones = phoneSection.split(',').map(p => p.trim()).filter(p => p);
                 if (phones.length === 0) return null;
                 
                 return (
-                  <li key={sectionIndex} className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <li key={sectionIndex} className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-primary-foreground/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Phone className="w-5 h-5 text-secondary" />
                     </div>
-                    <div className="text-primary-foreground/80 text-sm flex flex-col md:block leading-tight">
+                    <div className="text-primary-foreground/80 text-sm leading-relaxed">
                       {phones.map((phone, idx) => (
-                        <span key={idx} className="block md:inline">
-                          <a href={`tel:${phone.replace(/\s/g, '')}`} className="hover:text-secondary transition-colors">
+                        <span key={idx}>
+                          <a href={`tel:${phone.replace(/\s/g, '')}`} className="hover:text-secondary transition-colors whitespace-nowrap">
                             {phone}
                           </a>
-                          {idx < phones.length - 1 && <span className="hidden md:inline text-primary-foreground/50">, </span>}
+                          {idx < phones.length - 1 && <span className="text-primary-foreground/50">, </span>}
                         </span>
                       ))}
                     </div>
