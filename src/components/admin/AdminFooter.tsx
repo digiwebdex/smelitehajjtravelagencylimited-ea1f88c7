@@ -35,36 +35,51 @@ const SortablePhoneSection = ({ section, index, totalSections, onUpdate, onRemov
     opacity: isDragging ? 0.5 : 1,
   };
 
-  // Label: 1st Section #1 for index 0, 2nd Section #1 for index 1, 2nd Section #2 for index 2, etc.
-  const sectionLabel = index === 0 ? "1st Section #1" : `2nd Section #${index}`;
+  // Label based on index
+  const sectionLabel = `Section ${index + 1}`;
+  const phoneCount = section.phones.split(',').map(p => p.trim()).filter(p => p).length;
 
   return (
-    <div ref={setNodeRef} style={style} className="flex gap-2 items-center">
-      <button
-        type="button"
-        className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded"
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical className="w-4 h-4 text-muted-foreground" />
-      </button>
-      <span className={`text-xs font-medium w-28 flex-shrink-0 ${index === 0 ? 'text-primary' : 'text-muted-foreground'}`}>
-        {sectionLabel}
-      </span>
-      <Input 
-        value={section.phones} 
-        onChange={(e) => onUpdate(section.id, e.target.value)} 
-        placeholder="+8801234567890, +8809876543210" 
-        className="flex-1" 
-      />
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        onClick={() => onRemove(section.id)}
-        disabled={totalSections === 1}
-      >
-        <Trash2 className="w-4 h-4 text-destructive" />
-      </Button>
+    <div ref={setNodeRef} style={style} className="border rounded-lg p-3 bg-card">
+      <div className="flex gap-2 items-start">
+        <button
+          type="button"
+          className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded mt-1"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="w-4 h-4 text-muted-foreground" />
+        </button>
+        <div className="flex-1 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className={`text-sm font-medium ${index === 0 ? 'text-primary' : 'text-muted-foreground'}`}>
+              {sectionLabel} {index === 0 && <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded ml-2">Primary</span>}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {phoneCount} number{phoneCount !== 1 ? 's' : ''}
+            </span>
+          </div>
+          <Textarea 
+            value={section.phones} 
+            onChange={(e) => onUpdate(section.id, e.target.value)} 
+            placeholder="+8801234567890, +8809876543210, +8801111222333" 
+            className="min-h-[60px] text-sm font-mono"
+            rows={2}
+          />
+          <p className="text-xs text-muted-foreground">
+            Enter multiple phone numbers separated by commas
+          </p>
+        </div>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => onRemove(section.id)}
+          disabled={totalSections === 1}
+          className="mt-1"
+        >
+          <Trash2 className="w-4 h-4 text-destructive" />
+        </Button>
+      </div>
     </div>
   );
 };
@@ -672,24 +687,24 @@ const AdminFooter = () => {
               {/* Live Preview */}
               {phoneSections.some(s => s.phones.trim()) && (
                 <div className="mb-4 p-4 rounded-lg bg-[#1a3d2e] border border-[#2a5d4e]">
-                  <p className="text-xs text-white/60 mb-3 uppercase tracking-wide">Preview</p>
-                  <div className="space-y-3">
-                    {phoneSections.map((section, sectionIndex) => {
+                  <p className="text-xs text-white/60 mb-3 uppercase tracking-wide">Live Preview (as it will appear in footer)</p>
+                  <div className="space-y-4">
+                    {phoneSections.map((section) => {
                       const phones = section.phones.split(',').map(p => p.trim()).filter(p => p);
                       if (phones.length === 0) return null;
                       
                       return (
                         <div key={section.id} className="flex items-start gap-3">
-                          <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
                             <svg className="w-5 h-5 text-[#c9a961]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                             </svg>
                           </div>
-                          <div className="text-white/80 text-sm leading-relaxed">
+                          <div className="text-white/90 text-sm leading-loose flex flex-wrap items-center gap-x-0">
                             {phones.map((phone, idx) => (
-                              <span key={idx}>
+                              <span key={idx} className="inline-flex items-center">
                                 <span className="whitespace-nowrap">{phone}</span>
-                                {idx < phones.length - 1 && <span className="text-white/50">, </span>}
+                                {idx < phones.length - 1 && <span className="text-white/50 mr-1">,</span>}
                               </span>
                             ))}
                           </div>
