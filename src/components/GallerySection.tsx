@@ -60,8 +60,12 @@ const GallerySection = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [videoViewMode, setVideoViewMode] = useState<ViewMode>("grid");
   const [contentType, setContentType] = useState<ContentType>("images");
   const [selectedVideo, setSelectedVideo] = useState<GalleryVideo | null>(null);
+  const [videoCarouselApi, setVideoCarouselApi] = useState<CarouselApi>();
+  const [currentVideoSlide, setCurrentVideoSlide] = useState(0);
+  const [isVideoAutoplayPaused, setIsVideoAutoplayPaused] = useState(false);
   const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -86,6 +90,13 @@ const GallerySection = () => {
     stopOnMouseEnter: true,
   });
 
+  // Video autoplay plugin
+  const videoAutoplayPlugin = Autoplay({
+    delay: 5000,
+    stopOnInteraction: false,
+    stopOnMouseEnter: true,
+  });
+
   useEffect(() => {
     fetchGalleryData();
   }, []);
@@ -101,6 +112,21 @@ const GallerySection = () => {
     carouselApi.on("select", onSelect);
     return () => {
       carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi, onSelect]);
+
+  // Video carousel select handler
+  const onVideoSelect = useCallback(() => {
+    if (!videoCarouselApi) return;
+    setCurrentVideoSlide(videoCarouselApi.selectedScrollSnap());
+  }, [videoCarouselApi]);
+
+  useEffect(() => {
+    if (!videoCarouselApi) return;
+    onVideoSelect();
+    videoCarouselApi.on("select", onVideoSelect);
+    return () => {
+      videoCarouselApi.off("select", onVideoSelect);
     };
   }, [carouselApi, onSelect]);
 
@@ -180,6 +206,21 @@ const GallerySection = () => {
       autoplayPlugin.stop();
     }
     setIsAutoplayPaused(!isAutoplayPaused);
+  };
+
+  const toggleVideoAutoplay = () => {
+    if (isVideoAutoplayPaused) {
+      videoAutoplayPlugin.play();
+    } else {
+      videoAutoplayPlugin.stop();
+    }
+    setIsVideoAutoplayPaused(!isVideoAutoplayPaused);
+  };
+
+  const scrollToVideoSlide = (index: number) => {
+    if (videoCarouselApi) {
+      videoCarouselApi.scrollTo(index);
+    }
   };
 
   const scrollToSlide = (index: number) => {
@@ -490,9 +531,65 @@ const GallerySection = () => {
             </motion.div>
           )}
 
-          {/* Videos Grid */}
+          {/* View Mode Toggle for Videos */}
           {contentType === "videos" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              className="flex justify-center gap-3 mb-12"
+            >
+              <Button
+                variant={videoViewMode === "grid" ? "default" : "outline"}
+                size="lg"
+                onClick={() => setVideoViewMode("grid")}
+                className={`gap-2 px-6 transition-all duration-300 ${videoViewMode === "grid" ? "shadow-gold" : "hover:border-primary/50"}`}
+              >
+                <Grid3X3 className="w-5 h-5" />
+                Grid View
+              </Button>
+              <Button
+                variant={videoViewMode === "carousel" ? "default" : "outline"}
+                size="lg"
+                onClick={() => setVideoViewMode("carousel")}
+                className={`gap-2 px-6 transition-all duration-300 ${videoViewMode === "carousel" ? "shadow-gold" : "hover:border-primary/50"}`}
+              >
+                <SlidersHorizontal className="w-5 h-5" />
+                Carousel
+              </Button>
+              {videoViewMode === "carousel" && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={toggleVideoAutoplay}
+                    className="gap-2 px-6 border-secondary/50 hover:border-secondary"
+                  >
+                    {isVideoAutoplayPaused ? (
+                      <>
+                        <Play className="w-5 h-5 text-secondary" />
+                        Play
+                      </>
+                    ) : (
+                      <>
+                        <Pause className="w-5 h-5 text-secondary" />
+                        Pause
+                      </>
+                    )}
+                  </Button>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+
+          {/* Videos Grid View */}
+          {contentType === "videos" && videoViewMode === "grid" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {videos.length === 0 ? (
                 <div className="col-span-full text-center py-12 text-muted-foreground">
                   <Video className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -545,6 +642,124 @@ const GallerySection = () => {
                 ))
               )}
             </div>
+          )}
+
+          {/* Videos Carousel View */}
+          {contentType === "videos" && videoViewMode === "carousel" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Carousel
+                opts={{
+                  align: "center",
+                  loop: true,
+                  dragFree: true,
+                  skipSnaps: false,
+                  containScroll: "trimSnaps",
+                }}
+                plugins={[videoAutoplayPlugin]}
+                setApi={setVideoCarouselApi}
+                className="w-full max-w-full touch-pan-y"
+              >
+                <CarouselContent className="-ml-4">
+                  {videos.map((video, index) => (
+                    <CarouselItem key={video.id} className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/3">
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        whileHover={{ y: -5 }}
+                        className="group relative aspect-video overflow-hidden rounded-2xl cursor-pointer bg-muted shadow-elegant"
+                        onClick={() => setSelectedVideo(video)}
+                      >
+                        {/* Thumbnail */}
+                        {video.thumbnail_url ? (
+                          <img
+                            src={video.thumbnail_url}
+                            alt={video.title}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                            <Video className="w-16 h-16 text-muted-foreground/50" />
+                          </div>
+                        )}
+                        
+                        {/* Play Button Overlay */}
+                        <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-all duration-300 flex items-center justify-center">
+                          <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <Play className="w-8 h-8 text-white ml-1" fill="white" />
+                          </div>
+                        </div>
+                        
+                        {/* Title */}
+                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                          <p className="text-white font-medium text-sm">{video.title}</p>
+                          {video.description && (
+                            <p className="text-white/70 text-xs mt-1 line-clamp-1">{video.description}</p>
+                          )}
+                        </div>
+                        
+                        {/* Border Effect */}
+                        <div className="absolute inset-0 rounded-2xl ring-2 ring-transparent group-hover:ring-secondary/50 transition-all duration-500" />
+                        <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover:opacity-50 blur-md transition-all duration-700 -z-10" />
+                        
+                        {/* Corner Icon */}
+                        <div className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100">
+                          <Video className="w-5 h-5 text-white" />
+                        </div>
+                      </motion.div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden md:flex -left-14 h-12 w-12 bg-card/90 backdrop-blur-sm hover:bg-card border-primary/30 hover:border-secondary shadow-lg" />
+                <CarouselNext className="hidden md:flex -right-14 h-12 w-12 bg-card/90 backdrop-blur-sm hover:bg-card border-primary/30 hover:border-secondary shadow-lg" />
+              </Carousel>
+
+              {/* Thumbnail Navigation for Videos */}
+              <div className="flex justify-center gap-3 mt-8 overflow-x-auto pb-2 px-4">
+                {videos.map((video, index) => (
+                  <motion.button
+                    key={video.id}
+                    onClick={() => scrollToVideoSlide(index)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`relative flex-shrink-0 w-24 h-14 rounded-xl overflow-hidden transition-all duration-300 ${
+                      currentVideoSlide === index 
+                        ? 'ring-3 ring-secondary ring-offset-2 ring-offset-background shadow-gold scale-105' 
+                        : 'opacity-50 hover:opacity-100 grayscale hover:grayscale-0'
+                    }`}
+                  >
+                    {video.thumbnail_url ? (
+                      <img
+                        src={video.thumbnail_url}
+                        alt={video.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                        <Video className="w-6 h-6 text-muted-foreground/50" />
+                      </div>
+                    )}
+                    {currentVideoSlide === index && (
+                      <div className="absolute inset-0 border-2 border-secondary rounded-xl" />
+                    )}
+                  </motion.button>
+                ))}
+              </div>
+
+              {/* Autoplay indicator for videos */}
+              <div className="flex flex-col items-center gap-3 mt-6">
+                <div className="flex items-center gap-3 px-4 py-2 bg-card/50 backdrop-blur-sm rounded-full border border-border/50">
+                  <span className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${isVideoAutoplayPaused ? 'bg-muted-foreground' : 'bg-secondary animate-pulse shadow-gold'}`} />
+                  <span className="text-sm font-medium text-foreground">
+                    {isVideoAutoplayPaused ? 'Paused' : 'Auto-playing'}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
           )}
 
           {/* Grid View */}
