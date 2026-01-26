@@ -1499,6 +1499,89 @@ export type Database = {
         }
         Relationships: []
       }
+      visa_applications: {
+        Row: {
+          admin_notes: string | null
+          applicant_count: number
+          applicant_email: string | null
+          applicant_name: string
+          applicant_phone: string
+          bank_transaction_number: string | null
+          bank_transfer_screenshot_url: string | null
+          created_at: string
+          date_of_birth: string | null
+          id: string
+          nationality: string | null
+          notes: string | null
+          passport_number: string | null
+          payment_method: string | null
+          payment_status: string
+          status: string
+          total_price: number
+          transaction_id: string | null
+          travel_date: string | null
+          updated_at: string
+          user_id: string | null
+          visa_country_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          applicant_count?: number
+          applicant_email?: string | null
+          applicant_name: string
+          applicant_phone: string
+          bank_transaction_number?: string | null
+          bank_transfer_screenshot_url?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          nationality?: string | null
+          notes?: string | null
+          passport_number?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          status?: string
+          total_price: number
+          transaction_id?: string | null
+          travel_date?: string | null
+          updated_at?: string
+          user_id?: string | null
+          visa_country_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          applicant_count?: number
+          applicant_email?: string | null
+          applicant_name?: string
+          applicant_phone?: string
+          bank_transaction_number?: string | null
+          bank_transfer_screenshot_url?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          nationality?: string | null
+          notes?: string | null
+          passport_number?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          status?: string
+          total_price?: number
+          transaction_id?: string | null
+          travel_date?: string | null
+          updated_at?: string
+          user_id?: string | null
+          visa_country_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visa_applications_visa_country_id_fkey"
+            columns: ["visa_country_id"]
+            isOneToOne: false
+            referencedRelation: "visa_countries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       visa_countries: {
         Row: {
           country_name: string

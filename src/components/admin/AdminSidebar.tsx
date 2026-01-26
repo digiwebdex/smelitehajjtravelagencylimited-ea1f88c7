@@ -43,6 +43,7 @@ interface AdminSidebarProps {
 const menuItems = [
   { value: "overview", label: "Overview", icon: BarChart3 },
   { value: "bookings", label: "Bookings", icon: Package },
+  { value: "visa-applications", label: "Visa Applications", icon: Globe },
   { value: "packages", label: "Packages", icon: LayoutDashboard },
   { value: "package-sections", label: "Package Sections", icon: Layers },
   { value: "revenue", label: "Revenue", icon: Wallet },
@@ -59,7 +60,7 @@ const menuItems = [
   { value: "team", label: "Team", icon: Users },
   { value: "faq", label: "FAQ", icon: HelpCircle },
   { value: "gallery", label: "Gallery", icon: Images },
-  { value: "visa", label: "Visa", icon: Globe },
+  { value: "visa", label: "Visa Countries", icon: Globe },
   { value: "contact", label: "Contact", icon: Phone },
   { value: "offices", label: "Offices", icon: Building2 },
   { value: "social-networks", label: "Social Networks", icon: Share2 },

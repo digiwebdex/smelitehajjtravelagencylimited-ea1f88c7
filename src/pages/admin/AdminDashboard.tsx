@@ -25,6 +25,7 @@ import AdminTestimonials from "@/components/admin/AdminTestimonials";
 import AdminTeam from "@/components/admin/AdminTeam";
 import AdminFAQ from "@/components/admin/AdminFAQ";
 import AdminVisa from "@/components/admin/AdminVisa";
+import AdminVisaApplications from "@/components/admin/AdminVisaApplications";
 import AdminContact from "@/components/admin/AdminContact";
 import AdminFooter from "@/components/admin/AdminFooter";
 import AdminSettings from "@/components/admin/AdminSettings";
@@ -167,6 +168,8 @@ const AdminDashboard = () => {
         return <AdminOverview />;
       case "bookings":
         return <AdminBookings onUpdate={fetchStats} />;
+      case "visa-applications":
+        return <AdminVisaApplications />;
       case "packages":
         return <AdminPackages onUpdate={fetchStats} />;
       case "package-sections":
