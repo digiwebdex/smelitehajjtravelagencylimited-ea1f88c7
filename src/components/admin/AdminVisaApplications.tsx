@@ -45,7 +45,10 @@ import {
   Loader2,
   RefreshCw,
   ExternalLink,
+  Bell,
+  Send,
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
 import { formatCurrency } from "@/lib/currency";
 
@@ -105,6 +108,8 @@ const AdminVisaApplications = () => {
   const [adminNotes, setAdminNotes] = useState("");
   const [newStatus, setNewStatus] = useState("");
   const [newPaymentStatus, setNewPaymentStatus] = useState("");
+  const [sendNotification, setSendNotification] = useState(true);
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
 
   useEffect(() => {
     fetchApplications();
@@ -143,12 +148,15 @@ const AdminVisaApplications = () => {
     setAdminNotes(application.admin_notes || "");
     setNewStatus(application.status);
     setNewPaymentStatus(application.payment_status);
+    setSendNotification(true);
     setIsDetailsOpen(true);
   };
 
   const handleUpdateApplication = async () => {
     if (!selectedApplication) return;
 
+    const statusChanged = newStatus !== selectedApplication.status;
+    
     setIsUpdating(true);
     try {
       const { error } = await supabase
@@ -162,10 +170,47 @@ const AdminVisaApplications = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Application updated successfully",
-      });
+      // Send notification if status changed and notifications are enabled
+      if (statusChanged && sendNotification) {
+        setIsSendingNotification(true);
+        try {
+          const { error: notifError } = await supabase.functions.invoke('send-visa-notification', {
+            body: {
+              applicationId: selectedApplication.id,
+              newStatus,
+              notes: adminNotes || undefined
+            }
+          });
+
+          if (notifError) {
+            console.error("Notification error:", notifError);
+            toast({
+              title: "Status Updated",
+              description: "Application updated but notification failed to send",
+              variant: "default",
+            });
+          } else {
+            toast({
+              title: "Success",
+              description: "Application updated and notification sent",
+            });
+          }
+        } catch (notifErr) {
+          console.error("Notification invoke error:", notifErr);
+          toast({
+            title: "Status Updated",
+            description: "Application updated but notification failed",
+            variant: "default",
+          });
+        } finally {
+          setIsSendingNotification(false);
+        }
+      } else {
+        toast({
+          title: "Success",
+          description: "Application updated successfully",
+        });
+      }
 
       setIsDetailsOpen(false);
       fetchApplications();
@@ -495,29 +540,54 @@ const AdminVisaApplications = () => {
                   />
                 </div>
 
+                {/* Notification Toggle */}
+                {newStatus !== selectedApplication.status && (
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Bell className="w-4 h-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">Send Notification</p>
+                        <p className="text-xs text-muted-foreground">
+                          Notify applicant via SMS/Email/WhatsApp
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={sendNotification}
+                      onCheckedChange={setSendNotification}
+                    />
+                  </div>
+                )}
+
                 <div className="flex gap-3">
                   <Button
                     variant="outline"
                     onClick={() => setIsDetailsOpen(false)}
                     className="flex-1"
-                    disabled={isUpdating}
+                    disabled={isUpdating || isSendingNotification}
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleUpdateApplication}
                     className="flex-1"
-                    disabled={isUpdating}
+                    disabled={isUpdating || isSendingNotification}
                   >
-                    {isUpdating ? (
+                    {isUpdating || isSendingNotification ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Updating...
+                        {isSendingNotification ? "Sending..." : "Updating..."}
                       </>
                     ) : (
                       <>
-                        <Check className="w-4 h-4 mr-2" />
-                        Update Application
+                        {sendNotification && newStatus !== selectedApplication.status ? (
+                          <Send className="w-4 h-4 mr-2" />
+                        ) : (
+                          <Check className="w-4 h-4 mr-2" />
+                        )}
+                        {sendNotification && newStatus !== selectedApplication.status
+                          ? "Update & Notify"
+                          : "Update Application"}
                       </>
                     )}
                   </Button>
