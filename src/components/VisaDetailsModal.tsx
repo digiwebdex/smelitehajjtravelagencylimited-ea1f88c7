@@ -2,9 +2,8 @@ import { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Check, Clock, FileText, DollarSign, Calendar, ArrowRight } from "lucide-react";
+import { Check, Clock, FileText, DollarSign, Calendar, ArrowRight, X, Globe, Shield, Plane } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface VisaCountry {
@@ -27,6 +26,40 @@ interface VisaDetailsModalProps {
   onApply: (country: VisaCountry) => void;
   getCountryCode: (countryName: string) => string;
 }
+
+// Formatted section component similar to PackageDetailsModal
+const FormattedSection = ({ 
+  title, 
+  icon: Icon, 
+  items, 
+  iconColor = "text-primary" 
+}: { 
+  title: string; 
+  icon: React.ElementType; 
+  items: string[]; 
+  iconColor?: string;
+}) => (
+  <div className="bg-muted/30 rounded-xl p-4 border border-border/50">
+    <h5 className="font-semibold text-primary text-sm mb-3 flex items-center gap-2">
+      <span className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-secondary"></span>
+      {title}
+    </h5>
+    <div className="space-y-2 ml-4">
+      {items.map((item, idx) => (
+        <motion.div
+          key={idx}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: idx * 0.03 }}
+          className="flex items-start gap-2 text-sm text-foreground/85"
+        >
+          <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${iconColor}`} />
+          <span>{item}</span>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+);
 
 const VisaDetailsModal = ({ isOpen, onClose, country, onApply, getCountryCode }: VisaDetailsModalProps) => {
   // Lock body scroll when modal is open
@@ -69,6 +102,24 @@ const VisaDetailsModal = ({ isOpen, onClose, country, onApply, getCountryCode }:
         'Hotel booking confirmation',
         'Flight reservation'
       ];
+
+  // Services included
+  const servicesIncluded = [
+    'Complete visa application processing',
+    'Document verification and review',
+    'Embassy submission handling',
+    'Application status tracking',
+    'Visa collection and delivery',
+    'Expert consultation support'
+  ];
+
+  // Important notes
+  const importantNotes = [
+    'Processing times may vary based on embassy workload',
+    'Additional documents may be required based on your specific case',
+    'Visa approval is at the sole discretion of the embassy',
+    'All fees are non-refundable once application is submitted'
+  ];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose} modal={true}>
@@ -114,89 +165,116 @@ const VisaDetailsModal = ({ isOpen, onClose, country, onApply, getCountryCode }:
             </div>
 
             <ScrollArea className="flex-1 overflow-auto">
-              <div className="p-6 pt-8 space-y-6">
+              <div className="p-6 pt-8 space-y-4">
                 {/* Quick Info Cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="bg-muted/50 rounded-lg p-3 text-center">
                     <Clock className="w-5 h-5 mx-auto mb-1 text-primary" />
-                    <span className="text-sm font-medium">{country.processing_time}</span>
+                    <span className="text-xs text-muted-foreground">Processing</span>
+                    <span className="text-sm font-medium block">{country.processing_time}</span>
                   </div>
                   {country.validity_period && (
                     <div className="bg-muted/50 rounded-lg p-3 text-center">
                       <Calendar className="w-5 h-5 mx-auto mb-1 text-primary" />
-                      <span className="text-sm font-medium">{country.validity_period} validity</span>
+                      <span className="text-xs text-muted-foreground">Validity</span>
+                      <span className="text-sm font-medium block">{country.validity_period}</span>
                     </div>
                   )}
                   <div className="bg-muted/50 rounded-lg p-3 text-center">
-                    <DollarSign className="w-5 h-5 mx-auto mb-1 text-primary" />
-                    <span className="text-sm font-medium">All inclusive</span>
+                    <Globe className="w-5 h-5 mx-auto mb-1 text-primary" />
+                    <span className="text-xs text-muted-foreground">Type</span>
+                    <span className="text-sm font-medium block">Tourist</span>
+                  </div>
+                  <div className="bg-muted/50 rounded-lg p-3 text-center">
+                    <Plane className="w-5 h-5 mx-auto mb-1 text-primary" />
+                    <span className="text-xs text-muted-foreground">Entry</span>
+                    <span className="text-sm font-medium block">Single/Multiple</span>
                   </div>
                 </div>
 
                 {/* Description */}
                 {country.description && (
-                  <div>
-                    <h4 className="font-semibold text-sm text-muted-foreground mb-2">About</h4>
-                    <p className="text-foreground leading-relaxed">
+                  <div className="bg-muted/30 rounded-xl p-4 border border-border/50">
+                    <h5 className="font-semibold text-primary text-sm mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-secondary"></span>
+                      About This Visa
+                    </h5>
+                    <p className="text-sm text-foreground/85 leading-relaxed ml-4">
                       {country.description}
                     </p>
                   </div>
                 )}
 
-                <Separator />
+                {/* Services Included */}
+                <FormattedSection
+                  title="Services Included"
+                  icon={Check}
+                  items={servicesIncluded}
+                  iconColor="text-green-500"
+                />
 
                 {/* Requirements */}
-                <div>
-                  <h4 className="font-semibold text-sm text-muted-foreground mb-3 flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    Requirements
-                  </h4>
-                  <ul className="space-y-2">
-                    {requirements.map((item, i) => (
-                      <motion.li
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="flex items-start gap-2 text-sm"
-                      >
-                        <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>{item}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-
-                <Separator />
+                <FormattedSection
+                  title="Eligibility Requirements"
+                  icon={Shield}
+                  items={requirements}
+                  iconColor="text-blue-500"
+                />
 
                 {/* Documents Needed */}
-                <div>
-                  <h4 className="font-semibold text-sm text-muted-foreground mb-3 flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-primary" />
-                    Documents Required
-                  </h4>
-                  <ul className="grid sm:grid-cols-2 gap-2">
-                    {documents.map((item, i) => (
-                      <motion.li
-                        key={i}
+                <FormattedSection
+                  title="Documents Required"
+                  icon={FileText}
+                  items={documents}
+                  iconColor="text-primary"
+                />
+
+                {/* Important Notes */}
+                <div className="bg-muted/30 rounded-xl p-4 border border-border/50">
+                  <h5 className="font-semibold text-primary text-sm mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-secondary"></span>
+                    Important Notes
+                  </h5>
+                  <div className="space-y-2 ml-4">
+                    {importantNotes.map((note, idx) => (
+                      <motion.div
+                        key={idx}
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="flex items-start gap-2 text-sm"
+                        transition={{ delay: idx * 0.03 }}
+                        className="flex items-start gap-2 text-sm text-foreground/85"
                       >
-                        <FileText className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>{item}</span>
-                      </motion.li>
+                        <X className="w-4 h-4 mt-0.5 flex-shrink-0 text-red-500" />
+                        <span>{note}</span>
+                      </motion.div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
 
-                {/* Note */}
-                <div className="bg-muted/50 rounded-lg p-4">
-                  <p className="text-sm text-muted-foreground">
-                    <strong>Note:</strong> Processing times may vary based on embassy workload and completeness of documentation. 
-                    Additional documents may be required based on your specific case.
-                  </p>
+                {/* Fee Breakdown */}
+                <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 rounded-xl p-4 border border-secondary/20">
+                  <h5 className="font-semibold text-secondary text-sm mb-3 flex items-center gap-2">
+                    <DollarSign className="w-4 h-4" />
+                    Fee Breakdown
+                  </h5>
+                  <div className="space-y-2 ml-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-foreground/70">Visa Fee</span>
+                      <span className="font-medium">Included</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-foreground/70">Service Charge</span>
+                      <span className="font-medium">Included</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-foreground/70">Processing Fee</span>
+                      <span className="font-medium">Included</span>
+                    </div>
+                    <div className="border-t border-border/50 pt-2 mt-2 flex justify-between text-sm font-semibold">
+                      <span>Total Package</span>
+                      <span className="text-secondary">৳{country.price.toLocaleString()}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </ScrollArea>
