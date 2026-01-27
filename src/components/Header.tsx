@@ -220,13 +220,13 @@ const Header = () => {
             </button>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-8">
+            <div className="hidden lg:flex items-center gap-5 xl:gap-6">
               {menuItems.map((link) => (
                 <a
                   key={link.id}
                   href={link.href}
                   onClick={(e) => handleSmoothScroll(e, link.href)}
-                  className="text-foreground hover:text-primary font-medium transition-colors relative group cursor-pointer"
+                  className="text-foreground hover:text-primary text-sm xl:text-base font-medium transition-colors relative group cursor-pointer whitespace-nowrap"
                 >
                   {link.label}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary group-hover:w-full transition-all duration-300" />
@@ -234,11 +234,12 @@ const Header = () => {
               ))}
             </div>
 
-            <div className="hidden lg:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-2 xl:gap-3">
               <Link to="/track-order">
-                <Button variant="ghost" size="sm" className="gap-2">
+                <Button variant="ghost" size="sm" className="gap-1.5 text-sm px-3">
                   <MapPin className="w-4 h-4" />
-                  Track Order
+                  <span className="hidden xl:inline">Track Order</span>
+                  <span className="xl:hidden">Track</span>
                 </Button>
               </Link>
               {user && (
@@ -267,11 +268,11 @@ const Header = () => {
               {appearance.show_book_now_button !== false && packages.length > 0 && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button className="bg-gradient-primary hover:opacity-90 shadow-gold">
+                    <Button size="sm" className="bg-gradient-primary hover:opacity-90 shadow-gold text-sm px-4">
                       Book Now
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-72 max-h-96 overflow-y-auto">
+                  <DropdownMenuContent align="end" className="w-72 max-h-96 overflow-y-auto bg-card border border-border shadow-lg z-[100]">
                     {showMyBookings && (
                       <>
                         <DropdownMenuItem 
@@ -377,7 +378,7 @@ const Header = () => {
                           Book Now
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="center" className="w-72 max-h-80 overflow-y-auto">
+                      <DropdownMenuContent align="center" className="w-72 max-h-80 overflow-y-auto bg-card border border-border shadow-lg z-[100]">
                         {showMyBookings && (
                           <>
                             <DropdownMenuItem 
