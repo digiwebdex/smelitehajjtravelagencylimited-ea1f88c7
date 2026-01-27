@@ -48,7 +48,26 @@ const OptimizedImage = ({
     onError?.();
   }, [onError]);
 
-  // Generate srcset for responsive images (only for http URLs, not data URIs or local assets)
+  // Check if URL is a Supabase storage URL
+  const isSupabaseUrl = (url: string): boolean => {
+    return url.includes("supabase") && url.includes("/storage/");
+  };
+
+  // Generate optimized URL with WebP format and compression
+  const getOptimizedUrl = (imageSrc: string, targetWidth?: number, quality: number = 80): string => {
+    if (!isSupabaseUrl(imageSrc)) return imageSrc;
+    
+    const baseUrl = imageSrc.split("?")[0];
+    const params = new URLSearchParams();
+    
+    if (targetWidth) params.set("width", targetWidth.toString());
+    params.set("quality", quality.toString());
+    params.set("format", "webp");
+    
+    return `${baseUrl}?${params.toString()}`;
+  };
+
+  // Generate srcset for responsive images with WebP and compression
   const generateSrcSet = (imageSrc: string): string | undefined => {
     // Skip srcset for data URIs, blob URLs, or local imports
     if (
@@ -59,19 +78,36 @@ const OptimizedImage = ({
       return undefined;
     }
 
-    // For Supabase storage URLs, we can potentially add transforms
-    // For other URLs, return undefined to use default src
-    if (imageSrc.includes("supabase")) {
-      // Supabase image transforms format
+    if (isSupabaseUrl(imageSrc)) {
       const baseUrl = imageSrc.split("?")[0];
-      return `${baseUrl}?width=640 640w, ${baseUrl}?width=1024 1024w, ${baseUrl}?width=1920 1920w`;
+      // Generate srcset with WebP format and quality optimization
+      return [
+        `${baseUrl}?width=320&quality=75&format=webp 320w`,
+        `${baseUrl}?width=640&quality=80&format=webp 640w`,
+        `${baseUrl}?width=1024&quality=80&format=webp 1024w`,
+        `${baseUrl}?width=1920&quality=85&format=webp 1920w`,
+      ].join(", ");
     }
 
     return undefined;
   };
 
+  // Generate WebP-specific srcset for picture element
+  const generateWebPSrcSet = (imageSrc: string): string | undefined => {
+    if (!isSupabaseUrl(imageSrc)) return undefined;
+    
+    const baseUrl = imageSrc.split("?")[0];
+    return [
+      `${baseUrl}?width=320&quality=75&format=webp 320w`,
+      `${baseUrl}?width=640&quality=80&format=webp 640w`,
+      `${baseUrl}?width=1024&quality=80&format=webp 1024w`,
+      `${baseUrl}?width=1920&quality=85&format=webp 1920w`,
+    ].join(", ");
+  };
+
   const srcSet = generateSrcSet(src);
-  const imageSrc = hasError ? fallbackSrc : src;
+  const webpSrcSet = generateWebPSrcSet(src);
+  const imageSrc = hasError ? fallbackSrc : getOptimizedUrl(src, undefined, 80);
 
   return (
     <div className={cn("relative overflow-hidden", className)}>
@@ -85,10 +121,10 @@ const OptimizedImage = ({
       
       <picture>
         {/* WebP source for browsers that support it */}
-        {srcSet && (
+        {webpSrcSet && (
           <source
             type="image/webp"
-            srcSet={srcSet}
+            srcSet={webpSrcSet}
             sizes={sizes}
           />
         )}
