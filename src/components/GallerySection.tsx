@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Grid3X3, SlidersHorizontal, Pause, Play, Maximize, Minimize, ZoomIn, ZoomOut, RotateCcw, Sparkles, Camera, ChevronLeft, ChevronRight, Image as ImageIcon, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import OptimizedImage from "@/components/ui/optimized-image";
+import VideoThumbnail from "@/components/ui/video-thumbnail";
 import {
   Carousel,
   CarouselContent,
@@ -611,18 +612,14 @@ const GallerySection = () => {
                     className="group relative aspect-video overflow-hidden rounded-2xl cursor-pointer bg-muted shadow-elegant"
                     onClick={() => setSelectedVideo(video)}
                   >
-                    {/* Thumbnail */}
-                    {video.thumbnail_url ? (
-                      <img
-                        src={video.thumbnail_url}
-                        alt={video.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                        <Video className="w-16 h-16 text-muted-foreground/50" />
-                      </div>
-                    )}
+                    {/* Thumbnail - Auto-generated */}
+                    <VideoThumbnail
+                      videoUrl={video.video_url}
+                      thumbnailUrl={video.thumbnail_url}
+                      alt={video.title}
+                      className="transition-transform duration-700 group-hover:scale-110"
+                      iconSize="md"
+                    />
                     
                     {/* Play Button Overlay */}
                     <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-all duration-300 flex items-center justify-center">
@@ -674,18 +671,14 @@ const GallerySection = () => {
                         className="group relative aspect-video overflow-hidden rounded-2xl cursor-pointer bg-muted shadow-elegant"
                         onClick={() => setSelectedVideo(video)}
                       >
-                        {/* Thumbnail */}
-                        {video.thumbnail_url ? (
-                          <img
-                            src={video.thumbnail_url}
-                            alt={video.title}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                            <Video className="w-16 h-16 text-muted-foreground/50" />
-                          </div>
-                        )}
+                        {/* Thumbnail - Auto-generated */}
+                        <VideoThumbnail
+                          videoUrl={video.video_url}
+                          thumbnailUrl={video.thumbnail_url}
+                          alt={video.title}
+                          className="transition-transform duration-700 group-hover:scale-110"
+                          iconSize="md"
+                        />
                         
                         {/* Play Button Overlay */}
                         <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-all duration-300 flex items-center justify-center">
@@ -732,17 +725,12 @@ const GallerySection = () => {
                         : 'opacity-50 hover:opacity-100 grayscale hover:grayscale-0'
                     }`}
                   >
-                    {video.thumbnail_url ? (
-                      <img
-                        src={video.thumbnail_url}
-                        alt={video.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                        <Video className="w-6 h-6 text-muted-foreground/50" />
-                      </div>
-                    )}
+                    <VideoThumbnail
+                      videoUrl={video.video_url}
+                      thumbnailUrl={video.thumbnail_url}
+                      alt={video.title}
+                      iconSize="sm"
+                    />
                     {currentVideoSlide === index && (
                       <div className="absolute inset-0 border-2 border-secondary rounded-xl" />
                     )}
