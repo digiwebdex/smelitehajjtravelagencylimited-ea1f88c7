@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Phone, Mail, User, LogOut, LayoutDashboard, MapPin, MessageCircle, Package, ClipboardList, Globe, Settings } from "lucide-react";
+import { Menu, X, Phone, Mail, User, LogOut, LayoutDashboard, MapPin, MessageCircle, Package, ClipboardList, Globe, Settings, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
@@ -278,7 +278,7 @@ const Header = () => {
                   <span className="xl:hidden">Track</span>
                 </Button>
               </Link>
-              {user && (
+              {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="gap-2">
@@ -308,87 +308,13 @@ const Header = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              )}
-              {appearance.show_book_now_button !== false && packages.length > 0 && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size="sm" className="bg-gradient-primary hover:opacity-90 shadow-gold text-sm px-4">
-                      Book Now
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-72 max-h-96 overflow-y-auto bg-card border border-border shadow-lg z-[100]">
-                    {showMyBookings && (
-                      <>
-                        <DropdownMenuItem 
-                          onClick={() => navigate("/my-bookings")}
-                          className="flex items-center gap-2 cursor-pointer py-2 bg-secondary/50"
-                        >
-                          <ClipboardList className="w-4 h-4 text-primary" />
-                          <span className="font-medium text-primary">My Bookings</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                      </>
-                    )}
-                    <DropdownMenuLabel className="text-primary font-semibold">Hajj Packages</DropdownMenuLabel>
-                    {packages.filter(p => p.type === "hajj").map((pkg) => (
-                      <DropdownMenuItem 
-                        key={pkg.id} 
-                        onClick={() => handleBookPackage(pkg)}
-                        className="flex flex-col items-start gap-1 cursor-pointer py-2"
-                      >
-                        <span className="font-medium text-foreground">{pkg.title}</span>
-                        <span className="text-xs text-muted-foreground flex items-center gap-2">
-                          <span>{pkg.duration_days} Days</span>
-                          <span>•</span>
-                          <span className="text-primary font-semibold">{formatCurrency(pkg.price)}</span>
-                        </span>
-                      </DropdownMenuItem>
-                    ))}
-                    {packages.filter(p => p.type === "umrah").length > 0 && (
-                      <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel className="text-primary font-semibold">Umrah Packages</DropdownMenuLabel>
-                        {packages.filter(p => p.type === "umrah").map((pkg) => (
-                          <DropdownMenuItem 
-                            key={pkg.id} 
-                            onClick={() => handleBookPackage(pkg)}
-                            className="flex flex-col items-start gap-1 cursor-pointer py-2"
-                          >
-                            <span className="font-medium text-foreground">{pkg.title}</span>
-                            <span className="text-xs text-muted-foreground flex items-center gap-2">
-                              <span>{pkg.duration_days} Days</span>
-                              <span>•</span>
-                              <span className="text-primary font-semibold">{formatCurrency(pkg.price)}</span>
-                            </span>
-                          </DropdownMenuItem>
-                        ))}
-                      </>
-                    )}
-                    {visaCountries.length > 0 && (
-                      <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel className="text-primary font-semibold flex items-center gap-1.5">
-                          <Globe className="w-3.5 h-3.5" />
-                          Visa Services
-                        </DropdownMenuLabel>
-                        {visaCountries.map((country) => (
-                          <DropdownMenuItem 
-                            key={country.id} 
-                            onClick={() => handleApplyVisa(country)}
-                            className="flex flex-col items-start gap-1 cursor-pointer py-2"
-                          >
-                            <span className="font-medium text-foreground">{country.flag_emoji} {country.country_name}</span>
-                            <span className="text-xs text-muted-foreground flex items-center gap-2">
-                              <span>{country.processing_time}</span>
-                              <span>•</span>
-                              <span className="text-primary font-semibold">{formatCurrency(country.price)}</span>
-                            </span>
-                          </DropdownMenuItem>
-                        ))}
-                      </>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              ) : (
+                <Link to="/auth">
+                  <Button size="sm" className="bg-gradient-primary hover:opacity-90 shadow-gold text-sm px-4 gap-2">
+                    <LogIn className="w-4 h-4" />
+                    Sign In
+                  </Button>
+                </Link>
               )}
             </div>
 
