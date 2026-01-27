@@ -286,13 +286,17 @@ const Header = () => {
                       Account
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="bg-card border border-border shadow-lg z-[100]">
                     {isAdmin && (
                       <DropdownMenuItem onClick={() => navigate("/admin")}>
                         <LayoutDashboard className="w-4 h-4 mr-2" />
                         Admin Dashboard
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem onClick={() => navigate("/my-bookings")}>
+                      <ClipboardList className="w-4 h-4 mr-2" />
+                      My Bookings
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="w-4 h-4 mr-2" />
