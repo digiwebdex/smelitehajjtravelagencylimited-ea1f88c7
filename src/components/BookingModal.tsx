@@ -329,6 +329,15 @@ const BookingModal = ({ isOpen, onClose, package_info }: BookingModalProps) => {
       }
     }
 
+    // Store guest booking info for "My Bookings" access
+    const { saveGuestBookingInfo } = await import("@/utils/guestBookingStorage");
+    saveGuestBookingInfo(
+      formData.guestEmail.trim(),
+      formData.guestPhone.trim(),
+      formData.guestName.trim(),
+      bookingId
+    );
+
     // Send booking confirmation notifications in background
     supabase.functions.invoke("send-booking-notification", {
       body: { bookingId: bookingId }

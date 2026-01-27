@@ -34,6 +34,7 @@ import OrderTrackingModal from "@/components/OrderTrackingModal";
 import BookingDocumentUpload from "@/components/BookingDocumentUpload";
 import InstallmentDetails from "@/components/InstallmentDetails";
 import { generateBookingPDF } from "@/utils/generateBookingPDF";
+import { getGuestBookingInfo } from "@/utils/guestBookingStorage";
 import { cn } from "@/lib/utils";
 
 type TrackingStatus = 'order_submitted' | 'documents_received' | 'under_review' | 'approved' | 'processing' | 'completed';
@@ -132,20 +133,61 @@ const MyBookings = () => {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [documentUploadBooking, setDocumentUploadBooking] = useState<Booking | null>(null);
   const [activeTab, setActiveTab] = useState("bookings");
+  const [isGuestMode, setIsGuestMode] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      navigate("/auth");
+    // Check for guest bookings first
+    const guestInfo = getGuestBookingInfo();
+    
+    if (!authLoading) {
+      if (user) {
+        // Logged-in user
+        setIsGuestMode(false);
+        fetchBookings();
+        fetchVisaApplications();
+        subscribeToUpdates();
+      } else if (guestInfo && guestInfo.bookingIds.length > 0) {
+        // Guest with stored bookings
+        setIsGuestMode(true);
+        fetchGuestBookings(guestInfo.bookingIds);
+      } else {
+        // No user and no guest bookings
+        navigate("/auth");
+      }
     }
   }, [user, authLoading, navigate]);
 
-  useEffect(() => {
-    if (user) {
-      fetchBookings();
-      fetchVisaApplications();
-      subscribeToUpdates();
+  const fetchGuestBookings = async (bookingIds: string[]) => {
+    const { data, error } = await supabase
+      .from("bookings")
+      .select(`
+        id,
+        status,
+        tracking_status,
+        admin_notes,
+        total_price,
+        passenger_count,
+        travel_date,
+        created_at,
+        guest_name,
+        guest_email,
+        guest_phone,
+        payment_status,
+        packages (
+          title,
+          type,
+          duration_days,
+          price
+        )
+      `)
+      .in("id", bookingIds)
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setBookings(data as Booking[]);
     }
-  }, [user]);
+    setLoading(false);
+  };
 
   const fetchBookings = async () => {
     const { data, error } = await supabase

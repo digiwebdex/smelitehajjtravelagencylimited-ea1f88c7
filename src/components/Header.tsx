@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Phone, Mail, User, LogOut, LayoutDashboard, MapPin, MessageCircle, Package } from "lucide-react";
+import { Menu, X, Phone, Mail, User, LogOut, LayoutDashboard, MapPin, MessageCircle, Package, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
@@ -14,6 +14,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { formatCurrency } from "@/lib/currency";
+import { hasGuestBookings } from "@/utils/guestBookingStorage";
 import companyLogo from "@/assets/company-logo.jpeg";
 import BookingModal from "./BookingModal";
 
@@ -50,6 +51,12 @@ const Header = () => {
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<PackageItem | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [showMyBookings, setShowMyBookings] = useState(false);
+
+  // Check if user has bookings (logged in or guest)
+  useEffect(() => {
+    setShowMyBookings(!!user || hasGuestBookings());
+  }, [user]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -106,6 +113,14 @@ const Header = () => {
     setSelectedPackage(pkg);
     setIsBookingModalOpen(true);
     setIsMenuOpen(false);
+  };
+
+  // Refresh showMyBookings when booking modal closes (in case a new booking was made)
+  const handleBookingModalClose = () => {
+    setIsBookingModalOpen(false);
+    setSelectedPackage(null);
+    // Check again for guest bookings
+    setShowMyBookings(!!user || hasGuestBookings());
   };
 
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -257,6 +272,18 @@ const Header = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-72 max-h-96 overflow-y-auto">
+                    {showMyBookings && (
+                      <>
+                        <DropdownMenuItem 
+                          onClick={() => navigate("/my-bookings")}
+                          className="flex items-center gap-2 cursor-pointer py-2 bg-secondary/50"
+                        >
+                          <ClipboardList className="w-4 h-4 text-primary" />
+                          <span className="font-medium text-primary">My Bookings</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
                     <DropdownMenuLabel className="text-primary font-semibold">Hajj Packages</DropdownMenuLabel>
                     {packages.filter(p => p.type === "hajj").map((pkg) => (
                       <DropdownMenuItem 
@@ -351,6 +378,18 @@ const Header = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="center" className="w-72 max-h-80 overflow-y-auto">
+                        {showMyBookings && (
+                          <>
+                            <DropdownMenuItem 
+                              onClick={() => { navigate("/my-bookings"); setIsMenuOpen(false); }}
+                              className="flex items-center gap-2 cursor-pointer py-2 bg-secondary/50"
+                            >
+                              <ClipboardList className="w-4 h-4 text-primary" />
+                              <span className="font-medium text-primary">My Bookings</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                          </>
+                        )}
                         <DropdownMenuLabel className="text-primary font-semibold">Hajj Packages</DropdownMenuLabel>
                         {packages.filter(p => p.type === "hajj").map((pkg) => (
                           <DropdownMenuItem 
@@ -400,10 +439,7 @@ const Header = () => {
       {selectedPackage && (
         <BookingModal
           isOpen={isBookingModalOpen}
-          onClose={() => {
-            setIsBookingModalOpen(false);
-            setSelectedPackage(null);
-          }}
+          onClose={handleBookingModalClose}
           package_info={{
             id: selectedPackage.id,
             title: selectedPackage.title,
