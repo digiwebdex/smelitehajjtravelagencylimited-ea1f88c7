@@ -189,25 +189,25 @@ const getCustomerSmsMessage = (
 ): string => {
   switch (status) {
     case 'order_submitted':
-      return `Dear ${customerName}, your booking for ${packageTitle} has been submitted successfully and is awaiting document review. Booking ID: ${bookingIdShort}. - SM Elite Hajj`;
+      return `Dear ${customerName}, your booking for ${packageTitle} has been submitted successfully and is awaiting document review. Booking ID: ${bookingIdShort}. - S M Elite Hajj Limited`;
     
     case 'documents_received':
-      return `Dear ${customerName}, your documents for ${packageTitle} have been received successfully. We will begin reviewing them shortly. Booking ID: ${bookingIdShort}. - SM Elite Hajj`;
+      return `Dear ${customerName}, your documents for ${packageTitle} have been received successfully. We will begin reviewing them shortly. Booking ID: ${bookingIdShort}. - S M Elite Hajj Limited`;
     
     case 'under_review':
-      return `Dear ${customerName}, your documents for ${packageTitle} are under review. We will update you shortly. Booking ID: ${bookingIdShort}. - SM Elite Hajj`;
+      return `Dear ${customerName}, your documents for ${packageTitle} are under review. We will update you shortly. Booking ID: ${bookingIdShort}. - S M Elite Hajj Limited`;
     
     case 'approved':
-      return `Dear ${customerName}, CONGRATULATIONS! Your booking for ${packageTitle} has been APPROVED by S M Elite Hajj Limited. Total Amount: ${formatCurrency(totalPrice)}. Please complete your payment. Booking ID: ${bookingIdShort}. Contact us for next steps. - SM Elite Hajj`;
+      return `Dear ${customerName}, CONGRATULATIONS! Your booking for ${packageTitle} has been APPROVED by S M Elite Hajj Limited. Total Amount: ${formatCurrency(totalPrice)}. Please complete your payment. Booking ID: ${bookingIdShort}. Contact us for next steps. - S M Elite Hajj Limited`;
     
     case 'processing':
-      return `Dear ${customerName}, your booking for ${packageTitle} is now being processed. Booking ID: ${bookingIdShort}. - SM Elite Hajj`;
+      return `Dear ${customerName}, your booking for ${packageTitle} is now being processed. Booking ID: ${bookingIdShort}. - S M Elite Hajj Limited`;
     
     case 'completed':
-      return `Dear ${customerName}, your booking process for ${packageTitle} has been completed successfully. Thank you for choosing S M Elite Hajj Limited! Booking ID: ${bookingIdShort}. - SM Elite Hajj`;
+      return `Dear ${customerName}, your booking process for ${packageTitle} has been completed successfully. Thank you for choosing S M Elite Hajj Limited! Booking ID: ${bookingIdShort}. - S M Elite Hajj Limited`;
     
     default:
-      return `Dear ${customerName}, your booking status has been updated to: ${status}. Booking ID: ${bookingIdShort}. - SM Elite Hajj`;
+      return `Dear ${customerName}, your booking status has been updated to: ${status}. Booking ID: ${bookingIdShort}. - S M Elite Hajj Limited`;
   }
 };
 

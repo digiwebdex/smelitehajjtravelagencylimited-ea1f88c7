@@ -409,15 +409,15 @@ const getCustomerSmsMessage = (
   const bookingId = bookingDetails.id.slice(0, 8).toUpperCase();
   
   if (notificationType === "payment_verified") {
-    return `Dear ${customerName}, your payment for ${bookingDetails.package.title} has been verified! Booking ID: ${bookingId}. Travel Date: ${bookingDetails.travel_date || "TBD"}. Total: ${formatCurrency(bookingDetails.total_price)}. Thank you! - SM Elite Hajj`;
+    return `Dear ${customerName}, your payment for ${bookingDetails.package.title} has been verified! Booking ID: ${bookingId}. Travel Date: ${bookingDetails.travel_date || "TBD"}. Total: ${formatCurrency(bookingDetails.total_price)}. Thank you! - S M Elite Hajj Limited`;
   }
 
   if (notificationType === "payment_rejected") {
-    return `Dear ${customerName}, we could not verify your payment for ${bookingDetails.package.title}. ${rejectionReason ? `Reason: ${rejectionReason}. ` : ""}Please contact us. Booking ID: ${bookingId}. - SM Elite Hajj`;
+    return `Dear ${customerName}, we could not verify your payment for ${bookingDetails.package.title}. ${rejectionReason ? `Reason: ${rejectionReason}. ` : ""}Please contact us. Booking ID: ${bookingId}. - S M Elite Hajj Limited`;
   }
 
   // Default: booking_confirmed
-  return `Dear ${customerName}, your booking for ${bookingDetails.package.title} is confirmed! Booking ID: ${bookingId}. Passengers: ${bookingDetails.passenger_count}. Total: ${formatCurrency(bookingDetails.total_price)}. Thank you! - SM Elite Hajj`;
+  return `Dear ${customerName}, your booking for ${bookingDetails.package.title} is confirmed! Booking ID: ${bookingId}. Passengers: ${bookingDetails.passenger_count}. Total: ${formatCurrency(bookingDetails.total_price)}. Thank you! - S M Elite Hajj Limited`;
 };
 
 const getManagementSmsMessage = (
