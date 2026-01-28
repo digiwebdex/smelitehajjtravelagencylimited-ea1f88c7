@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.payment-nagad]
 verify_jwt = false
+
+[functions.backup-restore]
+verify_jwt = false

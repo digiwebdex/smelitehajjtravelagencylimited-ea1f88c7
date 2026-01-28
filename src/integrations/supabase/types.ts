@@ -68,6 +68,48 @@ export type Database = {
         }
         Relationships: []
       }
+      backup_history: {
+        Row: {
+          backup_name: string
+          backup_type: string
+          created_at: string
+          created_by: string | null
+          file_path: string
+          file_size: number | null
+          id: string
+          notes: string | null
+          record_counts: Json | null
+          status: string
+          tables_included: string[]
+        }
+        Insert: {
+          backup_name: string
+          backup_type?: string
+          created_at?: string
+          created_by?: string | null
+          file_path: string
+          file_size?: number | null
+          id?: string
+          notes?: string | null
+          record_counts?: Json | null
+          status?: string
+          tables_included?: string[]
+        }
+        Update: {
+          backup_name?: string
+          backup_type?: string
+          created_at?: string
+          created_by?: string | null
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          notes?: string | null
+          record_counts?: Json | null
+          status?: string
+          tables_included?: string[]
+        }
+        Relationships: []
+      }
       booking_documents: {
         Row: {
           booking_id: string
@@ -1076,6 +1118,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      restore_history: {
+        Row: {
+          backup_id: string | null
+          id: string
+          notes: string | null
+          restore_type: string
+          restored_at: string
+          restored_by: string | null
+          status: string
+          tables_restored: string[]
+        }
+        Insert: {
+          backup_id?: string | null
+          id?: string
+          notes?: string | null
+          restore_type?: string
+          restored_at?: string
+          restored_by?: string | null
+          status?: string
+          tables_restored?: string[]
+        }
+        Update: {
+          backup_id?: string | null
+          id?: string
+          notes?: string | null
+          restore_type?: string
+          restored_at?: string
+          restored_by?: string | null
+          status?: string
+          tables_restored?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restore_history_backup_id_fkey"
+            columns: ["backup_id"]
+            isOneToOne: false
+            referencedRelation: "backup_history"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       section_settings: {
         Row: {

@@ -22,6 +22,7 @@ import {
   Megaphone,
   UserCog,
   Share2,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,7 @@ const menuItems = [
   { value: "social-networks", label: "Social Networks", icon: Share2 },
   { value: "footer", label: "Footer", icon: FileText },
   { value: "legal", label: "Legal Pages", icon: Scale },
+  { value: "backup", label: "Backup & Restore", icon: Shield },
   { value: "settings", label: "Settings", icon: Settings },
 ];
 

@@ -42,6 +42,7 @@ import AdminEMIReport from "@/components/admin/AdminEMIReport";
 import AdminNotices from "@/components/admin/AdminNotices";
 import AdminStaffManagement from "@/components/admin/AdminStaffManagement";
 import AdminSocialNetworks from "@/components/admin/AdminSocialNetworks";
+import AdminBackupRestore from "@/components/admin/AdminBackupRestore";
 import { formatCurrency } from "@/lib/currency";
 
 interface Stats {
@@ -214,6 +215,8 @@ const AdminDashboard = () => {
         return <AdminFooter />;
       case "legal":
         return <AdminLegalPages />;
+      case "backup":
+        return <AdminBackupRestore />;
       case "settings":
         return <AdminSettings />;
       default:
