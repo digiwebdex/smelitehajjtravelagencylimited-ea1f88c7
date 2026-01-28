@@ -534,24 +534,24 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
           </Dialog>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
+      <CardContent className="p-0">
+        <div className="admin-table-scroll">
+          <Table className="w-full" style={{ minWidth: '800px' }}>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="whitespace-nowrap sticky left-0 bg-background z-20 min-w-[150px]">Title</TableHead>
+                <TableHead className="whitespace-nowrap">Type</TableHead>
+                <TableHead className="whitespace-nowrap">Price</TableHead>
+                <TableHead className="whitespace-nowrap">Duration</TableHead>
+                <TableHead className="whitespace-nowrap">Stock</TableHead>
+                <TableHead className="whitespace-nowrap">Status</TableHead>
+                <TableHead className="whitespace-nowrap sticky right-0 bg-background z-20 border-l">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {packages.map((pkg) => (
                 <TableRow key={pkg.id}>
-                  <TableCell className="font-medium">{pkg.title}</TableCell>
+                  <TableCell className="font-medium sticky left-0 bg-background z-10 min-w-[150px]">{pkg.title}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="capitalize">
                       {pkg.type}
@@ -566,7 +566,7 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
                       onCheckedChange={() => toggleActive(pkg.id, pkg.is_active)}
                     />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="sticky right-0 bg-background z-10 border-l">
                     <div className="flex items-center gap-2">
                       <Button variant="ghost" size="icon" onClick={() => handleEdit(pkg)}>
                         <Edit className="w-4 h-4" />
@@ -585,6 +585,7 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
               ))}
             </TableBody>
           </Table>
+          <div className="h-4" />
         </div>
       </CardContent>
     </Card>
