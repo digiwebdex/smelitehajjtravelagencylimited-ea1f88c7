@@ -607,21 +607,21 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
+          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-muted/20">
+            <Table className="min-w-[1200px]">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Booking ID</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Package</TableHead>
-                  <TableHead>Passengers</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Payment</TableHead>
-                  <TableHead>Documents</TableHead>
-                  <TableHead>Tracking</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="whitespace-nowrap">Date</TableHead>
+                  <TableHead className="whitespace-nowrap">Booking ID</TableHead>
+                  <TableHead className="whitespace-nowrap min-w-[180px]">Customer</TableHead>
+                  <TableHead className="whitespace-nowrap min-w-[150px]">Package</TableHead>
+                  <TableHead className="whitespace-nowrap">Passengers</TableHead>
+                  <TableHead className="whitespace-nowrap min-w-[120px]">Amount</TableHead>
+                  <TableHead className="whitespace-nowrap min-w-[130px]">Payment</TableHead>
+                  <TableHead className="whitespace-nowrap">Documents</TableHead>
+                  <TableHead className="whitespace-nowrap min-w-[140px]">Tracking</TableHead>
+                  <TableHead className="whitespace-nowrap">Status</TableHead>
+                  <TableHead className="whitespace-nowrap">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
