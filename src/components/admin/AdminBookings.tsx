@@ -33,7 +33,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Search, Eye, CheckCircle, XCircle, Clock, AlertCircle, Download, CalendarIcon, X, CreditCard, Banknote, Wallet, MapPin, Calculator, Building, ShieldCheck, FileSpreadsheet, FileText, FolderOpen } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, Clock, AlertCircle, Download, CalendarIcon, X, CreditCard, Banknote, Wallet, MapPin, Calculator, Building, ShieldCheck, FileSpreadsheet, FileText } from "lucide-react";
 import * as XLSX from "xlsx";
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/currency";
@@ -120,12 +120,14 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
   const [verifyBankTransferBooking, setVerifyBankTransferBooking] = useState<Booking | null>(null);
   const [documentReviewBooking, setDocumentReviewBooking] = useState<Booking | null>(null);
   const [documentCounts, setDocumentCounts] = useState<Record<string, number>>({});
+  const [emiPayments, setEmiPayments] = useState<Record<string, { advance_amount: number; remaining_amount: number; paid_emis: number; number_of_emis: number }>>({});
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
 
   useEffect(() => {
     fetchBookings();
     fetchDocumentCounts();
+    fetchEmiPayments();
   }, []);
 
   const fetchBookings = async () => {
@@ -191,6 +193,25 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
         counts[doc.booking_id] = (counts[doc.booking_id] || 0) + 1;
       });
       setDocumentCounts(counts);
+    }
+  };
+
+  const fetchEmiPayments = async () => {
+    const { data, error } = await supabase
+      .from("emi_payments")
+      .select("booking_id, advance_amount, remaining_amount, paid_emis, number_of_emis");
+
+    if (!error && data) {
+      const emiMap: Record<string, { advance_amount: number; remaining_amount: number; paid_emis: number; number_of_emis: number }> = {};
+      data.forEach((emi) => {
+        emiMap[emi.booking_id] = {
+          advance_amount: emi.advance_amount,
+          remaining_amount: emi.remaining_amount,
+          paid_emis: emi.paid_emis,
+          number_of_emis: emi.number_of_emis,
+        };
+      });
+      setEmiPayments(emiMap);
     }
   };
 
@@ -637,8 +658,22 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
                       </div>
                     </TableCell>
                     <TableCell>{booking.passenger_count}</TableCell>
-                    <TableCell className="font-bold">
-                      {formatCurrency(Number(booking.total_price))}
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-bold">{formatCurrency(Number(booking.total_price))}</span>
+                        {emiPayments[booking.id] && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            <span className="text-green-600">Adv: {formatCurrency(emiPayments[booking.id].advance_amount)}</span>
+                            <span className="mx-1">•</span>
+                            <span>{emiPayments[booking.id].paid_emis}/{emiPayments[booking.id].number_of_emis} Paid</span>
+                          </div>
+                        )}
+                        {booking.payment_method === "installment" && !emiPayments[booking.id] && (
+                          <Badge variant="outline" className="text-xs w-fit mt-1 text-orange-600 border-orange-300">
+                            Installment Pending
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1">
@@ -693,7 +728,7 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
                         )}
                         onClick={() => setDocumentReviewBooking(booking)}
                       >
-                        <FolderOpen className="w-3 h-3" />
+                        <FileText className="w-3 h-3" />
                         {documentCounts[booking.id] || 0} Files
                       </Button>
                     </TableCell>
@@ -710,30 +745,13 @@ const AdminBookings = ({ onUpdate }: AdminBookingsProps) => {
                     </TableCell>
                     <TableCell>{getStatusBadge(booking.status)}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setSelectedBooking(booking)}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Select
-                          value={booking.status}
-                          onValueChange={(value) => updateBookingStatus(booking.id, value as "pending" | "confirmed" | "completed" | "cancelled")}
-                        >
-                          <SelectTrigger className="w-32 h-8">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {statusOptions.map((status) => (
-                              <SelectItem key={status.value} value={status.value}>
-                                {status.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setSelectedBooking(booking)}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                   );
