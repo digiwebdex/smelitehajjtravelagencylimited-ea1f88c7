@@ -293,27 +293,27 @@ const AdminVisaApplications = () => {
               <p>No visa applications found</p>
             </div>
           ) : (
-            <div className="admin-table-scroll rounded-md border">
-              <Table className="w-full" style={{ minWidth: '900px' }}>
+            <div className="rounded-md border overflow-x-auto">
+              <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="whitespace-nowrap sticky left-0 bg-background z-20 min-w-[100px]">Date</TableHead>
-                    <TableHead className="whitespace-nowrap sticky left-[100px] bg-background z-20 min-w-[120px] border-r">Applicant</TableHead>
-                    <TableHead className="whitespace-nowrap">Country</TableHead>
-                    <TableHead className="whitespace-nowrap">Applicants</TableHead>
-                    <TableHead className="whitespace-nowrap">Total</TableHead>
-                    <TableHead className="whitespace-nowrap">Payment</TableHead>
-                    <TableHead className="whitespace-nowrap">Status</TableHead>
-                    <TableHead className="whitespace-nowrap text-right sticky right-0 bg-background z-20 border-l">Actions</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Applicant</TableHead>
+                    <TableHead>Country</TableHead>
+                    <TableHead>Applicants</TableHead>
+                    <TableHead>Total</TableHead>
+                    <TableHead>Payment</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredApplications.map((app) => (
                     <TableRow key={app.id}>
-                      <TableCell className="whitespace-nowrap sticky left-0 bg-background z-10 min-w-[100px]">
+                      <TableCell className="whitespace-nowrap">
                         {format(new Date(app.created_at), "dd MMM yyyy")}
                       </TableCell>
-                      <TableCell className="sticky left-[100px] bg-background z-10 min-w-[120px] border-r">
+                      <TableCell>
                         <div>
                           <p className="font-medium">{app.applicant_name}</p>
                           <p className="text-xs text-muted-foreground">{app.applicant_phone}</p>
@@ -339,7 +339,7 @@ const AdminVisaApplications = () => {
                           {app.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right sticky right-0 bg-background z-10 border-l">
+                      <TableCell className="text-right">
                         <Button
                           variant="ghost"
                           size="sm"
