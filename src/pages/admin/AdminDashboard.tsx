@@ -43,6 +43,7 @@ import AdminNotices from "@/components/admin/AdminNotices";
 import AdminStaffManagement from "@/components/admin/AdminStaffManagement";
 import AdminSocialNetworks from "@/components/admin/AdminSocialNetworks";
 import AdminBackupRestore from "@/components/admin/AdminBackupRestore";
+import AdminReportsAnalytics from "@/components/admin/AdminReportsAnalytics";
 import { formatCurrency } from "@/lib/currency";
 
 interface Stats {
@@ -177,6 +178,8 @@ const AdminDashboard = () => {
         return <AdminPackageSections />;
       case "revenue":
         return <AdminRevenue />;
+      case "reports":
+        return <AdminReportsAnalytics />;
       case "emi-report":
         return <AdminEMIReport />;
       case "payments":
