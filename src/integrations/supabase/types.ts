@@ -1393,9 +1393,11 @@ export type Database = {
           hire_date: string | null
           id: string
           is_active: boolean
+          mobile_number: string | null
           permissions: Json | null
           phone: string | null
           role: Database["public"]["Enums"]["staff_role"]
+          staff_name: string | null
           updated_at: string
           user_id: string
         }
@@ -1407,9 +1409,11 @@ export type Database = {
           hire_date?: string | null
           id?: string
           is_active?: boolean
+          mobile_number?: string | null
           permissions?: Json | null
           phone?: string | null
           role?: Database["public"]["Enums"]["staff_role"]
+          staff_name?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1421,9 +1425,11 @@ export type Database = {
           hire_date?: string | null
           id?: string
           is_active?: boolean
+          mobile_number?: string | null
           permissions?: Json | null
           phone?: string | null
           role?: Database["public"]["Enums"]["staff_role"]
+          staff_name?: string | null
           updated_at?: string
           user_id?: string
         }

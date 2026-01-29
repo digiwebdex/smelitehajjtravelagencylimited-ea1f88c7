@@ -70,6 +70,8 @@ interface StaffMember {
   permissions: Record<string, boolean>;
   created_at: string;
   updated_at: string;
+  staff_name: string | null;
+  mobile_number: string | null;
   profile?: {
     full_name: string | null;
     email: string | null;
@@ -123,6 +125,8 @@ const AdminStaffManagement = () => {
 
   const [formData, setFormData] = useState({
     user_email: "",
+    staff_name: "",
+    mobile_number: "",
     role: "agent" as 'admin' | 'manager' | 'agent' | 'support',
     employee_id: "",
     department: "",
@@ -185,6 +189,8 @@ const AdminStaffManagement = () => {
         const { error } = await supabase
           .from("staff_members")
           .update({
+            staff_name: formData.staff_name || null,
+            mobile_number: formData.mobile_number || null,
             role: formData.role,
             employee_id: formData.employee_id || null,
             department: formData.department || null,
@@ -202,7 +208,7 @@ const AdminStaffManagement = () => {
         // First, find the user by email
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
-          .select("id, email")
+          .select("id, email, full_name")
           .eq("email", formData.user_email)
           .single();
 
@@ -220,6 +226,8 @@ const AdminStaffManagement = () => {
           .from("staff_members")
           .insert({
             user_id: profileData.id,
+            staff_name: formData.staff_name || profileData.full_name || null,
+            mobile_number: formData.mobile_number || null,
             role: formData.role,
             employee_id: formData.employee_id || null,
             department: formData.department || null,
@@ -305,6 +313,8 @@ const AdminStaffManagement = () => {
   const resetForm = () => {
     setFormData({
       user_email: "",
+      staff_name: "",
+      mobile_number: "",
       role: "agent",
       employee_id: "",
       department: "",
@@ -320,6 +330,8 @@ const AdminStaffManagement = () => {
     setEditingStaff(staffMember);
     setFormData({
       user_email: staffMember.profile?.email || "",
+      staff_name: staffMember.staff_name || staffMember.profile?.full_name || "",
+      mobile_number: staffMember.mobile_number || "",
       role: staffMember.role,
       employee_id: staffMember.employee_id || "",
       department: staffMember.department || "",
@@ -420,6 +432,33 @@ const AdminStaffManagement = () => {
                         </p>
                       </div>
                     )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="staff_name">Staff Name *</Label>
+                        <Input
+                          id="staff_name"
+                          value={formData.staff_name}
+                          onChange={(e) =>
+                            setFormData({ ...formData, staff_name: e.target.value })
+                          }
+                          placeholder="Full name of staff member"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="mobile_number">Mobile Number *</Label>
+                        <Input
+                          id="mobile_number"
+                          value={formData.mobile_number}
+                          onChange={(e) =>
+                            setFormData({ ...formData, mobile_number: e.target.value })
+                          }
+                          placeholder="e.g., +880 1XXX XXXXXX"
+                          required
+                        />
+                      </div>
+                    </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -575,6 +614,7 @@ const AdminStaffManagement = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Staff</TableHead>
+                      <TableHead>Mobile</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>Department</TableHead>
                       <TableHead>Employee ID</TableHead>
@@ -585,7 +625,7 @@ const AdminStaffManagement = () => {
                   <TableBody>
                     {filteredStaff.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                           No staff members found
                         </TableCell>
                       </TableRow>
@@ -594,12 +634,13 @@ const AdminStaffManagement = () => {
                         <TableRow key={member.id}>
                           <TableCell>
                             <div>
-                              <p className="font-medium">{member.profile?.full_name || "N/A"}</p>
+                              <p className="font-medium">{member.staff_name || member.profile?.full_name || "N/A"}</p>
                               <p className="text-sm text-muted-foreground">
                                 {member.profile?.email}
                               </p>
                             </div>
                           </TableCell>
+                          <TableCell className="text-sm">{member.mobile_number || "-"}</TableCell>
                           <TableCell>
                             <Badge className={ROLE_COLORS[member.role]}>
                               {member.role}
@@ -656,7 +697,7 @@ const AdminStaffManagement = () => {
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>Remove Staff Member?</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      This will remove {member.profile?.full_name} from the staff list.
+                                      This will remove {member.staff_name || member.profile?.full_name} from the staff list.
                                       This action cannot be undone.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
