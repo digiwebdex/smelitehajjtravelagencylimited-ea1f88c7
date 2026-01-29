@@ -507,7 +507,7 @@ const AdminStaffManagement = () => {
                         <Label htmlFor="role">Role *</Label>
                         <Select
                           value={formData.role}
-                          onValueChange={(value: 'admin' | 'manager' | 'agent' | 'support') =>
+                          onValueChange={(value: 'admin' | 'manager' | 'support') =>
                             setFormData({ ...formData, role: value })
                           }
                         >
@@ -517,7 +517,6 @@ const AdminStaffManagement = () => {
                           <SelectContent>
                             <SelectItem value="admin">Admin</SelectItem>
                             <SelectItem value="manager">Manager</SelectItem>
-                            <SelectItem value="agent">Agent</SelectItem>
                             <SelectItem value="support">Support</SelectItem>
                           </SelectContent>
                         </Select>
