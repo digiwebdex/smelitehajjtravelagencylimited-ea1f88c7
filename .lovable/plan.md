@@ -1,158 +1,167 @@
 
-# Implementation Plan: Critical Missing Features
+# Facebook Pixel & Conversions API Integration
 
-This plan covers the implementation of two high-priority features for your SM Elite Hajj website:
-1. **Password Reset / Forgot Password** - Allow users to recover their accounts
-2. **Google Analytics Integration** - Track visitor behavior and conversions
+## Overview
+
+This plan implements a complete Facebook marketing tracking solution with:
+- **Browser-side Facebook Pixel** - for immediate client-side event tracking
+- **Server-side Conversions API** - for reliable server-to-Facebook event delivery
+- **Event deduplication** - using unique `event_id` to prevent duplicate conversions
+- **Admin configuration** - secure storage of credentials in the database
+- **Test mode support** - for debugging without affecting live data
 
 ---
 
-## Phase 1: Password Reset / Forgot Password
+## Architecture
 
-### Overview
-Users currently have no way to recover their accounts if they forget their password. This is critical for customer experience and reduces support burden.
-
-### What Will Be Built
-
-**1. Forgot Password Link on Login Page**
-- Add "Forgot Password?" link below the sign-in form
-- Opens a modal or switches to a forgot password view
-
-**2. Forgot Password Form**
-- Email input field with validation
-- "Send Reset Link" button
-- Success/error feedback messages
-
-**3. Reset Password Page (`/reset-password`)**
-- New route to handle the password reset callback
-- New password input with confirmation
-- Password strength requirements display
-- Submit button to update password
-
-### User Flow
 ```text
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  Login Page     │───▶│ Forgot Password  │───▶│  Check Email    │
-│  Click "Forgot" │    │  Enter Email     │    │  for Reset Link │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                                        │
-                                                        ▼
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  Login Page     │◀───│ Password Updated │◀───│  Reset Password │
-│  Success!       │    │  Success Toast   │    │  Enter New Pass │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
++---------------------+       +------------------+       +----------------+
+|   User Browser      |       |  Edge Function   |       |   Facebook     |
+|   (Pixel/fbq)       |------>|  /api/fb-event   |------>|  Conversions   |
+|   event_id: xyz     |       |  event_id: xyz   |       |  API           |
++---------------------+       +------------------+       +----------------+
+         |                            |
+         v                            v
+   PageView, Purchase           Deduplication
+   InitiateCheckout             (same event_id)
 ```
 
-### Files to Create/Modify
-| File | Action |
-|------|--------|
-| `src/pages/Auth.tsx` | Add forgot password mode and form |
-| `src/pages/ResetPassword.tsx` | New page for password update |
-| `src/App.tsx` | Add `/reset-password` route |
+**Deduplication Flow**: Both browser and server send the same `event_id`, Facebook automatically deduplicates.
 
 ---
 
-## Phase 2: Google Analytics Integration
+## What Will Be Implemented
 
-### Overview
-Track visitor behavior, page views, booking conversions, and package popularity to make data-driven decisions.
+### 1. Database Configuration Storage
+Store Facebook settings securely in the existing `site_settings` table:
+- **Pixel ID** - Your Facebook Pixel identifier (e.g., `1234567890`)
+- **Access Token** - Server-side API token (securely stored)
+- **Test Event Code** - Optional code for testing (e.g., `TEST12345`)
+- **Enable/Disable Toggle** - Control tracking globally
 
-### What Will Be Built
-
-**1. Admin Settings - Analytics Tab**
-- New "Analytics" tab in Admin Settings
-- Input field for Google Analytics Measurement ID (G-XXXXXXXXXX)
-- Toggle to enable/disable tracking
-- Instructions for getting the Measurement ID
-
-**2. Analytics Tracking Component**
-- Page view tracking on route changes
-- Event tracking for key actions:
-  - Package views
-  - Booking initiations
-  - Payment completions
-  - Contact form submissions
-
-**3. Database Storage**
-- Store analytics configuration in `site_settings` table
-
-### Admin Settings Preview
-The new Analytics tab will include:
-- Measurement ID input field
+### 2. Admin Settings UI (Analytics Tab)
+Add a new "Facebook Pixel" section in Admin Settings > Analytics:
+- Input field for Pixel ID
+- Secure input for Access Token (masked)
+- Test Event Code field
 - Enable/disable toggle
-- Link to Google Analytics dashboard
-- Setup instructions
+- Instructions on how to obtain credentials
+- Test mode indicator
 
-### Files to Create/Modify
-| File | Action |
-|------|--------|
-| `src/components/AnalyticsTracker.tsx` | New component for page tracking |
-| `src/components/admin/AdminSettings.tsx` | Add Analytics tab |
-| `src/App.tsx` | Include AnalyticsTracker component |
-| `src/hooks/useAnalytics.ts` | Hook for tracking custom events |
+### 3. Facebook Pixel Component (Browser-side)
+Create `src/components/FacebookPixel.tsx`:
+- Injects Facebook Pixel script dynamically
+- Loads settings from database
+- Tracks `PageView` on route changes
+- Generates unique `event_id` for deduplication
+- Only activates when enabled in settings
 
-### Tracking Events
-| Event Name | Trigger |
-|------------|---------|
-| `page_view` | Every route change |
-| `view_package` | Package details opened |
-| `begin_checkout` | Booking modal opened |
-| `purchase` | Booking confirmed |
-| `contact_submit` | Contact form submitted |
+### 4. Facebook Tracking Hook
+Create `src/hooks/useFacebookPixel.ts`:
+- `trackPageView()` - Track page visits
+- `trackInitiateCheckout()` - When booking modal opens
+- `trackPurchase()` - When booking is completed
+- `trackViewContent()` - When viewing package details
+- All events include `event_id` for deduplication
+
+### 5. Edge Function for Conversions API
+Create `supabase/functions/fb-event/index.ts`:
+- Receives events from frontend
+- Fetches Facebook credentials from database
+- Sends events to Facebook Conversions API
+- Includes user data hashing (email, phone)
+- Supports test mode via Test Event Code
+- Returns success/error response
+
+### 6. Integration Points
+Update existing components to track events:
+- **PackageDetailsModal** - `ViewContent` event
+- **BookingModal** - `InitiateCheckout` when opening
+- **BookingConfirmation** - `Purchase` event
+- **ContactSection** - `Lead` event (form submission)
 
 ---
 
 ## Technical Details
 
-### Password Reset Implementation
-```text
-Authentication Flow:
-1. User clicks "Forgot Password"
-2. Enters email, system calls supabase.auth.resetPasswordForEmail()
-3. User receives email with reset link
-4. Link redirects to /reset-password with recovery token
-5. Auth state listener detects PASSWORD_RECOVERY event
-6. User enters new password, calls supabase.auth.updateUser()
+### Database Schema
+Uses existing `site_settings` table with new key:
+```
+setting_key: 'facebook_pixel'
+setting_value: {
+  pixel_id: string,
+  access_token: string,
+  test_event_code: string,
+  is_enabled: boolean
+}
 ```
 
-### Analytics Implementation
-```text
-Tracking Flow:
-1. Admin enters GA4 Measurement ID in settings
-2. App loads measurement ID from site_settings
-3. AnalyticsTracker initializes GA4 on app load
-4. useLocation hook tracks page changes
-5. Custom events tracked via useAnalytics hook
+### Event Deduplication Strategy
+```javascript
+// Generate unique event ID
+const eventId = `${eventName}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+// Browser sends with Pixel
+fbq('track', 'Purchase', {value: 100}, {eventID: eventId});
+
+// Server sends same eventId to Conversions API
+// Facebook deduplicates automatically
 ```
 
-### Dependencies
-- No new packages required for password reset (uses existing Supabase auth)
-- **New package for analytics**: `react-ga4` (lightweight GA4 wrapper)
+### Conversions API Payload Format
+```javascript
+{
+  "data": [{
+    "event_name": "Purchase",
+    "event_time": 1706000000,
+    "event_id": "Purchase_1706000000_abc123",
+    "event_source_url": "https://yoursite.com/confirmation",
+    "action_source": "website",
+    "user_data": {
+      "em": ["hashed_email"],
+      "ph": ["hashed_phone"],
+      "client_ip_address": "...",
+      "client_user_agent": "...",
+      "fbc": "fb cookie",
+      "fbp": "fb browser id"
+    },
+    "custom_data": {
+      "value": 150000,
+      "currency": "BDT",
+      "content_name": "Premium Hajj Package"
+    }
+  }],
+  "test_event_code": "TEST12345" // Only in test mode
+}
+```
+
+### Files to Create
+1. `src/components/FacebookPixel.tsx` - Browser pixel component
+2. `src/hooks/useFacebookPixel.ts` - Tracking functions hook
+3. `supabase/functions/fb-event/index.ts` - Server-side API
+
+### Files to Modify
+1. `src/components/admin/AdminSettings.tsx` - Add Facebook Pixel configuration UI
+2. `src/App.tsx` - Add FacebookPixel component
+3. `src/components/BookingModal.tsx` - Track InitiateCheckout
+4. `src/pages/BookingConfirmation.tsx` - Track Purchase
+5. `src/components/PackageDetailsModal.tsx` - Track ViewContent
+6. `supabase/config.toml` - Register new edge function
 
 ---
 
-## Implementation Order
-
-1. **Password Reset** (Priority: Critical)
-   - Update Auth.tsx with forgot password flow
-   - Create ResetPassword.tsx page
-   - Add route in App.tsx
-   - Test complete flow
-
-2. **Google Analytics** (Priority: High)
-   - Install react-ga4 package
-   - Add Analytics tab to AdminSettings
-   - Create AnalyticsTracker component
-   - Add tracking hook for custom events
-   - Test tracking in GA4 debug mode
+## Security Considerations
+- Access Token stored in database, never exposed to client
+- Server-side API uses service role key to fetch credentials
+- User data (email, phone) hashed with SHA-256 before sending
+- Test mode isolated from production data
 
 ---
 
-## Summary
-
-| Feature | Impact | Effort |
-|---------|--------|--------|
-| Password Reset | Critical - User account recovery | Medium |
-| Google Analytics | High - Business insights | Medium |
-
-**Total estimated changes**: 5 new/modified files
+## How to Get Facebook Credentials
+The admin UI will include instructions:
+1. Go to Facebook Events Manager
+2. Select your Pixel or create new one
+3. Copy Pixel ID (numeric ID)
+4. Generate Access Token via System User
+5. Get Test Event Code from Test Events tab
