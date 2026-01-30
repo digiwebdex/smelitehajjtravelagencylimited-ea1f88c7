@@ -133,7 +133,7 @@ const AdminGallery = () => {
       .from("site_settings")
       .select("setting_value")
       .eq("setting_key", "gallery_section_header")
-      .single();
+      .maybeSingle();
     
     if (data?.setting_value) {
       setSectionHeader(data.setting_value as unknown as SectionHeader);
@@ -149,7 +149,7 @@ const AdminGallery = () => {
         .from("site_settings")
         .select("id")
         .eq("setting_key", "gallery_section_header")
-        .single();
+        .maybeSingle();
 
       if (existing) {
         await supabase

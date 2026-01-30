@@ -58,7 +58,7 @@ const AdminFAQ = () => {
       .from("site_settings")
       .select("setting_value")
       .eq("setting_key", "faq_section_header")
-      .single();
+      .maybeSingle();
     
     if (data?.setting_value) {
       setSectionHeader(data.setting_value as unknown as SectionHeader);
@@ -74,7 +74,7 @@ const AdminFAQ = () => {
         .from("site_settings")
         .select("id")
         .eq("setting_key", "faq_section_header")
-        .single();
+        .maybeSingle();
 
       if (existing) {
         await supabase

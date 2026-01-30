@@ -49,7 +49,7 @@ const TestimonialsSection = () => {
       .from("site_settings")
       .select("setting_value")
       .eq("setting_key", "testimonials_section_header")
-      .single();
+      .maybeSingle();
     
     if (data?.setting_value) {
       setSectionHeader(data.setting_value as unknown as SectionHeader);
