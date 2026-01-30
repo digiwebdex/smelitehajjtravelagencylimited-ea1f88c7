@@ -36,39 +36,115 @@ interface AdminMobileNavProps {
   onTabChange: (tab: string) => void;
 }
 
-const menuItems = [
-  { value: "overview", label: "Overview", icon: BarChart3 },
-  { value: "bookings", label: "Bookings", icon: Package },
-  { value: "visa-applications", label: "Visa Applications", icon: Globe },
-  { value: "packages", label: "Packages", icon: LayoutDashboard },
-  { value: "package-sections", label: "Package Sections", icon: Layers },
-  { value: "revenue", label: "Revenue", icon: Wallet },
-  { value: "reports", label: "Reports & Analytics", icon: BarChart3 },
-  { value: "reconciliation", label: "Payment Reconciliation", icon: AlertTriangle },
-  { value: "emi-report", label: "Installment Report", icon: Calculator },
-  { value: "payments", label: "Payments", icon: Wallet },
-  { value: "staff", label: "Staff Management", icon: UserCog },
-  { value: "audit-log", label: "Audit Log", icon: Activity },
-  { value: "notifications", label: "Notifications", icon: Bell },
-  { value: "notification-retry", label: "Notification Retry", icon: MessageSquare },
-  { value: "notices", label: "Notice Board", icon: Megaphone },
-  { value: "sections", label: "Section Visibility", icon: Layers },
-  { value: "menu", label: "Menu", icon: MenuIcon },
-  { value: "hero", label: "Hero", icon: Image },
-  { value: "services", label: "Services", icon: Settings },
-  { value: "testimonials", label: "Testimonials", icon: MessageSquare },
-  { value: "team", label: "Team", icon: Users },
-  { value: "faq", label: "FAQ", icon: HelpCircle },
-  { value: "gallery", label: "Gallery", icon: Images },
-  { value: "visa", label: "Visa Countries", icon: Globe },
-  { value: "contact", label: "Contact", icon: Phone },
-  { value: "offices", label: "Offices", icon: Building2 },
-  { value: "social-networks", label: "Social Networks", icon: Share2 },
-  { value: "footer", label: "Footer", icon: FileText },
-  { value: "legal", label: "Legal Pages", icon: Scale },
-  { value: "backup", label: "Backup & Restore", icon: Shield },
-  { value: "settings", label: "Settings", icon: Settings },
+// Menu items organized by category
+const menuGroups = [
+  {
+    label: "Dashboard",
+    items: [
+      { value: "overview", label: "Overview", icon: BarChart3 },
+    ]
+  },
+  {
+    label: "Orders & Bookings",
+    items: [
+      { value: "bookings", label: "Bookings", icon: Package },
+      { value: "visa-applications", label: "Visa Applications", icon: Globe },
+      { value: "group-inquiries", label: "Group Inquiries", icon: Users },
+    ]
+  },
+  {
+    label: "Marketing & Leads",
+    items: [
+      { value: "leads", label: "Leads CRM", icon: Users },
+      { value: "marketing-analytics", label: "Marketing Analytics", icon: BarChart3 },
+      { value: "lead-magnets", label: "Lead Magnets", icon: FileText },
+      { value: "webinars", label: "Webinars", icon: Megaphone },
+      { value: "retargeting", label: "Retargeting Segments", icon: Activity },
+    ]
+  },
+  {
+    label: "Referral & Agents",
+    items: [
+      { value: "referrals", label: "Referrals", icon: Share2 },
+      { value: "agents", label: "Agents", icon: UserCog },
+    ]
+  },
+  {
+    label: "CRM & Automation",
+    items: [
+      { value: "crm-automation", label: "Follow-up Sequences", icon: MessageSquare },
+    ]
+  },
+  {
+    label: "Packages",
+    items: [
+      { value: "packages", label: "Packages", icon: LayoutDashboard },
+      { value: "package-sections", label: "Package Sections", icon: Layers },
+    ]
+  },
+  {
+    label: "Finance",
+    items: [
+      { value: "revenue", label: "Revenue", icon: Wallet },
+      { value: "financial-analytics", label: "Financial Analytics", icon: Calculator },
+      { value: "reports", label: "Reports & Analytics", icon: BarChart3 },
+      { value: "reconciliation", label: "Payment Reconciliation", icon: AlertTriangle },
+      { value: "emi-report", label: "Installment Report", icon: Calculator },
+      { value: "payments", label: "Payment Methods", icon: Wallet },
+    ]
+  },
+  {
+    label: "Team & Operations",
+    items: [
+      { value: "staff", label: "Staff Management", icon: UserCog },
+      { value: "audit-log", label: "Audit Log", icon: Activity },
+    ]
+  },
+  {
+    label: "Notifications",
+    items: [
+      { value: "notifications", label: "Notifications", icon: Bell },
+      { value: "notification-retry", label: "Notification Retry", icon: MessageSquare },
+    ]
+  },
+  {
+    label: "Content",
+    items: [
+      { value: "blog", label: "Blog Posts", icon: FileText },
+      { value: "notices", label: "Notice Board", icon: Megaphone },
+      { value: "gallery", label: "Gallery", icon: Images },
+      { value: "testimonials", label: "Testimonials", icon: MessageSquare },
+      { value: "faq", label: "FAQ", icon: HelpCircle },
+      { value: "translations", label: "Translations", icon: Globe },
+    ]
+  },
+  {
+    label: "Site Design",
+    items: [
+      { value: "sections", label: "Section Visibility", icon: Layers },
+      { value: "menu", label: "Menu", icon: MenuIcon },
+      { value: "hero", label: "Hero", icon: Image },
+      { value: "services", label: "Services", icon: Settings },
+      { value: "team", label: "Team", icon: Users },
+      { value: "visa", label: "Visa Countries", icon: Globe },
+      { value: "contact", label: "Contact", icon: Phone },
+      { value: "offices", label: "Offices", icon: Building2 },
+      { value: "social-networks", label: "Social Networks", icon: Share2 },
+      { value: "footer", label: "Footer", icon: FileText },
+      { value: "legal", label: "Legal Pages", icon: Scale },
+    ]
+  },
+  {
+    label: "System",
+    items: [
+      { value: "backup", label: "Backup & Restore", icon: Shield },
+      { value: "settings", label: "Settings", icon: Settings },
+    ]
+  },
 ];
+
+// Flatten menu items for finding active item
+const menuItems = menuGroups.flatMap(group => group.items);
 
 const AdminMobileNav = ({ activeTab, onTabChange }: AdminMobileNavProps) => {
   const [open, setOpen] = useState(false);
@@ -99,27 +175,34 @@ const AdminMobileNav = ({ activeTab, onTabChange }: AdminMobileNavProps) => {
             <SheetTitle className="text-left">Admin Menu</SheetTitle>
           </SheetHeader>
           <ScrollArea className="h-[calc(100vh-80px)]">
-            <nav className="space-y-1 p-2">
-              {menuItems.map((item) => {
-                const isActive = activeTab === item.value;
-                const Icon = item.icon;
+            <nav className="space-y-4 p-2">
+              {menuGroups.map((group) => (
+                <div key={group.label} className="space-y-1">
+                  <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    {group.label}
+                  </p>
+                  {group.items.map((item) => {
+                    const isActive = activeTab === item.value;
+                    const Icon = item.icon;
 
-                return (
-                  <button
-                    key={item.value}
-                    onClick={() => handleTabChange(item.value)}
-                    className={cn(
-                      "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors",
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    )}
-                  >
-                    <Icon className="h-5 w-5 flex-shrink-0" />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
+                    return (
+                      <button
+                        key={item.value}
+                        onClick={() => handleTabChange(item.value)}
+                        className={cn(
+                          "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors",
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        )}
+                      >
+                        <Icon className="h-5 w-5 flex-shrink-0" />
+                        <span>{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
             </nav>
           </ScrollArea>
         </SheetContent>

@@ -49,6 +49,16 @@ import AdminPaymentReconciliation from "@/components/admin/AdminPaymentReconcili
 import AdminNotificationRetry from "@/components/admin/AdminNotificationRetry";
 import AdminLeadsManagement from "@/components/admin/AdminLeadsManagement";
 import AdminMarketingAnalytics from "@/components/admin/AdminMarketingAnalytics";
+import AdminLeadMagnets from "@/components/admin/AdminLeadMagnets";
+import AdminWebinars from "@/components/admin/AdminWebinars";
+import AdminReferrals from "@/components/admin/AdminReferrals";
+import AdminAgents from "@/components/admin/AdminAgents";
+import AdminCRMAutomation from "@/components/admin/AdminCRMAutomation";
+import AdminGroupInquiries from "@/components/admin/AdminGroupInquiries";
+import AdminFinancialAnalytics from "@/components/admin/AdminFinancialAnalytics";
+import AdminRetargetingSegments from "@/components/admin/AdminRetargetingSegments";
+import AdminBlog from "@/components/admin/AdminBlog";
+import AdminTranslations from "@/components/admin/AdminTranslations";
 import { formatCurrency } from "@/lib/currency";
 
 interface Stats {
@@ -181,12 +191,28 @@ const AdminDashboard = () => {
         return <AdminLeadsManagement />;
       case "marketing-analytics":
         return <AdminMarketingAnalytics />;
+      case "lead-magnets":
+        return <AdminLeadMagnets />;
+      case "webinars":
+        return <AdminWebinars />;
+      case "retargeting":
+        return <AdminRetargetingSegments />;
+      case "referrals":
+        return <AdminReferrals />;
+      case "agents":
+        return <AdminAgents />;
+      case "crm-automation":
+        return <AdminCRMAutomation />;
+      case "group-inquiries":
+        return <AdminGroupInquiries />;
       case "packages":
         return <AdminPackages onUpdate={fetchStats} />;
       case "package-sections":
         return <AdminPackageSections />;
       case "revenue":
         return <AdminRevenue />;
+      case "financial-analytics":
+        return <AdminFinancialAnalytics />;
       case "reports":
         return <AdminReportsAnalytics />;
       case "reconciliation":
@@ -203,24 +229,28 @@ const AdminDashboard = () => {
         return <AdminNotifications />;
       case "notification-retry":
         return <AdminNotificationRetry />;
-      case "sections":
-        return <AdminSectionVisibility />;
+      case "blog":
+        return <AdminBlog />;
       case "notices":
         return <AdminNotices />;
+      case "gallery":
+        return <AdminGallery />;
+      case "testimonials":
+        return <AdminTestimonials />;
+      case "faq":
+        return <AdminFAQ />;
+      case "translations":
+        return <AdminTranslations />;
+      case "sections":
+        return <AdminSectionVisibility />;
       case "menu":
         return <AdminMenu />;
       case "hero":
         return <AdminHero />;
       case "services":
         return <AdminServices />;
-      case "testimonials":
-        return <AdminTestimonials />;
       case "team":
         return <AdminTeam />;
-      case "faq":
-        return <AdminFAQ />;
-      case "gallery":
-        return <AdminGallery />;
       case "visa":
         return <AdminVisa />;
       case "contact":
