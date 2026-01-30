@@ -68,6 +68,144 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_leads: {
+        Row: {
+          agent_id: string
+          commission_amount: number
+          converted: boolean
+          created_at: string
+          id: string
+          is_paid: boolean
+          lead_id: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          commission_amount?: number
+          converted?: boolean
+          created_at?: string
+          id?: string
+          is_paid?: boolean
+          lead_id: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          commission_amount?: number
+          converted?: boolean
+          created_at?: string
+          id?: string
+          is_paid?: boolean
+          lead_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_leads_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_leads_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agents: {
+        Row: {
+          commission_rate: number
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          is_approved: boolean
+          name: string
+          pending_commission: number
+          phone: string
+          referral_link_code: string
+          total_commission: number
+          total_conversions: number
+          total_leads: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          commission_rate?: number
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          is_approved?: boolean
+          name: string
+          pending_commission?: number
+          phone: string
+          referral_link_code: string
+          total_commission?: number
+          total_conversions?: number
+          total_leads?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          commission_rate?: number
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          is_approved?: boolean
+          name?: string
+          pending_commission?: number
+          phone?: string
+          referral_link_code?: string
+          total_commission?: number
+          total_conversions?: number
+          total_leads?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audience_segments: {
+        Row: {
+          created_at: string
+          criteria: Json
+          id: string
+          is_active: boolean
+          lead_count: number
+          lead_ids: string[]
+          segment_name: string
+          segment_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          criteria?: Json
+          id?: string
+          is_active?: boolean
+          lead_count?: number
+          lead_ids?: string[]
+          segment_name: string
+          segment_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          criteria?: Json
+          id?: string
+          is_active?: boolean
+          lead_count?: number
+          lead_ids?: string[]
+          segment_name?: string
+          segment_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       backup_history: {
         Row: {
           backup_name: string
@@ -109,6 +247,101 @@ export type Database = {
           tables_included?: string[]
         }
         Relationships: []
+      }
+      blog_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          order_index: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          order_index?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          order_index?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          author_id: string | null
+          category_id: string | null
+          content: string
+          created_at: string
+          excerpt: string | null
+          featured_image_url: string | null
+          id: string
+          is_published: boolean
+          meta_description: string | null
+          published_at: string | null
+          seo_title: string | null
+          slug: string
+          title: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          author_id?: string | null
+          category_id?: string | null
+          content: string
+          created_at?: string
+          excerpt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          is_published?: boolean
+          meta_description?: string | null
+          published_at?: string | null
+          seo_title?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          author_id?: string | null
+          category_id?: string | null
+          content?: string
+          created_at?: string
+          excerpt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          is_published?: boolean
+          meta_description?: string | null
+          published_at?: string | null
+          seo_title?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_posts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "blog_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       booking_documents: {
         Row: {
@@ -308,6 +541,164 @@ export type Database = {
           order_index?: number
           title?: string
           type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      crm_lead_sequences: {
+        Row: {
+          created_at: string
+          current_step: number
+          id: string
+          last_triggered_at: string | null
+          lead_id: string
+          next_trigger_at: string | null
+          sequence_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_step?: number
+          id?: string
+          last_triggered_at?: string | null
+          lead_id: string
+          next_trigger_at?: string | null
+          sequence_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_step?: number
+          id?: string
+          last_triggered_at?: string | null
+          lead_id?: string
+          next_trigger_at?: string | null
+          sequence_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_lead_sequences_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_lead_sequences_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "crm_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_sequence_steps: {
+        Row: {
+          created_at: string
+          day_offset: number
+          id: string
+          is_active: boolean
+          message_template: string
+          sequence_id: string
+          step_number: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_offset?: number
+          id?: string
+          is_active?: boolean
+          message_template: string
+          sequence_id: string
+          step_number: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_offset?: number
+          id?: string
+          is_active?: boolean
+          message_template?: string
+          sequence_id?: string
+          step_number?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_sequence_steps_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "crm_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_sequences: {
+        Row: {
+          channel: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      downloadable_resources: {
+        Row: {
+          created_at: string
+          description: string | null
+          download_count: number
+          file_url: string
+          id: string
+          is_active: boolean
+          resource_type: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          download_count?: number
+          file_url: string
+          id?: string
+          is_active?: boolean
+          resource_type: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          download_count?: number
+          file_url?: string
+          id?: string
+          is_active?: boolean
+          resource_type?: string
+          title?: string
           updated_at?: string
         }
         Relationships: []
@@ -684,6 +1075,71 @@ export type Database = {
           video_url?: string
         }
         Relationships: []
+      }
+      group_inquiries: {
+        Row: {
+          assigned_to: string | null
+          budget: string | null
+          contact_email: string | null
+          contact_name: string
+          contact_phone: string
+          created_at: string
+          group_discount: number | null
+          group_name: string
+          id: string
+          lead_status: string
+          notes: string | null
+          preferred_package_id: string | null
+          special_requirements: string | null
+          travel_date: string | null
+          traveler_count: number
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          budget?: string | null
+          contact_email?: string | null
+          contact_name: string
+          contact_phone: string
+          created_at?: string
+          group_discount?: number | null
+          group_name: string
+          id?: string
+          lead_status?: string
+          notes?: string | null
+          preferred_package_id?: string | null
+          special_requirements?: string | null
+          travel_date?: string | null
+          traveler_count?: number
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          budget?: string | null
+          contact_email?: string | null
+          contact_name?: string
+          contact_phone?: string
+          created_at?: string
+          group_discount?: number | null
+          group_name?: string
+          id?: string
+          lead_status?: string
+          notes?: string | null
+          preferred_package_id?: string | null
+          special_requirements?: string | null
+          travel_date?: string | null
+          traveler_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_inquiries_preferred_package_id_fkey"
+            columns: ["preferred_package_id"]
+            isOneToOne: false
+            referencedRelation: "packages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       hero_content: {
         Row: {
@@ -1150,6 +1606,8 @@ export type Database = {
       }
       packages: {
         Row: {
+          category: string | null
+          countdown_end_date: string | null
           created_at: string
           description: string | null
           duration_days: number
@@ -1164,7 +1622,11 @@ export type Database = {
           id: string
           image_url: string | null
           includes: string[] | null
+          installment_enabled: boolean | null
           is_active: boolean
+          is_featured: boolean | null
+          max_installment_months: number | null
+          min_down_payment_percent: number | null
           price: number
           show_book_now: boolean | null
           show_view_details: boolean | null
@@ -1174,8 +1636,11 @@ export type Database = {
           transport_type: string | null
           type: Database["public"]["Enums"]["package_type"]
           updated_at: string
+          weekly_bookings: number | null
         }
         Insert: {
+          category?: string | null
+          countdown_end_date?: string | null
           created_at?: string
           description?: string | null
           duration_days?: number
@@ -1190,7 +1655,11 @@ export type Database = {
           id?: string
           image_url?: string | null
           includes?: string[] | null
+          installment_enabled?: boolean | null
           is_active?: boolean
+          is_featured?: boolean | null
+          max_installment_months?: number | null
+          min_down_payment_percent?: number | null
           price: number
           show_book_now?: boolean | null
           show_view_details?: boolean | null
@@ -1200,8 +1669,11 @@ export type Database = {
           transport_type?: string | null
           type: Database["public"]["Enums"]["package_type"]
           updated_at?: string
+          weekly_bookings?: number | null
         }
         Update: {
+          category?: string | null
+          countdown_end_date?: string | null
           created_at?: string
           description?: string | null
           duration_days?: number
@@ -1216,7 +1688,11 @@ export type Database = {
           id?: string
           image_url?: string | null
           includes?: string[] | null
+          installment_enabled?: boolean | null
           is_active?: boolean
+          is_featured?: boolean | null
+          max_installment_months?: number | null
+          min_down_payment_percent?: number | null
           price?: number
           show_book_now?: boolean | null
           show_view_details?: boolean | null
@@ -1226,6 +1702,7 @@ export type Database = {
           transport_type?: string | null
           type?: Database["public"]["Enums"]["package_type"]
           updated_at?: string
+          weekly_bookings?: number | null
         }
         Relationships: []
       }
@@ -1300,6 +1777,131 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          customer_name: string
+          customer_phone: string
+          id: string
+          is_paid: boolean
+          lead_id: string | null
+          reward_amount: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          customer_name: string
+          customer_phone: string
+          id?: string
+          is_paid?: boolean
+          lead_id?: string | null
+          reward_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          is_paid?: boolean
+          lead_id?: string | null
+          reward_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_codes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_conversions: {
+        Row: {
+          conversion_value: number
+          created_at: string
+          id: string
+          referral_code_id: string
+          referred_booking_id: string | null
+          status: string
+        }
+        Insert: {
+          conversion_value?: number
+          created_at?: string
+          id?: string
+          referral_code_id: string
+          referred_booking_id?: string | null
+          status?: string
+        }
+        Update: {
+          conversion_value?: number
+          created_at?: string
+          id?: string
+          referral_code_id?: string
+          referred_booking_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_conversions_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
+            referencedRelation: "referral_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_conversions_referred_booking_id_fkey"
+            columns: ["referred_booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_downloads: {
+        Row: {
+          downloaded_at: string
+          id: string
+          lead_id: string | null
+          resource_id: string
+          source: string | null
+        }
+        Insert: {
+          downloaded_at?: string
+          id?: string
+          lead_id?: string | null
+          resource_id: string
+          source?: string | null
+        }
+        Update: {
+          downloaded_at?: string
+          id?: string
+          lead_id?: string | null
+          resource_id?: string
+          source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_downloads_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_downloads_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "downloadable_resources"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       restore_history: {
         Row: {
@@ -1696,8 +2298,11 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          display_location: string | null
           id: string
           is_active: boolean
+          is_featured: boolean | null
+          is_video: boolean | null
           location: string | null
           name: string
           order_index: number
@@ -1705,12 +2310,16 @@ export type Database = {
           quote: string
           rating: number
           updated_at: string
+          video_url: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          display_location?: string | null
           id?: string
           is_active?: boolean
+          is_featured?: boolean | null
+          is_video?: boolean | null
           location?: string | null
           name: string
           order_index?: number
@@ -1718,12 +2327,16 @@ export type Database = {
           quote: string
           rating?: number
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          display_location?: string | null
           id?: string
           is_active?: boolean
+          is_featured?: boolean | null
+          is_video?: boolean | null
           location?: string | null
           name?: string
           order_index?: number
@@ -1731,6 +2344,7 @@ export type Database = {
           quote?: string
           rating?: number
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -1776,6 +2390,36 @@ export type Database = {
           secondary_color?: string | null
           text_color?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      translations: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          language_code: string
+          section: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          language_code: string
+          section: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          language_code?: string
+          section?: string
+          updated_at?: string
+          value?: string
         }
         Relationships: []
       }
@@ -1910,6 +2554,80 @@ export type Database = {
           requirements?: string[] | null
           updated_at?: string
           validity_period?: string | null
+        }
+        Relationships: []
+      }
+      webinar_registrations: {
+        Row: {
+          email: string | null
+          id: string
+          name: string
+          phone: string
+          preferred_session: string | null
+          registered_at: string
+          webinar_id: string
+        }
+        Insert: {
+          email?: string | null
+          id?: string
+          name: string
+          phone: string
+          preferred_session?: string | null
+          registered_at?: string
+          webinar_id: string
+        }
+        Update: {
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string
+          preferred_session?: string | null
+          registered_at?: string
+          webinar_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webinar_registrations_webinar_id_fkey"
+            columns: ["webinar_id"]
+            isOneToOne: false
+            referencedRelation: "webinars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webinars: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          max_capacity: number
+          registration_count: number
+          session_date: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_capacity?: number
+          registration_count?: number
+          session_date: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_capacity?: number
+          registration_count?: number
+          session_date?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
