@@ -69,20 +69,22 @@ const FloatingIslamicPattern = () => {
   };
 
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
       {floatingElements.map((element) => (
         <motion.div
           key={element.id}
-          className="absolute text-secondary/30"
+          className="absolute text-secondary/40"
           style={{
             left: element.x,
             top: element.y,
           }}
+          initial={{ opacity: 0, scale: 0.5 }}
           animate={{
-            y: [0, -20, 0],
-            x: [0, 10, 0],
-            rotate: [0, 360],
-            opacity: [0.2, 0.4, 0.2],
+            y: [0, -30, 0],
+            x: [0, 15, -10, 0],
+            rotate: [0, 180, 360],
+            opacity: [0.15, 0.35, 0.15],
+            scale: [1, 1.1, 1],
           }}
           transition={{
             duration: element.duration,
@@ -93,6 +95,29 @@ const FloatingIslamicPattern = () => {
         >
           {renderShape(element.type, element.size)}
         </motion.div>
+      ))}
+
+      {/* Additional floating particles for footer depth */}
+      {[...Array(6)].map((_, i) => (
+        <motion.div
+          key={`particle-${i}`}
+          className="absolute w-2 h-2 bg-secondary/20 rounded-full"
+          style={{
+            left: `${10 + i * 15}%`,
+            top: `${30 + (i % 3) * 25}%`,
+          }}
+          animate={{
+            y: [0, -40, 0],
+            opacity: [0.1, 0.3, 0.1],
+            scale: [0.8, 1.2, 0.8],
+          }}
+          transition={{
+            duration: 4 + i,
+            delay: i * 0.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
       ))}
       
       {/* Large decorative pattern in corner */}
