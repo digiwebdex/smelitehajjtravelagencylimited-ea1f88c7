@@ -22,6 +22,7 @@ import { motion } from "framer-motion";
 import IslamicBorder from "./IslamicBorder";
 import MakkahIcon from "./icons/MakkahIcon";
 import MadinahIcon from "./icons/MadinahIcon";
+import AirTicketBookingModal from "./AirTicketBookingModal";
 
 interface Service {
   id: string;
@@ -90,6 +91,7 @@ const CustomServiceIcon = ({ icon: Icon }: { icon: React.FC<{ size?: number; cla
 const ServicesOverview = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [airTicketModalOpen, setAirTicketModalOpen] = useState(false);
   const [parentCompany, setParentCompany] = useState<ParentCompanySettings>({
     button_text: "Visit Parent Company",
     button_link: "",
@@ -178,6 +180,12 @@ const ServicesOverview = () => {
   };
 
   const handleServiceClick = (service: Service) => {
+    // Check if this is the Air Ticket service
+    if (service.title.toLowerCase().includes('air ticket') || service.icon_name === 'Ticket') {
+      setAirTicketModalOpen(true);
+      return;
+    }
+    
     if (!service.link_url) return;
     
     const url = service.link_url;
@@ -253,8 +261,7 @@ const ServicesOverview = () => {
                   y: { duration: 0.2 },
                 }}
                 onClick={() => handleServiceClick(service)}
-                className={`group relative flex items-start gap-4 p-6 rounded-xl transition-all duration-300 overflow-hidden
-                  ${service.link_url ? 'cursor-pointer' : 'cursor-default'}
+                className={`group relative flex items-start gap-4 p-6 rounded-xl transition-all duration-300 overflow-hidden cursor-pointer
                   ${index % 2 === 0 ? 'bg-muted/30' : 'bg-card'}
                   hover:bg-gradient-to-br hover:from-primary/5 hover:to-secondary/10
                   before:absolute before:inset-0 before:rounded-xl before:border-2 before:border-transparent before:transition-all before:duration-300
@@ -329,6 +336,12 @@ const ServicesOverview = () => {
         )}
       </div>
       </section>
+
+      {/* Air Ticket Booking Modal */}
+      <AirTicketBookingModal 
+        open={airTicketModalOpen} 
+        onOpenChange={setAirTicketModalOpen} 
+      />
     </IslamicBorder>
   );
 };

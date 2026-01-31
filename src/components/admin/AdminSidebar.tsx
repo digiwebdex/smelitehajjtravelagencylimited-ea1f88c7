@@ -28,6 +28,8 @@ import {
   UserPlus,
   TrendingUp,
   Receipt,
+  Plane,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -57,7 +59,8 @@ const menuGroups = [
   {
     label: "Orders & Bookings",
     items: [
-      { value: "bookings", label: "Bookings", icon: Package },
+      { value: "bookings", label: "Package Bookings", icon: Package },
+      { value: "air-ticket-bookings", label: "Air Ticket Bookings", icon: Plane },
       { value: "visa-applications", label: "Visa Applications", icon: Globe },
       { value: "group-inquiries", label: "Group Inquiries", icon: Users },
     ]
@@ -112,10 +115,12 @@ const menuGroups = [
     ]
   },
   {
-    label: "Notifications",
+    label: "Notifications & Templates",
     items: [
       { value: "notifications", label: "Notifications", icon: Bell },
       { value: "notification-retry", label: "Notification Retry", icon: MessageSquare },
+      { value: "notification-templates", label: "Email/SMS Templates", icon: Mail },
+      { value: "booking-settings", label: "Booking Settings", icon: Settings },
     ]
   },
   {
