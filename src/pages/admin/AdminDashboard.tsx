@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AdminBookings from "@/components/admin/AdminBookings";
+import AdminAirTicketBookings from "@/components/admin/AdminAirTicketBookings";
 import AdminPackages from "@/components/admin/AdminPackages";
 import AdminPackageSections from "@/components/admin/AdminPackageSections";
 import AdminRevenue from "@/components/admin/AdminRevenue";
@@ -47,6 +48,8 @@ import AdminReportsAnalytics from "@/components/admin/AdminReportsAnalytics";
 import AdminAuditLog from "@/components/admin/AdminAuditLog";
 import AdminPaymentReconciliation from "@/components/admin/AdminPaymentReconciliation";
 import AdminNotificationRetry from "@/components/admin/AdminNotificationRetry";
+import AdminNotificationTemplates from "@/components/admin/AdminNotificationTemplates";
+import AdminBookingSettings from "@/components/admin/AdminBookingSettings";
 import AdminLeadsManagement from "@/components/admin/AdminLeadsManagement";
 import AdminMarketingAnalytics from "@/components/admin/AdminMarketingAnalytics";
 import AdminLeadMagnets from "@/components/admin/AdminLeadMagnets";
@@ -186,6 +189,8 @@ const AdminDashboard = () => {
         return <AdminOverview />;
       case "bookings":
         return <AdminBookings onUpdate={fetchStats} />;
+      case "air-ticket-bookings":
+        return <AdminAirTicketBookings />;
       case "visa-applications":
         return <AdminVisaApplications />;
       case "leads":
@@ -232,6 +237,10 @@ const AdminDashboard = () => {
         return <AdminNotifications />;
       case "notification-retry":
         return <AdminNotificationRetry />;
+      case "notification-templates":
+        return <AdminNotificationTemplates />;
+      case "booking-settings":
+        return <AdminBookingSettings />;
       case "blog":
         return <AdminBlog />;
       case "notices":
