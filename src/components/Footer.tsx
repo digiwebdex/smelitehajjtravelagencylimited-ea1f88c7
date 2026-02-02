@@ -396,6 +396,22 @@ const Footer = () => {
             </Link>
           </div>
         </div>
+        {/* Developer Credit */}
+        <div className="border-t border-primary-foreground/5 relative z-10">
+          <div className="container py-4 flex justify-center">
+            <p className="text-primary-foreground/50 text-xs">
+              Designed & Developed by{" "}
+              <a 
+                href="https://digiwebdex.com/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-secondary hover:text-secondary/80 transition-colors font-medium"
+              >
+                DigiWebDex
+              </a>
+            </p>
+          </div>
+        </div>
       </div>
     </footer>
   );
