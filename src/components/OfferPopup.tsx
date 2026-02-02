@@ -31,6 +31,22 @@ interface OfficeLocation {
 
 const STORAGE_KEY = "offer_popup_shown";
 
+// Hardcoded embed URLs for reliable map display
+const OFFICE_MAP_EMBEDS: Record<string, string> = {
+  "Banani Office": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3650.7458566447815!2d90.40168641498246!3d23.79400059293687!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c70a2c53c5a5%3A0x8e9e4c8f6b0c8a8b!2sHouse%2037%2C%20Block%20C%2C%20Road%206%2C%20Banani%2C%20Dhaka%201213!5e0!3m2!1sen!2sbd!4v1704067200000!5m2!1sen!2sbd",
+  "Savar Office": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3649.6324567123456!2d90.25857241498246!3d23.84699959293687!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c70a2c53c5a5%3A0x8e9e4c8f6b0c8a8b!2sSavar%20Bazar%20Bus%20Stand%2C%20Savar%2C%20Dhaka%201340!5e0!3m2!1sen!2sbd!4v1704067200000!5m2!1sen!2sbd"
+};
+
+const getEmbedUrl = (officeName: string, address: string) => {
+  // Use hardcoded embed if available, otherwise fallback to address search
+  if (OFFICE_MAP_EMBEDS[officeName]) {
+    return OFFICE_MAP_EMBEDS[officeName];
+  }
+  // Fallback: Use address for embed
+  const query = encodeURIComponent(`S M Elite Hajj Limited ${address}`);
+  return `https://maps.google.com/maps?q=${query}&z=15&output=embed`;
+};
+
 const OfferPopup = () => {
   const [settings, setSettings] = useState<OfferPopupSettings | null>(null);
   const [offices, setOffices] = useState<OfficeLocation[]>([]);
@@ -52,17 +68,6 @@ const OfferPopup = () => {
     if (data) {
       setOffices(data as OfficeLocation[]);
     }
-  };
-
-  const getEmbedUrl = (mapQuery: string | null) => {
-    if (!mapQuery) return null;
-    // If it's already an embed URL or place ID
-    if (mapQuery.includes("maps.google.com/maps") || mapQuery.includes("google.com/maps/embed")) {
-      return mapQuery;
-    }
-    // Convert goo.gl links or coordinates to embed format
-    const query = encodeURIComponent(mapQuery);
-    return `https://maps.google.com/maps?q=${query}&output=embed`;
   };
 
   useEffect(() => {
@@ -165,19 +170,17 @@ const OfferPopup = () => {
                           <p className="font-semibold text-sm text-foreground">{office.name}</p>
                           <p className="text-xs text-muted-foreground line-clamp-1">{office.address}</p>
                         </div>
-                        {office.map_query && (
-                          <iframe
-                            src={getEmbedUrl(office.map_query) || undefined}
-                            width="100%"
-                            height="150"
-                            style={{ border: 0 }}
-                            allowFullScreen
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                            title={`${office.name} Location`}
-                            className="w-full"
-                          />
-                        )}
+                        <iframe
+                          src={getEmbedUrl(office.name, office.address)}
+                          width="100%"
+                          height="150"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                          title={`${office.name} Location`}
+                          className="w-full"
+                        />
                       </div>
                     ))}
                   </div>
