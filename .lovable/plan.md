@@ -1,99 +1,57 @@
 
-# Hotel Booking Multi-Step Selection Flow
 
-## Overview
-Implementing an enhanced hotel booking experience with a multi-step wizard flow that guides users through: Country Selection → Star Category Selection → Hotel Listings.
+# Hotel Bookings - Separate Page Implementation
 
-## Current State
-- The existing `HotelSection.tsx` uses tabs for Makkah/Madinah cities only
-- Hotels are stored in the `hotels` table with `city`, `star_rating`, and other fields
-- The current `city` field only supports "makkah" and "madinah" values
+## Problem
+Currently, when clicking "Hotel Bookings" from the services section on the home page, the hotel selection wizard appears as a full-screen overlay on top of the home page content. The user wants the hotel booking experience to open on its own dedicated page with a proper URL route.
 
-## Proposed Changes
+## Solution
+Create a dedicated `/hotels` page route that displays the hotel selection wizard as a standalone page, with proper navigation back to the home page.
 
-### 1. Database Schema Update
-Add a `country` column to the `hotels` table to support multiple countries (Saudi Arabia, Dubai, etc.):
+## Changes Required
 
-- Add `country` column (text, default "Saudi Arabia") to `hotels` table
-- Update existing hotels to have the default country value
-- This allows hotels to be grouped by country first
+### 1. Create New Hotels Page
+Create a new page component at `src/pages/Hotels.tsx` that:
+- Includes the Header component for consistent navigation
+- Renders the hotel selection wizard content
+- Uses a "Back to Home" navigation instead of a close button
+- Has a proper page layout (not an overlay)
 
-### 2. Update Admin Hotels Management
-Modify `AdminHotels.tsx` to:
-- Add a country dropdown when creating/editing hotels
-- Default options: "Saudi Arabia", "Dubai", "Malaysia", "Turkey" (configurable)
-- Filter hotels by country in the admin table
+### 2. Convert HotelSection to Page-Based Component
+Modify `src/components/HotelSection.tsx` to:
+- Remove the fixed overlay styling (`fixed inset-0 z-50`)
+- Convert to a regular page section layout
+- Replace the close button (X) with a "Back to Home" link
+- Keep all the multi-step wizard logic intact
 
-### 3. Redesign HotelSection Component
-Replace the current tab-based layout with a step-by-step wizard:
+### 3. Update ServicesOverview Navigation
+Modify `src/components/ServicesOverview.tsx` to:
+- Remove the `hotelSectionOpen` state and overlay rendering
+- Navigate to `/hotels` route when clicking the Hotel service
+- Use React Router's `useNavigate` hook for navigation
 
-**Step 1 - Country Selection**
-- Display country cards with flags/icons
-- Fetch unique countries from the database
-- Show hotel count per country
-
-**Step 2 - Star Category Selection**
-- Show 3/4/5 Star category cards
-- Back button to return to countries
-- Display hotel count per category
-
-**Step 3 - Hotel Listings**
-- Display hotels matching selected country + star rating
-- Back button to return to categories
-- Each hotel card shows: image, name, city, distance, facilities
-- Book Now button triggers the existing booking modal
-
-### 4. UI/UX Design
-- Use animated transitions between steps (framer-motion)
-- Consistent styling with the existing design system
-- Mobile-responsive layout (grid cols adjust by screen size)
-- Visual breadcrumb showing current step
+### 4. Add Route to App.tsx
+Add a new route `/hotels` that renders the Hotels page.
 
 ## Technical Details
 
-### Database Migration
-```sql
-ALTER TABLE hotels 
-ADD COLUMN country TEXT DEFAULT 'Saudi Arabia';
-```
-
-### Component Structure
-```text
-HotelSection.tsx
-├── Step 1: CountrySelector
-│   └── CountryCard[] (clickable cards)
-├── Step 2: CategorySelector
-│   └── CategoryCard[] (3/4/5 Star options)
-└── Step 3: HotelListings
-    └── HotelCard[] (existing component)
-```
-
-### State Management
-```typescript
-const [step, setStep] = useState<1 | 2 | 3>(1);
-const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-const [selectedStarRating, setSelectedStarRating] = useState<number | null>(null);
-```
+### Files to Create
+- `src/pages/Hotels.tsx` - New dedicated page for hotel bookings
 
 ### Files to Modify
-1. **Database**: Add migration for `country` column
-2. **`src/components/HotelSection.tsx`**: Complete rewrite with step-based flow
-3. **`src/components/admin/AdminHotels.tsx`**: Add country field in hotel form
+- `src/App.tsx` - Add `/hotels` route
+- `src/components/ServicesOverview.tsx` - Change from overlay to navigation
+- `src/components/HotelSection.tsx` - Convert from overlay to page content
 
-## Visual Flow
+### Navigation Flow
 ```text
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Select Country │ ──▶ │ Select Category │ ──▶ │   Hotel List    │
-│                 │     │                 │     │                 │
-│ Saudi Arabia    │     │   ⭐⭐⭐ 3 Star   │     │ [Hotel Card 1]  │
-│ Dubai           │     │   ⭐⭐⭐⭐ 4 Star  │     │ [Hotel Card 2]  │
-│ Malaysia        │     │   ⭐⭐⭐⭐⭐ 5 Star │     │ [Book Now]      │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-                        ← Back                  ← Back
+Home (/) → Click "Hotel Bookings" → Navigate to /hotels
+Hotels (/hotels) → Click "Back to Home" → Navigate to /
 ```
 
-## Estimated Scope
-- Database migration: 1 change
-- Admin panel update: 1 file
-- Hotel section rewrite: 1 file
-- Total implementation: ~200-300 lines of code changes
+## User Experience Improvements
+- Proper browser history - users can use back/forward buttons
+- Bookmarkable URL for the hotels page
+- Cleaner separation between home page and hotel booking
+- Better mobile experience without overlay z-index issues
+
