@@ -197,14 +197,26 @@ const OfferPopup = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
+                  className="flex flex-col sm:flex-row gap-3 justify-center items-center"
                 >
                   <Button 
                     onClick={handleButtonClick}
                     size="lg"
                     variant="secondary"
-                    className="mt-2 font-semibold px-8 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    className="font-semibold px-8 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all"
                   >
                     {settings.button_text} →
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setIsOpen(false);
+                      const element = document.querySelector("#contact");
+                      if (element) element.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    size="lg"
+                    className="font-semibold px-8 py-6 text-base rounded-xl bg-amber-500 hover:bg-amber-600 text-primary-foreground shadow-lg hover:shadow-xl transition-all"
+                  >
+                    Book Now →
                   </Button>
                 </motion.div>
               </div>
