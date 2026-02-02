@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface OfferPopupSettings {
@@ -22,16 +22,48 @@ interface OfferPopupSettings {
   overlay_opacity: number;
 }
 
+interface OfficeLocation {
+  id: string;
+  name: string;
+  address: string;
+  map_query: string | null;
+}
+
 const STORAGE_KEY = "offer_popup_shown";
 
 const OfferPopup = () => {
   const [settings, setSettings] = useState<OfferPopupSettings | null>(null);
+  const [offices, setOffices] = useState<OfficeLocation[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchSettings();
+    fetchOffices();
   }, []);
+
+  const fetchOffices = async () => {
+    const { data } = await supabase
+      .from("office_locations")
+      .select("id, name, address, map_query")
+      .eq("is_active", true)
+      .order("order_index");
+    
+    if (data) {
+      setOffices(data as OfficeLocation[]);
+    }
+  };
+
+  const getEmbedUrl = (mapQuery: string | null) => {
+    if (!mapQuery) return null;
+    // If it's already an embed URL or place ID
+    if (mapQuery.includes("maps.google.com/maps") || mapQuery.includes("google.com/maps/embed")) {
+      return mapQuery;
+    }
+    // Convert goo.gl links or coordinates to embed format
+    const query = encodeURIComponent(mapQuery);
+    return `https://maps.google.com/maps?q=${query}&output=embed`;
+  };
 
   useEffect(() => {
     if (!settings || !settings.is_enabled || loading) return;
@@ -108,117 +140,158 @@ const OfferPopup = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", duration: 0.5 }}
-              className="relative rounded-2xl overflow-hidden shadow-2xl"
-              style={{ 
-                backgroundColor: settings.background_color,
-                color: settings.text_color
-              }}
+              className="relative rounded-2xl overflow-hidden shadow-2xl bg-card max-h-[90vh] overflow-y-auto"
             >
               {/* Close Button */}
               <button
                 onClick={handleClose}
-                className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 transition-colors"
+                className="absolute top-3 right-3 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 transition-colors text-white"
                 aria-label="Close popup"
               >
                 <X className="w-4 h-4" />
               </button>
 
-              {/* Badge */}
-              {settings.badge_text && (
-                <div className="text-center py-3" style={{ backgroundColor: "rgba(0,0,0,0.2)" }}>
-                  <span className="text-sm font-medium tracking-wide">
-                    {settings.badge_text}
-                  </span>
+              {/* Office Maps Section - First View */}
+              {offices.length > 0 && (
+                <div className="p-4 pb-2">
+                  <div className="flex items-center gap-2 mb-3">
+                    <MapPin className="w-5 h-5 text-primary" />
+                    <h3 className="text-lg font-bold text-foreground">Visit Our Offices</h3>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {offices.map((office) => (
+                      <div key={office.id} className="rounded-xl overflow-hidden border border-border shadow-sm">
+                        <div className="bg-primary/10 px-3 py-2">
+                          <p className="font-semibold text-sm text-foreground">{office.name}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-1">{office.address}</p>
+                        </div>
+                        {office.map_query && (
+                          <iframe
+                            src={getEmbedUrl(office.map_query) || undefined}
+                            width="100%"
+                            height="150"
+                            style={{ border: 0 }}
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            title={`${office.name} Location`}
+                            className="w-full"
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
-              {/* Banner Image */}
-              {settings.image_url && (
-                <div className="relative h-40 sm:h-48 overflow-hidden">
-                  <img
-                    src={settings.image_url}
-                    alt="Offer Banner"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30" />
-                </div>
-              )}
+              {/* Divider */}
+              <div className="h-px bg-border mx-4" />
 
-              {/* Content */}
-              <div className="p-6 text-center space-y-4">
-                <motion.h2 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="text-2xl sm:text-3xl font-bold"
-                >
-                  ✨ {settings.title} ✨
-                </motion.h2>
-
-                {settings.subtitle && (
-                  <motion.p 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-base opacity-90 font-medium"
-                  >
-                    {settings.subtitle}
-                  </motion.p>
-                )}
-
-                {settings.description && (
-                  <motion.p 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="text-sm opacity-80 leading-relaxed"
-                  >
-                    {settings.description}
-                  </motion.p>
-                )}
-
-                {settings.discount_text && (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.4, type: "spring" }}
-                    className="py-3"
-                  >
-                    <span 
-                      className="inline-block px-6 py-2 rounded-full text-lg font-bold"
-                      style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
-                    >
-                      {settings.discount_text}
+              {/* Offer Content Section */}
+              <div 
+                className="rounded-xl mx-2 my-2 overflow-hidden"
+                style={{ 
+                  backgroundColor: settings.background_color,
+                  color: settings.text_color
+                }}
+              >
+                {/* Badge */}
+                {settings.badge_text && (
+                  <div className="text-center py-2" style={{ backgroundColor: "rgba(0,0,0,0.2)" }}>
+                    <span className="text-sm font-medium tracking-wide">
+                      {settings.badge_text}
                     </span>
-                  </motion.div>
+                  </div>
                 )}
 
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="flex flex-col sm:flex-row gap-3 justify-center items-center"
-                >
-                  <Button 
-                    onClick={handleButtonClick}
-                    size="lg"
-                    variant="secondary"
-                    className="font-semibold px-8 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all"
+                {/* Banner Image */}
+                {settings.image_url && (
+                  <div className="relative h-32 sm:h-40 overflow-hidden">
+                    <img
+                      src={settings.image_url}
+                      alt="Offer Banner"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30" />
+                  </div>
+                )}
+
+                {/* Content */}
+                <div className="p-4 text-center space-y-3">
+                  <motion.h2 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-xl sm:text-2xl font-bold"
                   >
-                    {settings.button_text} →
-                  </Button>
-                  <Button 
-                    onClick={() => {
-                      setIsOpen(false);
-                      const element = document.querySelector("#contact");
-                      if (element) element.scrollIntoView({ behavior: "smooth" });
-                    }}
-                    size="lg"
-                    className="font-semibold px-8 py-6 text-base rounded-xl bg-amber-500 hover:bg-amber-600 text-primary-foreground shadow-lg hover:shadow-xl transition-all"
+                    ✨ {settings.title} ✨
+                  </motion.h2>
+
+                  {settings.subtitle && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="text-sm opacity-90 font-medium"
+                    >
+                      {settings.subtitle}
+                    </motion.p>
+                  )}
+
+                  {settings.description && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="text-xs opacity-80 leading-relaxed"
+                    >
+                      {settings.description}
+                    </motion.p>
+                  )}
+
+                  {settings.discount_text && (
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.4, type: "spring" }}
+                      className="py-2"
+                    >
+                      <span 
+                        className="inline-block px-4 py-1.5 rounded-full text-base font-bold"
+                        style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
+                      >
+                        {settings.discount_text}
+                      </span>
+                    </motion.div>
+                  )}
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="flex flex-col sm:flex-row gap-2 justify-center items-center pt-2"
                   >
-                    Book Now →
-                  </Button>
-                </motion.div>
+                    <Button 
+                      onClick={handleButtonClick}
+                      size="default"
+                      variant="secondary"
+                      className="font-semibold px-6 py-5 text-sm rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    >
+                      {settings.button_text} →
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        setIsOpen(false);
+                        const element = document.querySelector("#contact");
+                        if (element) element.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      size="default"
+                      className="font-semibold px-6 py-5 text-sm rounded-xl bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-lg hover:shadow-xl transition-all"
+                    >
+                      Book Now →
+                    </Button>
+                  </motion.div>
+                </div>
               </div>
             </motion.div>
           </DialogContent>
