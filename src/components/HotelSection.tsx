@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, X, Star, Globe, Building2 } from "lucide-react";
+import { ArrowLeft, X, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import HotelCard from "./HotelCard";
 import HotelDetailsModal from "./HotelDetailsModal";
 import HotelBookingModal from "./HotelBookingModal";
 
@@ -31,29 +29,51 @@ interface SectionSettings {
   is_enabled: boolean;
   booking_enabled: boolean;
   star_label: string;
-  show_map_button: boolean;
-  show_details_button: boolean;
 }
 
 interface HotelSectionProps {
   onClose: () => void;
 }
 
-type Step = 1 | 2 | 3;
+// Demo fallback data
+const DEMO_HOTELS: Record<string, Record<string, { name: string; city: string; price: string }[]>> = {
+  "Saudi Arabia": {
+    "3": [
+      { name: "Al Ebaa Hotel", city: "Makkah", price: "$80/night" },
+      { name: "Diyar Al Salam", city: "Madinah", price: "$75/night" }
+    ],
+    "4": [
+      { name: "Elaf Ajyad Hotel", city: "Makkah", price: "$120/night" },
+      { name: "Saja Al Madinah", city: "Madinah", price: "$110/night" }
+    ],
+    "5": [
+      { name: "Swissotel Makkah", city: "Makkah", price: "$250/night" },
+      { name: "Anwar Al Madinah Mövenpick", city: "Madinah", price: "$230/night" }
+    ]
+  },
+  "Dubai": {
+    "3": [
+      { name: "Citymax Hotel", city: "Dubai", price: "$70/night" }
+    ],
+    "4": [
+      { name: "Golden Tulip Deira", city: "Dubai", price: "$130/night" }
+    ],
+    "5": [
+      { name: "Atlantis The Palm", city: "Dubai", price: "$450/night" }
+    ]
+  }
+};
 
 const COUNTRY_FLAGS: Record<string, string> = {
   "Saudi Arabia": "🇸🇦",
   "Dubai": "🇦🇪",
   "Malaysia": "🇲🇾",
   "Turkey": "🇹🇷",
-  "Indonesia": "🇮🇩",
-  "Egypt": "🇪🇬",
 };
 
 const HotelSection = ({ onClose }: HotelSectionProps) => {
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState<Step>(1);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [selectedStarRating, setSelectedStarRating] = useState<number | null>(null);
   const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
@@ -65,9 +85,9 @@ const HotelSection = ({ onClose }: HotelSectionProps) => {
     is_enabled: true,
     booking_enabled: true,
     star_label: "Star",
-    show_map_button: true,
-    show_details_button: true,
   });
+
+  const useDemoData = hotels.length === 0 && !loading;
 
   useEffect(() => {
     fetchHotels();
@@ -88,8 +108,6 @@ const HotelSection = ({ onClose }: HotelSectionProps) => {
         is_enabled: data.is_enabled ?? true,
         booking_enabled: data.booking_enabled ?? true,
         star_label: data.star_label || "Star",
-        show_map_button: data.show_map_button ?? true,
-        show_details_button: data.show_details_button ?? true,
       });
     }
   };
@@ -109,23 +127,23 @@ const HotelSection = ({ onClose }: HotelSectionProps) => {
     setLoading(false);
   };
 
-  // Get unique countries with hotel counts
-  const countries = hotels.reduce((acc, hotel) => {
-    const country = hotel.country || "Saudi Arabia";
-    acc[country] = (acc[country] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  // Get countries from database or demo data
+  const getCountries = () => {
+    if (useDemoData) {
+      return Object.keys(DEMO_HOTELS);
+    }
+    const countrySet = new Set(hotels.map(h => h.country || "Saudi Arabia"));
+    return Array.from(countrySet);
+  };
 
-  // Get star ratings for selected country with counts
+  // Get star ratings for selected country
   const getStarRatings = () => {
+    if (useDemoData && selectedCountry) {
+      return Object.keys(DEMO_HOTELS[selectedCountry] || {}).map(r => parseInt(r));
+    }
     const filtered = hotels.filter(h => (h.country || "Saudi Arabia") === selectedCountry);
-    const ratings: Record<number, number> = {};
-    filtered.forEach(h => {
-      ratings[h.star_rating] = (ratings[h.star_rating] || 0) + 1;
-    });
-    return Object.entries(ratings)
-      .map(([rating, count]) => ({ rating: parseInt(rating), count }))
-      .sort((a, b) => a.rating - b.rating);
+    const ratings = new Set(filtered.map(h => h.star_rating));
+    return Array.from(ratings).sort((a, b) => a - b);
   };
 
   // Get hotels for selected country and star rating
@@ -135,40 +153,15 @@ const HotelSection = ({ onClose }: HotelSectionProps) => {
     );
   };
 
-  const handleCountrySelect = (country: string) => {
-    setSelectedCountry(country);
-    setStep(2);
-  };
-
-  const handleStarSelect = (rating: number) => {
-    setSelectedStarRating(rating);
-    setStep(3);
-  };
-
-  const handleBack = () => {
-    if (step === 2) {
-      setSelectedCountry(null);
-      setStep(1);
-    } else if (step === 3) {
-      setSelectedStarRating(null);
-      setStep(2);
-    }
-  };
-
-  const handleViewDetails = (hotel: Hotel) => {
-    setSelectedHotel(hotel);
-    setDetailsModalOpen(true);
+  // Get demo hotels for selected country and star rating
+  const getDemoHotels = () => {
+    if (!selectedCountry || !selectedStarRating) return [];
+    return DEMO_HOTELS[selectedCountry]?.[String(selectedStarRating)] || [];
   };
 
   const handleBookNow = (hotel: Hotel) => {
     setSelectedHotel(hotel);
     setBookingModalOpen(true);
-  };
-
-  const handleViewMap = (hotel: Hotel) => {
-    if (hotel.google_map_link) {
-      window.open(hotel.google_map_link, "_blank");
-    }
   };
 
   if (loading) {
@@ -179,213 +172,160 @@ const HotelSection = ({ onClose }: HotelSectionProps) => {
     );
   }
 
-  const filteredHotels = getFilteredHotels();
+  const countries = getCountries();
   const starRatings = getStarRatings();
+  const filteredHotels = getFilteredHotels();
+  const demoHotels = getDemoHotels();
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-background overflow-auto"
+      className="fixed inset-0 z-50 bg-muted/50 overflow-auto"
     >
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
-        <div className="container py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {step > 1 && (
-                <Button variant="ghost" size="icon" onClick={handleBack}>
-                  <ArrowLeft className="h-5 w-5" />
-                </Button>
-              )}
-              <div>
-                <h1 className="font-heading text-2xl md:text-3xl font-bold">
-                  {settings.title}
-                </h1>
-                <p className="text-muted-foreground text-sm mt-1">
-                  {settings.subtitle}
-                </p>
-              </div>
-            </div>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 mt-4 text-sm">
-            <span className={step === 1 ? "text-primary font-medium" : "text-muted-foreground"}>
-              Country
-            </span>
-            <span className="text-muted-foreground">/</span>
-            <span className={step === 2 ? "text-primary font-medium" : "text-muted-foreground"}>
-              Category
-            </span>
-            <span className="text-muted-foreground">/</span>
-            <span className={step === 3 ? "text-primary font-medium" : "text-muted-foreground"}>
-              Hotels
-            </span>
-          </div>
+      <div className="sticky top-0 z-10 bg-background border-b">
+        <div className="container py-4 flex items-center justify-between">
+          <h1 className="text-2xl md:text-3xl font-bold text-primary">
+            {settings.title}
+          </h1>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-5 w-5" />
+          </Button>
         </div>
       </div>
 
       <div className="container py-8">
         <AnimatePresence mode="wait">
           {/* Step 1: Country Selection */}
-          {step === 1 && (
+          {!selectedCountry && (
             <motion.div
               key="step1"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
             >
-              <div className="text-center mb-8">
-                <h2 className="font-heading text-xl md:text-2xl font-semibold">
-                  Select Destination Country
-                </h2>
-                <p className="text-muted-foreground text-sm mt-2">
-                  Choose your preferred destination to explore hotels
-                </p>
+              <h2 className="text-xl font-semibold mb-6">Select Destination Country</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {countries.map((country) => (
+                  <button
+                    key={country}
+                    onClick={() => setSelectedCountry(country)}
+                    className="bg-card p-6 shadow-md rounded-xl hover:bg-primary/10 transition-colors text-left"
+                  >
+                    <span className="text-3xl mb-2 block">{COUNTRY_FLAGS[country] || "🌍"}</span>
+                    <span className="font-medium">{country}</span>
+                  </button>
+                ))}
               </div>
-
-              {Object.keys(countries).length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  No hotels available at the moment.
-                </div>
-              ) : (
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-5xl mx-auto">
-                  {Object.entries(countries).map(([country, count], index) => (
-                    <motion.div
-                      key={country}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                    >
-                      <Card
-                        className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all duration-300 group"
-                        onClick={() => handleCountrySelect(country)}
-                      >
-                        <CardContent className="p-6 text-center">
-                          <div className="text-5xl mb-4">
-                            {COUNTRY_FLAGS[country] || <Globe className="h-12 w-12 mx-auto text-primary" />}
-                          </div>
-                          <h3 className="font-heading font-semibold text-lg group-hover:text-primary transition-colors">
-                            {country}
-                          </h3>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {count} {count === 1 ? "hotel" : "hotels"}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
             </motion.div>
           )}
 
           {/* Step 2: Star Category Selection */}
-          {step === 2 && selectedCountry && (
+          {selectedCountry && !selectedStarRating && (
             <motion.div
               key="step2"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
             >
-              <div className="text-center mb-8">
-                <h2 className="font-heading text-xl md:text-2xl font-semibold">
-                  {selectedCountry} - Select Hotel Category
-                </h2>
-                <p className="text-muted-foreground text-sm mt-2">
-                  Choose your preferred star rating
-                </p>
+              <button
+                onClick={() => setSelectedCountry(null)}
+                className="mb-4 text-muted-foreground flex items-center gap-1 hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" /> Back
+              </button>
+              <h2 className="text-xl font-semibold mb-6">
+                {selectedCountry} - Select Category
+              </h2>
+              <div className="grid grid-cols-3 gap-4 max-w-2xl">
+                {starRatings.map((rating) => (
+                  <button
+                    key={rating}
+                    onClick={() => setSelectedStarRating(rating)}
+                    className="bg-card p-6 shadow-md rounded-xl hover:bg-primary/10 transition-colors"
+                  >
+                    <div className="flex justify-center gap-0.5 mb-2">
+                      {Array.from({ length: rating }).map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-primary text-primary" />
+                      ))}
+                    </div>
+                    <span className="font-medium">{rating} {settings.star_label}</span>
+                  </button>
+                ))}
               </div>
-
-              {starRatings.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  No hotels available in {selectedCountry}.
-                </div>
-              ) : (
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                  {starRatings.map(({ rating, count }, index) => (
-                    <motion.div
-                      key={rating}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                    >
-                      <Card
-                        className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all duration-300 group"
-                        onClick={() => handleStarSelect(rating)}
-                      >
-                        <CardContent className="p-6 text-center">
-                          <div className="flex justify-center gap-1 mb-4">
-                            {Array.from({ length: rating }).map((_, i) => (
-                              <Star
-                                key={i}
-                                className="h-6 w-6 fill-primary text-primary"
-                              />
-                            ))}
-                          </div>
-                          <h3 className="font-heading font-semibold text-lg group-hover:text-primary transition-colors">
-                            {rating} {settings.star_label}
-                          </h3>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {count} {count === 1 ? "hotel" : "hotels"}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
             </motion.div>
           )}
 
           {/* Step 3: Hotel Listings */}
-          {step === 3 && selectedCountry && selectedStarRating && (
+          {selectedCountry && selectedStarRating && (
             <motion.div
               key="step3"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
             >
-              <div className="text-center mb-8">
-                <h2 className="font-heading text-xl md:text-2xl font-semibold flex items-center justify-center gap-2">
-                  <span>{selectedStarRating} {settings.star_label}</span>
-                  <span className="text-muted-foreground">Hotels in</span>
-                  <span>{selectedCountry}</span>
-                </h2>
-                <p className="text-muted-foreground text-sm mt-2">
-                  {filteredHotels.length} {filteredHotels.length === 1 ? "hotel" : "hotels"} available
-                </p>
-              </div>
+              <button
+                onClick={() => setSelectedStarRating(null)}
+                className="mb-4 text-muted-foreground flex items-center gap-1 hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" /> Back
+              </button>
+              <h2 className="text-xl font-semibold mb-6">
+                {selectedStarRating} {settings.star_label} Hotels in {selectedCountry}
+              </h2>
 
-              {filteredHotels.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  No hotels found for this selection.
-                </div>
-              ) : (
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {filteredHotels.map((hotel, index) => (
-                    <HotelCard
-                      key={hotel.id}
-                      hotel={hotel}
-                      index={index}
-                      starLabel={settings.star_label}
-                      showDetailsButton={settings.show_details_button}
-                      showMapButton={settings.show_map_button}
-                      bookingEnabled={settings.booking_enabled}
-                      onViewDetails={() => handleViewDetails(hotel)}
-                      onViewMap={() => handleViewMap(hotel)}
-                      onBookNow={() => handleBookNow(hotel)}
-                    />
+              {/* Database Hotels */}
+              {filteredHotels.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredHotels.map((hotel) => (
+                    <div key={hotel.id} className="bg-card p-6 shadow-lg rounded-xl">
+                      {hotel.images?.[0] && (
+                        <img
+                          src={hotel.images[0]}
+                          alt={hotel.name}
+                          className="w-full h-40 object-cover rounded-lg mb-4"
+                        />
+                      )}
+                      <h3 className="text-lg font-bold">{hotel.name}</h3>
+                      <p className="text-muted-foreground">{hotel.city}</p>
+                      {hotel.description && (
+                        <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                          {hotel.description}
+                        </p>
+                      )}
+                      {settings.booking_enabled && (
+                        <Button
+                          className="mt-4 w-full"
+                          onClick={() => handleBookNow(hotel)}
+                        >
+                          Book Now
+                        </Button>
+                      )}
+                    </div>
                   ))}
                 </div>
+              )}
+
+              {/* Demo Hotels (when no database hotels) */}
+              {filteredHotels.length === 0 && demoHotels.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {demoHotels.map((hotel, index) => (
+                    <div key={index} className="bg-card p-6 shadow-lg rounded-xl">
+                      <h3 className="text-lg font-bold">{hotel.name}</h3>
+                      <p className="text-muted-foreground">{hotel.city}</p>
+                      <p className="text-primary font-semibold mt-2">{hotel.price}</p>
+                      <Button className="mt-4 w-full">Book Now</Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {filteredHotels.length === 0 && demoHotels.length === 0 && (
+                <p className="text-muted-foreground text-center py-12">
+                  No hotels available for this selection.
+                </p>
               )}
             </motion.div>
           )}
