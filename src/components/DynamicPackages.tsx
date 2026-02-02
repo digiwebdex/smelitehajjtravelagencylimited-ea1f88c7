@@ -179,7 +179,7 @@ const ExpandablePackageCard = ({
                 </Badge>
               </div>
               
-              <h3 className="font-display text-base sm:text-xl font-bold tracking-wide mb-2 sm:mb-3 text-white line-clamp-2">{pkg.title}</h3>
+              <h3 className="font-display text-base sm:text-xl font-medium tracking-wide mb-2 sm:mb-3 text-white line-clamp-2">{pkg.title}</h3>
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <Badge variant="secondary" className="bg-white/20 text-white border-0 whitespace-nowrap text-[10px] sm:text-xs">
                   {pkg.duration_days} Days
