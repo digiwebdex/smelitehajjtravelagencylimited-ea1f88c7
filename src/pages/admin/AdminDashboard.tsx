@@ -71,6 +71,7 @@ import AdminHotels from "@/components/admin/AdminHotels";
 import AdminHotelBookings from "@/components/admin/AdminHotelBookings";
 import AdminHotelSettings from "@/components/admin/AdminHotelSettings";
 import AdminOfferPopup from "@/components/admin/AdminOfferPopup";
+import AdminDemoAccount from "@/components/admin/AdminDemoAccount";
 import { formatCurrency } from "@/lib/currency";
 
 interface Stats {
@@ -295,6 +296,8 @@ const AdminDashboard = () => {
         return <AdminLegalPages />;
       case "backup":
         return <AdminBackupRestore />;
+      case "demo-account":
+        return <AdminDemoAccount />;
       case "settings":
         return <AdminSettings />;
       default:

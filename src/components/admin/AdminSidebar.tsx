@@ -30,6 +30,7 @@ import {
   Receipt,
   Plane,
   Mail,
+  Eye,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -159,6 +160,7 @@ const menuGroups = [
     label: "System",
     items: [
       { value: "backup", label: "Backup & Restore", icon: Shield },
+      { value: "demo-account", label: "Demo Account", icon: Eye },
       { value: "settings", label: "Settings", icon: Settings },
     ]
   },
