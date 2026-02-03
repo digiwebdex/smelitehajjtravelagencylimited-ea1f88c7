@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,13 +64,57 @@ interface Hotel {
   order_index: number;
 }
 
-const COUNTRY_OPTIONS = [
+const COUNTRY_SUGGESTIONS = [
   "Saudi Arabia",
+  "United Arab Emirates",
   "Dubai",
   "Malaysia",
   "Turkey",
   "Indonesia",
   "Egypt",
+  "Qatar",
+  "Kuwait",
+  "Bahrain",
+  "Oman",
+  "Jordan",
+  "Morocco",
+  "Tunisia",
+  "Singapore",
+  "Thailand",
+  "Bangladesh",
+  "India",
+  "Pakistan",
+];
+
+const CITY_SUGGESTIONS = [
+  "Makkah",
+  "Madinah",
+  "Jeddah",
+  "Riyadh",
+  "Dubai",
+  "Abu Dhabi",
+  "Sharjah",
+  "Doha",
+  "Kuwait City",
+  "Manama",
+  "Muscat",
+  "Amman",
+  "Istanbul",
+  "Ankara",
+  "Kuala Lumpur",
+  "Jakarta",
+  "Cairo",
+  "Alexandria",
+  "Casablanca",
+  "Tunis",
+  "Singapore",
+  "Bangkok",
+  "Dhaka",
+  "Chittagong",
+  "Delhi",
+  "Mumbai",
+  "Karachi",
+  "Lahore",
 ];
 
 interface SectionSettings {
@@ -670,45 +715,28 @@ const AdminHotels = () => {
               </div>
               <div className="space-y-2">
                 <Label>Country *</Label>
-                <Select
+                <AutocompleteInput
                   value={formData.country}
-                  onValueChange={(value) =>
+                  onChange={(value) =>
                     setFormData({ ...formData, country: value })
                   }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COUNTRY_OPTIONS.map(country => (
-                      <SelectItem key={country} value={country}>{country}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  suggestions={COUNTRY_SUGGESTIONS}
+                  placeholder="Type country name..."
+                />
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>City *</Label>
-                <Select
+                <AutocompleteInput
                   value={formData.city}
-                  onValueChange={(value) =>
+                  onChange={(value) =>
                     setFormData({ ...formData, city: value })
                   }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="makkah">Makkah</SelectItem>
-                    <SelectItem value="madinah">Madinah</SelectItem>
-                    <SelectItem value="dubai">Dubai</SelectItem>
-                    <SelectItem value="kuala-lumpur">Kuala Lumpur</SelectItem>
-                    <SelectItem value="istanbul">Istanbul</SelectItem>
-                    <SelectItem value="cairo">Cairo</SelectItem>
-                  </SelectContent>
-                </Select>
+                  suggestions={CITY_SUGGESTIONS}
+                  placeholder="Type city name..."
+                />
               </div>
             </div>
 
