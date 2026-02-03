@@ -174,7 +174,7 @@ const ExpandablePackageCard = ({
                     <Moon className="w-3 h-3 sm:w-4 sm:h-4 text-secondary-foreground fill-secondary-foreground" />
                   )}
                 </div>
-                <Badge variant="secondary" className="bg-white/20 text-white border-0 uppercase text-[10px] sm:text-xs font-bold tracking-wide">
+                <Badge variant="secondary" className="bg-white/20 text-white border-0 uppercase text-[10px] sm:text-xs font-medium tracking-wide">
                   {pkg.type}
                 </Badge>
               </div>
