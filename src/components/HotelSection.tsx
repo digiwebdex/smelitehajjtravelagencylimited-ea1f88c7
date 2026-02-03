@@ -273,7 +273,7 @@ const HotelSection = () => {
   return (
     <div className="min-h-[60vh]">
       {/* Page Header with Back Navigation */}
-      <div className="bg-muted/30 border-b py-4">
+      <div className="bg-muted/30 border-b py-4 pt-24">
         <div className="container">
           <Button
             variant="outline"
