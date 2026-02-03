@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense, memo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { 
   Phone, Mail, Facebook, Instagram, Youtube, Twitter, Building2, Building,
   Linkedin, MessageCircle, Send, Music, Globe, ExternalLink, Camera, Video, Rss, Twitch, Github
@@ -52,6 +52,8 @@ interface FooterContent {
 }
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const currentYear = new Date().getFullYear();
   const { companyInfo, contactDetails, socialLinks } = useSiteSettings();
   
@@ -286,17 +288,53 @@ const Footer = () => {
               Our Services
             </h4>
             <ul className="space-y-3">
-              {content.services_links.map((service) => (
-                <li key={service.label}>
-                  <a
-                    href={service.href}
-                    className="text-primary-foreground/80 hover:text-secondary transition-colors text-sm flex items-center gap-2 group"
-                  >
-                    <span className="w-1.5 h-1.5 bg-secondary/50 rounded-full group-hover:bg-secondary transition-colors" />
-                    {service.label}
-                  </a>
-                </li>
-              ))}
+              {content.services_links.map((service) => {
+                const isExternalOrHash = service.href.startsWith('#') || service.href.startsWith('http');
+                const isHashRoute = service.href.startsWith('/#');
+                
+                const handleClick = (e: React.MouseEvent) => {
+                  if (isHashRoute) {
+                    e.preventDefault();
+                    const hash = service.href.substring(1); // Remove leading /
+                    if (location.pathname !== '/') {
+                      navigate('/' + hash);
+                    } else {
+                      const element = document.querySelector(hash);
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }
+                  }
+                };
+                
+                if (!isExternalOrHash && !isHashRoute) {
+                  // Internal route like /hotels
+                  return (
+                    <li key={service.label}>
+                      <Link
+                        to={service.href}
+                        className="text-primary-foreground/80 hover:text-secondary transition-colors text-sm flex items-center gap-2 group"
+                      >
+                        <span className="w-1.5 h-1.5 bg-secondary/50 rounded-full group-hover:bg-secondary transition-colors" />
+                        {service.label}
+                      </Link>
+                    </li>
+                  );
+                }
+                
+                return (
+                  <li key={service.label}>
+                    <a
+                      href={isHashRoute ? service.href.substring(1) : service.href}
+                      onClick={handleClick}
+                      className="text-primary-foreground/80 hover:text-secondary transition-colors text-sm flex items-center gap-2 group"
+                    >
+                      <span className="w-1.5 h-1.5 bg-secondary/50 rounded-full group-hover:bg-secondary transition-colors" />
+                      {service.label}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
