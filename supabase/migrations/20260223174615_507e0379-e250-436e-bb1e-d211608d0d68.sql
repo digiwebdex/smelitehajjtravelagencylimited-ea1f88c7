@@ -1,0 +1,1 @@
+ALTER TABLE public.hotels ADD COLUMN IF NOT EXISTS price_per_night numeric DEFAULT NULL;

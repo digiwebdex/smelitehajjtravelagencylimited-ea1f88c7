@@ -1,4 +1,5 @@
 import { Star, MapPin, Eye, Map, CalendarCheck } from "lucide-react";
+import { formatCurrency } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,7 @@ interface Hotel {
   facilities: string[];
   images: string[];
   google_map_link: string | null;
+  price_per_night: number | null;
 }
 
 interface HotelCardProps {
@@ -87,12 +89,20 @@ const HotelCard = ({
         </div>
 
         <CardContent className="flex-1 p-4 flex flex-col">
-          <h3 className="font-heading font-semibold text-lg line-clamp-1 mb-1">
-            {hotel.name}
-          </h3>
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <h3 className="font-heading font-semibold text-lg line-clamp-1 flex-1">
+              {hotel.name}
+            </h3>
+            {hotel.price_per_night && (
+              <span className="text-secondary font-bold text-lg whitespace-nowrap">
+                {formatCurrency(hotel.price_per_night)}
+              </span>
+            )}
+          </div>
           
           <p className="text-xs text-muted-foreground mb-2">
             {hotel.star_rating} {starLabel} • {formatDistance(hotel.distance_from_haram)} from Haram
+            {hotel.price_per_night && <span> • per night</span>}
           </p>
 
           {hotel.description && (

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Star, Home, MapPin } from "lucide-react";
+import { formatCurrency } from "@/lib/currency";
 import { motion, AnimatePresence } from "framer-motion";
 import HotelDetailsModal from "./HotelDetailsModal";
 import HotelBookingModal from "./HotelBookingModal";
@@ -23,6 +24,7 @@ interface Hotel {
   contact_phone: string | null;
   contact_email: string | null;
   is_active: boolean;
+  price_per_night: number | null;
 }
 
 interface SectionSettings {
@@ -283,6 +285,7 @@ const HotelSection = () => {
       contact_phone: null,
       contact_email: null,
       is_active: true,
+      price_per_night: null,
     };
     setSelectedHotel(tempHotel);
     setBookingModalOpen(true);
@@ -426,6 +429,11 @@ const HotelSection = () => {
                       )}
                       <h3 className="text-lg font-bold">{hotel.name}</h3>
                       <p className="text-muted-foreground">{hotel.city}</p>
+                      {hotel.price_per_night && (
+                        <p className="text-secondary font-bold text-lg mt-1">
+                          {formatCurrency(hotel.price_per_night)}<span className="text-sm font-normal text-muted-foreground">/night</span>
+                        </p>
+                      )}
                       {hotel.description && (
                         <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
                           {hotel.description}
