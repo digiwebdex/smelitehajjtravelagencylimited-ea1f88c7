@@ -41,6 +41,7 @@ interface Package {
   stock: number;
   show_view_details: boolean;
   show_book_now: boolean;
+  pdf_url: string | null;
 }
 
 interface DynamicPackagesProps {

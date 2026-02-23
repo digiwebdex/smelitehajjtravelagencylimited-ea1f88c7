@@ -2110,6 +2110,7 @@ export type Database = {
           is_featured: boolean | null
           max_installment_months: number | null
           min_down_payment_percent: number | null
+          pdf_url: string | null
           price: number
           show_book_now: boolean | null
           show_view_details: boolean | null
@@ -2143,6 +2144,7 @@ export type Database = {
           is_featured?: boolean | null
           max_installment_months?: number | null
           min_down_payment_percent?: number | null
+          pdf_url?: string | null
           price: number
           show_book_now?: boolean | null
           show_view_details?: boolean | null
@@ -2176,6 +2178,7 @@ export type Database = {
           is_featured?: boolean | null
           max_installment_months?: number | null
           min_down_payment_percent?: number | null
+          pdf_url?: string | null
           price?: number
           show_book_now?: boolean | null
           show_view_details?: boolean | null

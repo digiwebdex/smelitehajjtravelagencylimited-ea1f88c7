@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Check, X, Star, Calendar, Hotel, Plane, Bus, FileText, MapPin, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { Check, X, Star, Calendar, Hotel, Plane, Bus, FileText, MapPin, ChevronLeft, ChevronRight, ExternalLink, Download } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFacebookPixel } from "@/hooks/useFacebookPixel";
@@ -29,6 +29,7 @@ interface PackageDetails {
   special_notes: string | null;
   stock: number;
   show_book_now: boolean;
+  pdf_url: string | null;
 }
 
 interface PackageDetailsModalProps {
@@ -426,6 +427,21 @@ const PackageDetailsModal = ({ isOpen, onClose, package_info, onBookNow }: Packa
                     <p className="text-sm text-foreground whitespace-pre-line">
                       {package_info.special_notes}
                     </p>
+                  </div>
+                )}
+
+                {/* Download PDF */}
+                {package_info.pdf_url && (
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                    <a
+                      href={package_info.pdf_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium"
+                    >
+                      <Download className="w-5 h-5" />
+                      Download Package Brochure (PDF)
+                    </a>
                   </div>
                 )}
 
