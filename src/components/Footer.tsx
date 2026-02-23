@@ -246,8 +246,8 @@ const Footer = () => {
         <div className="absolute inset-0 geometric-pattern" />
       </div>
 
-      <div className="container py-20 relative z-10">
-        <div className="grid md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] gap-12">
+      <div className="container py-12 sm:py-16 lg:py-20 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] gap-8 lg:gap-12">
           {/* About */}
           <div>
             <div className="flex items-center gap-3 mb-6">
@@ -426,11 +426,11 @@ const Footer = () => {
 
       {/* Bottom Bar */}
       <div className="border-t border-primary-foreground/10 relative z-10">
-        <div className="container py-6 pb-20 lg:pb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-primary-foreground/70 text-sm text-center md:text-left">
+        <div className="container py-4 sm:py-6 pb-20 lg:pb-6 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
+          <p className="text-primary-foreground/70 text-xs sm:text-sm text-center md:text-left">
             {displayCopyright}
           </p>
-          <div className="flex gap-6 text-sm">
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-6 text-xs sm:text-sm">
             <Link to="/legal/privacy-policy" className="text-primary-foreground/70 hover:text-secondary transition-colors">
               Privacy Policy
             </Link>

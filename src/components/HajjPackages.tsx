@@ -56,14 +56,14 @@ const HajjPackages = () => {
 
   return (
     <IslamicBorder>
-      <section id="hajj" className="py-24 bg-muted relative overflow-hidden">
+      <section id="hajj" className="py-12 sm:py-16 lg:py-24 bg-muted relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent" />
         </div>
         
         <div className="container relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 items-center mb-16">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center mb-12 lg:mb-16">
             {/* Image on LEFT */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -88,10 +88,10 @@ const HajjPackages = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
-                className="absolute -bottom-8 -right-8 bg-secondary text-secondary-foreground p-6 rounded-2xl shadow-gold"
+                className="absolute -bottom-4 right-2 sm:-bottom-8 sm:-right-8 bg-secondary text-secondary-foreground p-3 sm:p-6 rounded-xl sm:rounded-2xl shadow-gold z-10"
               >
-                <div className="font-heading text-3xl font-bold">{settings.success_rate}</div>
-                <div className="text-sm font-medium">Success Rate</div>
+                <div className="font-heading text-xl sm:text-3xl font-bold">{settings.success_rate}</div>
+                <div className="text-xs sm:text-sm font-medium">Success Rate</div>
               </motion.div>
               
               {/* Another floating element */}
@@ -100,10 +100,10 @@ const HajjPackages = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.4 }}
-                className="absolute -top-4 -left-4 bg-card text-foreground p-4 rounded-xl shadow-elegant"
+                className="absolute -top-2 left-2 sm:-top-4 sm:-left-4 bg-card text-foreground p-2 sm:p-4 rounded-lg sm:rounded-xl shadow-elegant hidden xs:block"
               >
-                <div className="text-2xl mb-1">🕋</div>
-                <div className="text-xs font-medium">Hotels Near<br />Masjid al-Haram</div>
+                <div className="text-lg sm:text-2xl mb-1">🕋</div>
+                <div className="text-[10px] sm:text-xs font-medium">Hotels Near<br />Masjid al-Haram</div>
               </motion.div>
             </motion.div>
 
@@ -119,7 +119,7 @@ const HajjPackages = () => {
                 <Calendar className="w-4 h-4" />
                 {settings.badge_text}
               </span>
-              <h2 className="font-calligraphy text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mt-3 mb-4">
+              <h2 className="font-calligraphy text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mt-3 mb-4">
                 {settings.title}
               </h2>
               <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">{settings.subtitle}</span>
@@ -127,7 +127,7 @@ const HajjPackages = () => {
                 {settings.description}
               </p>
               
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-3 sm:gap-6">
                 {settings.stats.map((stat, index) => (
                   <motion.div
                     key={stat.label}
@@ -145,9 +145,9 @@ const HajjPackages = () => {
                       scale: { duration: 0.2 },
                       y: { duration: 0.2 }
                     }}
-                    className={`bg-gradient-to-br ${index === 0 ? 'from-primary/10 to-primary/5 border-primary/10' : 'from-secondary/10 to-secondary/5 border-secondary/10'} rounded-2xl p-6 border cursor-pointer`}
+                    className={`bg-gradient-to-br ${index === 0 ? 'from-primary/10 to-primary/5 border-primary/10' : 'from-secondary/10 to-secondary/5 border-secondary/10'} rounded-xl sm:rounded-2xl p-3 sm:p-6 border cursor-pointer`}
                   >
-                    <div className={`font-heading text-4xl font-bold ${index === 0 ? 'text-primary' : 'text-secondary'} mb-1`}>{stat.value}</div>
+                    <div className={`font-heading text-2xl sm:text-4xl font-bold ${index === 0 ? 'text-primary' : 'text-secondary'} mb-1`}>{stat.value}</div>
                     <div className="text-sm text-muted-foreground">{stat.label}</div>
                   </motion.div>
                 ))}

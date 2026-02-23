@@ -111,7 +111,7 @@ const ContactSection = () => {
 
   return (
     <IslamicBorder variant="top">
-      <section id="contact" className="py-24 bg-muted geometric-pattern relative overflow-hidden">
+      <section id="contact" className="py-12 sm:py-16 lg:py-24 bg-muted geometric-pattern relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-secondary/5 rounded-full blur-3xl" />
@@ -127,7 +127,7 @@ const ContactSection = () => {
             <MessageSquare className="w-4 h-4" />
             Get In Touch
           </span>
-          <h2 className="font-calligraphy text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mt-3 mb-4">
+          <h2 className="font-calligraphy text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mt-3 mb-4">
             Contact Us
           </h2>
           <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">اتصل بنا</span>

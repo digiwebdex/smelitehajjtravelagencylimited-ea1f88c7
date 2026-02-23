@@ -115,7 +115,7 @@ const TestimonialsSection = () => {
 
   return (
     <IslamicBorder>
-      <section className="py-24 bg-gradient-to-b from-background to-muted overflow-hidden">
+      <section className="py-12 sm:py-16 lg:py-24 bg-gradient-to-b from-background to-muted overflow-hidden">
       <div className="container">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
@@ -127,7 +127,7 @@ const TestimonialsSection = () => {
           <span className="text-secondary font-semibold uppercase tracking-wider">
             {sectionHeader.badge_text}
           </span>
-          <h2 className="font-calligraphy text-4xl md:text-5xl font-bold text-foreground mt-3 mb-4">
+          <h2 className="font-calligraphy text-2xl sm:text-4xl md:text-5xl font-bold text-foreground mt-3 mb-4">
             {sectionHeader.title}
           </h2>
           <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">{sectionHeader.arabic_text}</span>
@@ -210,8 +210,8 @@ const TestimonialsSection = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="-left-4 md:-left-12" />
-            <CarouselNext className="-right-4 md:-right-12" />
+            <CarouselPrevious className="left-0 -translate-x-1/2 sm:-left-4 md:-left-12" />
+            <CarouselNext className="right-0 translate-x-1/2 sm:-right-4 md:-right-12" />
           </Carousel>
         </motion.div>
       </div>

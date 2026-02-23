@@ -99,7 +99,7 @@ const FAQSection = () => {
 
   if (loading) {
     return (
-      <section className="py-24 bg-background">
+      <section className="py-12 sm:py-16 lg:py-24 bg-background">
         <div className="container">
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -111,7 +111,7 @@ const FAQSection = () => {
 
   return (
     <IslamicBorder>
-      <section className="py-24 bg-background">
+      <section className="py-12 sm:py-16 lg:py-24 bg-background">
       <div className="container">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
@@ -123,7 +123,7 @@ const FAQSection = () => {
           <span className="text-secondary font-semibold uppercase tracking-wider">
             {sectionHeader.badge_text}
           </span>
-          <h2 className="font-calligraphy text-4xl md:text-5xl font-bold text-foreground mt-3 mb-4">
+          <h2 className="font-calligraphy text-2xl sm:text-4xl md:text-5xl font-bold text-foreground mt-3 mb-4">
             {sectionHeader.title}
           </h2>
           <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">{sectionHeader.arabic_text}</span>

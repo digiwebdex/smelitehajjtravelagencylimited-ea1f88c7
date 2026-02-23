@@ -367,7 +367,7 @@ const GallerySection = () => {
 
   if (loading) {
     return (
-      <section id="gallery" className="py-20 bg-muted/30">
+      <section id="gallery" className="py-12 sm:py-16 lg:py-20 bg-muted/30">
         <div className="container">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -381,7 +381,7 @@ const GallerySection = () => {
     <>
       <section 
         id="gallery" 
-        className="py-24 relative overflow-hidden"
+        className="py-12 sm:py-16 lg:py-24 relative overflow-hidden"
         style={{ backgroundColor: settings?.background_color || undefined }}
       >
         {/* Background Video */}

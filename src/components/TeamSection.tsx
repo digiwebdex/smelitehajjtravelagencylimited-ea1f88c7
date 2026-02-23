@@ -73,7 +73,7 @@ const TeamSection = () => {
 
   if (loading) {
     return (
-      <section id="team" className="py-24 bg-background relative overflow-hidden">
+      <section id="team" className="py-12 sm:py-16 lg:py-24 bg-background relative overflow-hidden">
         <div className="container">
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -85,7 +85,7 @@ const TeamSection = () => {
 
   return (
     <IslamicBorder>
-      <section id="team" className="py-24 bg-background relative overflow-hidden">
+      <section id="team" className="py-12 sm:py-16 lg:py-24 bg-background relative overflow-hidden">
         {/* Decorative background */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-radial from-primary/5 to-transparent rounded-full" />
       
@@ -112,7 +112,7 @@ const TeamSection = () => {
                 viewport={{ once: true }}
                 className="text-center mb-12"
               >
-                <h2 className="font-calligraphy text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4">
+                <h2 className="font-calligraphy text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4">
                   Shariah Board
                 </h2>
                 <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">مجلس الشريعة</span>
@@ -181,7 +181,7 @@ const TeamSection = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="font-calligraphy text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mt-3 mb-4">
+            <h2 className="font-calligraphy text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mt-3 mb-4">
               Management Board
             </h2>
             <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">فريقنا</span>

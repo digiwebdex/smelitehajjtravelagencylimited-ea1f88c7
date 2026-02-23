@@ -229,7 +229,7 @@ const ServicesOverview = () => {
 
   return (
     <IslamicBorder>
-      <section id="services" className="py-20 bg-card relative overflow-hidden">
+      <section id="services" className="py-12 sm:py-16 lg:py-20 bg-card relative overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/5 rounded-full translate-x-1/2 translate-y-1/2" />
@@ -239,7 +239,7 @@ const ServicesOverview = () => {
           <span className="text-secondary font-semibold uppercase tracking-wider">
             {sectionHeader.badge_text}
           </span>
-          <h2 className="font-calligraphy text-4xl md:text-5xl font-bold text-foreground mt-3 mb-4">
+          <h2 className="font-calligraphy text-2xl sm:text-4xl md:text-5xl font-bold text-foreground mt-3 mb-4">
             {sectionHeader.title}
           </h2>
           <span className="font-thuluth text-secondary/60 text-2xl md:text-3xl block mb-6">{sectionHeader.arabic_text}</span>
