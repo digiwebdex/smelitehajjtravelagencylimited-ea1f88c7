@@ -94,16 +94,16 @@ export const generateBookingPDF = (booking: BookingData): void => {
     year: 'numeric'
   }), pageWidth / 2, yPos);
 
-  yPos += 20;
+  yPos += 14;
 
   // Customer Details (if available)
   if (booking.guest_name || booking.guest_email || booking.guest_phone) {
-    doc.setFontSize(14);
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...primaryColor);
     doc.text('Customer Details', 14, yPos);
     
-    yPos += 8;
+    yPos += 6;
     
     const customerData: [string, string][] = [];
     if (booking.guest_name) customerData.push(['Name', booking.guest_name]);
@@ -116,8 +116,8 @@ export const generateBookingPDF = (booking: BookingData): void => {
       body: customerData,
       theme: 'plain',
       styles: {
-        fontSize: 10,
-        cellPadding: 3,
+        fontSize: 9,
+        cellPadding: 2,
       },
       columnStyles: {
         0: { fontStyle: 'bold', cellWidth: 40, textColor: secondaryColor },
@@ -126,16 +126,16 @@ export const generateBookingPDF = (booking: BookingData): void => {
       margin: { left: 14, right: 14 },
     });
 
-    yPos = (doc as any).lastAutoTable.finalY + 10;
+    yPos = (doc as any).lastAutoTable.finalY + 6;
   }
 
   // Package Details
-  doc.setFontSize(14);
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...primaryColor);
   doc.text('Package Details', 14, yPos);
   
-  yPos += 8;
+  yPos += 6;
 
   const perPersonPrice = booking.packages.price || Math.round(booking.total_price / booking.passenger_count);
   
@@ -155,8 +155,8 @@ export const generateBookingPDF = (booking: BookingData): void => {
     body: packageData,
     theme: 'striped',
     styles: {
-      fontSize: 10,
-      cellPadding: 5,
+      fontSize: 9,
+      cellPadding: 3,
     },
     columnStyles: {
       0: { fontStyle: 'bold', cellWidth: 50, textColor: secondaryColor },
@@ -165,15 +165,15 @@ export const generateBookingPDF = (booking: BookingData): void => {
     margin: { left: 14, right: 14 },
   });
 
-  yPos = (doc as any).lastAutoTable.finalY + 15;
+  yPos = (doc as any).lastAutoTable.finalY + 8;
 
   // Payment Summary
-  doc.setFontSize(14);
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...primaryColor);
   doc.text('Payment Summary', 14, yPos);
   
-  yPos += 8;
+  yPos += 6;
 
   const formatPDFCurrency = (amount: number) => `Tk ${amount.toLocaleString("en-BD")}`;
 
@@ -190,8 +190,8 @@ export const generateBookingPDF = (booking: BookingData): void => {
     body: paymentData,
     theme: 'striped',
     styles: {
-      fontSize: 10,
-      cellPadding: 5,
+      fontSize: 9,
+      cellPadding: 3,
     },
     columnStyles: {
       0: { fontStyle: 'bold', cellWidth: 60, textColor: secondaryColor },
@@ -208,22 +208,22 @@ export const generateBookingPDF = (booking: BookingData): void => {
     },
   });
 
-  yPos = (doc as any).lastAutoTable.finalY + 15;
+  yPos = (doc as any).lastAutoTable.finalY + 8;
 
   // Status
   if (booking.tracking_status) {
-    doc.setFontSize(14);
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...primaryColor);
     doc.text('Booking Status', 14, yPos);
     
-    yPos += 8;
-    doc.setFontSize(11);
+    yPos += 6;
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(0, 0, 0);
     doc.text(statusLabels[booking.tracking_status] || booking.tracking_status, 14, yPos);
     
-    yPos += 15;
+    yPos += 10;
   }
 
   // Footer
