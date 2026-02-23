@@ -63,6 +63,7 @@ interface Hotel {
   contact_email: string | null;
   is_active: boolean;
   order_index: number;
+  price_per_night: number | null;
 }
 
 const COUNTRY_SUGGESTIONS = [
@@ -182,6 +183,7 @@ const AdminHotels = () => {
     contact_phone: "",
     contact_email: "",
     is_active: true,
+    price_per_night: "",
   });
 
   useEffect(() => {
@@ -232,6 +234,7 @@ const AdminHotels = () => {
       contact_phone: "",
       contact_email: "",
       is_active: true,
+      price_per_night: "",
     });
     setDialogOpen(true);
   };
@@ -253,6 +256,7 @@ const AdminHotels = () => {
       contact_phone: hotel.contact_phone || "",
       contact_email: hotel.contact_email || "",
       is_active: hotel.is_active,
+      price_per_night: hotel.price_per_night?.toString() || "",
     });
     setDialogOpen(true);
   };
@@ -280,6 +284,7 @@ const AdminHotels = () => {
         contact_phone: formData.contact_phone || null,
         contact_email: formData.contact_email || null,
         is_active: formData.is_active,
+        price_per_night: formData.price_per_night ? parseFloat(formData.price_per_night) : null,
       };
 
       if (editingHotel) {
@@ -780,6 +785,18 @@ const AdminHotels = () => {
                   placeholder="e.g. 500"
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Price Per Night (৳)</Label>
+              <Input
+                type="number"
+                value={formData.price_per_night}
+                onChange={(e) =>
+                  setFormData({ ...formData, price_per_night: e.target.value })
+                }
+                placeholder="e.g. 19000"
+              />
             </div>
 
             <div className="space-y-2">

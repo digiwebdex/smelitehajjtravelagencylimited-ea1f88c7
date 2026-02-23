@@ -1603,6 +1603,7 @@ export type Database = {
           is_active: boolean | null
           name: string
           order_index: number | null
+          price_per_night: number | null
           star_rating: number
           updated_at: string
         }
@@ -1623,6 +1624,7 @@ export type Database = {
           is_active?: boolean | null
           name: string
           order_index?: number | null
+          price_per_night?: number | null
           star_rating: number
           updated_at?: string
         }
@@ -1643,6 +1645,7 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           order_index?: number | null
+          price_per_night?: number | null
           star_rating?: number
           updated_at?: string
         }
