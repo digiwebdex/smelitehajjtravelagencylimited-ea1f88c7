@@ -277,3 +277,22 @@
 .admin-table-scroll th[class*="right-0"] {
   box-shadow: -2px 0 4px -2px hsl(var(--muted-foreground) / 0.1);
 }
+
+/* Hero slide animations - one direction */
+@keyframes slide-in-from-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slide-out-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+.animate-slide-in-from-right {
+  animation: slide-in-from-right 700ms ease-out forwards;
+}
+
+.animate-slide-out-left {
+  animation: slide-out-left 700ms ease-out forwards;
+}

@@ -54,6 +54,7 @@ const defaultSlides: HeroSlide[] = [
 const HeroSection = () => {
   const [slides, setSlides] = useState<HeroSlide[]>(defaultSlides);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [prevSlide, setPrevSlide] = useState<number | null>(null);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -154,6 +155,7 @@ const HeroSection = () => {
     }
     
     autoplayRef.current = setTimeout(() => {
+      setPrevSlide(currentSlide);
       setCurrentSlide(curr => (curr + 1) % slides.length);
     }, autoplayInterval);
 
@@ -211,22 +213,25 @@ const HeroSection = () => {
   );
 
   const goToSlide = useCallback((index: number) => {
+    setPrevSlide(currentSlide);
     setCurrentSlide(index);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
-  }, []);
+  }, [currentSlide]);
 
   const goToPrevious = useCallback(() => {
+    setPrevSlide(currentSlide);
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
-  }, [slides.length]);
+  }, [slides.length, currentSlide]);
 
   const goToNext = useCallback(() => {
+    setPrevSlide(currentSlide);
     setCurrentSlide((prev) => (prev + 1) % slides.length);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
-  }, [slides.length]);
+  }, [slides.length, currentSlide]);
 
   const minSwipeDistance = 50;
 
@@ -334,25 +339,36 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-primary overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-emerald-900/90 z-[1]" />
           
-          {/* Background images - stacked with CSS transitions */}
-          {slides.map((slide, index) => (
+          {/* Background images - always slide right to left */}
+          {prevSlide !== null && prevSlide !== currentSlide && (
             <div
-              key={slide.id}
-              className="absolute inset-0 z-[2] transition-transform duration-700 ease-out"
-              style={{
-                transform: `translateX(${(index - currentSlide) * 100}%)`,
-              }}
+              key={`prev-${prevSlide}`}
+              className="absolute inset-0 z-[2] animate-slide-out-left"
+              style={{ animationDuration: '700ms', animationFillMode: 'forwards' }}
             >
               <img
-                src={slide.background_image_url || heroImage}
+                src={slides[prevSlide]?.background_image_url || heroImage}
                 alt="Hero background"
                 className="w-full h-full object-cover"
                 style={{ objectPosition: imageFocalPoint }}
                 draggable={false}
-                loading={index === 0 ? "eager" : "lazy"}
               />
             </div>
-          ))}
+          )}
+          <div
+            key={`current-${currentSlide}`}
+            className="absolute inset-0 z-[2] animate-slide-in-from-right"
+            style={{ animationDuration: '700ms', animationFillMode: 'forwards' }}
+          >
+            <img
+              src={slides[currentSlide]?.background_image_url || heroImage}
+              alt="Hero background"
+              className="w-full h-full object-cover"
+              style={{ objectPosition: imageFocalPoint }}
+              draggable={false}
+              loading="eager"
+            />
+          </div>
 
           {/* Overlay gradients */}
           <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/50 to-transparent z-[3]" />
