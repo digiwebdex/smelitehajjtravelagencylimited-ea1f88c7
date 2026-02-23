@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Lock } from "lucide-react";
+import { Plus, Edit, Trash2, Lock, Upload, FileText, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, CURRENCY } from "@/lib/currency";
 import ImageUpload from "./ImageUpload";
@@ -59,6 +59,7 @@ interface Package {
   show_book_now: boolean;
   hotel_image_url: string | null;
   hotel_map_link: string | null;
+  pdf_url: string | null;
 }
 
 interface AdminPackagesProps {
@@ -97,6 +98,7 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
     show_book_now: true,
     hotel_image_url: "",
     hotel_map_link: "",
+    pdf_url: "",
   });
 
   useEffect(() => {
@@ -137,6 +139,7 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
       show_book_now: true,
       hotel_image_url: "",
       hotel_map_link: "",
+      pdf_url: "",
     });
     setEditingPackage(null);
   };
@@ -164,6 +167,7 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
       show_book_now: pkg.show_book_now ?? true,
       hotel_image_url: pkg.hotel_image_url || "",
       hotel_map_link: pkg.hotel_map_link || "",
+      pdf_url: pkg.pdf_url || "",
     });
     setIsDialogOpen(true);
   };
@@ -192,6 +196,7 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
       show_book_now: formData.show_book_now,
       hotel_image_url: formData.hotel_image_url || null,
       hotel_map_link: formData.hotel_map_link || null,
+      pdf_url: formData.pdf_url || null,
     };
 
     let error;
@@ -483,7 +488,66 @@ const AdminPackages = ({ onUpdate }: AdminPackagesProps) => {
                       onChange={(e) => setFormData({ ...formData, hotel_map_link: e.target.value })}
                       placeholder="https://maps.google.com/..."
                     />
+                </div>
+
+                {/* PDF Upload Section */}
+                <div className="space-y-3 p-3 bg-accent/30 rounded-lg border border-accent/50">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Package PDF Brochure
+                  </h4>
+                  {formData.pdf_url ? (
+                    <div className="flex items-center gap-2">
+                      <a href={formData.pdf_url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary underline truncate flex-1">
+                        {formData.pdf_url.split('/').pop()}
+                      </a>
+                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setFormData({ ...formData, pdf_url: "" })}>
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : null}
+                  <div>
+                    <Label htmlFor="pdf_upload" className="cursor-pointer">
+                      <div className="border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 text-center hover:border-primary/50 transition-colors">
+                        <Upload className="w-6 h-6 mx-auto mb-1 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Click to upload PDF</span>
+                      </div>
+                    </Label>
+                    <input
+                      id="pdf_upload"
+                      type="file"
+                      accept=".pdf"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (file.size > 10 * 1024 * 1024) {
+                          toast({ title: "File too large", description: "Max 10MB", variant: "destructive" });
+                          return;
+                        }
+                        const ext = file.name.split(".").pop() || "pdf";
+                        const fileName = `packages/pdf/${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+                        const { error: uploadError } = await supabase.storage.from("admin-uploads").upload(fileName, file, { cacheControl: "31536000", contentType: file.type });
+                        if (uploadError) {
+                          toast({ title: "Upload failed", description: uploadError.message, variant: "destructive" });
+                          return;
+                        }
+                        const { data: urlData } = supabase.storage.from("admin-uploads").getPublicUrl(fileName);
+                        setFormData({ ...formData, pdf_url: urlData.publicUrl });
+                        toast({ title: "PDF uploaded successfully" });
+                      }}
+                    />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="pdf_url_manual">Or paste PDF URL</Label>
+                    <Input
+                      id="pdf_url_manual"
+                      value={formData.pdf_url}
+                      onChange={(e) => setFormData({ ...formData, pdf_url: e.target.value })}
+                      placeholder="https://example.com/brochure.pdf"
+                    />
+                  </div>
+                </div>
                 </div>
 
                 <div className="space-y-3 p-3 bg-muted/50 rounded-lg">
