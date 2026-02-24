@@ -122,9 +122,10 @@ const HeroServiceTiles = ({ tiles = defaultTiles, theme = "light" }: HeroService
           {/* Text Content */}
           <div className="text-center sm:text-left">
             <h3 className={`
-              font-semibold text-sm md:text-base
+              font-normal text-sm md:text-base
               ${theme === "light" ? "text-foreground" : "text-white"}
-            `}>
+            `}
+            style={{ fontFamily: 'Arial, sans-serif' }}>
               {tile.title}
             </h3>
             <p className={`
