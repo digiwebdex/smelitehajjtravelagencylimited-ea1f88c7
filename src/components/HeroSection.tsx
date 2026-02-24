@@ -411,7 +411,7 @@ const HeroSection = () => {
               >
                 <span className="inline-block">{content.title}</span>
                 {content.subtitle && (
-                  <span className={`block mt-2 font-kufi pb-2 text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl ${isLight ? "text-emerald-600" : "text-gradient-gold"}`}>
+                  <span className={`block mt-4 sm:mt-6 font-kufi pb-2 text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl ${isLight ? "text-emerald-600" : "text-gradient-gold"}`}>
                     {content.subtitle}
                   </span>
                 )}
@@ -510,7 +510,7 @@ const HeroSection = () => {
                   >
                     <span className="inline-block">{content.title}</span>
                     {content.subtitle && (
-                      <span className={`block mt-1 font-kufi pb-1 text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl ${isLight ? "text-emerald-600" : "text-gradient-gold"}`}>
+                      <span className={`block mt-4 sm:mt-6 font-kufi pb-1 text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl ${isLight ? "text-emerald-600" : "text-gradient-gold"}`}>
                         {content.subtitle}
                       </span>
                     )}
