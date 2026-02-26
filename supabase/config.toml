@@ -29,3 +29,30 @@ verify_jwt = false
 
 [functions.fb-event]
 verify_jwt = false
+
+[functions.create-staff-user]
+verify_jwt = false
+
+[functions.create-admin-user]
+verify_jwt = false
+
+[functions.create-demo-user]
+verify_jwt = false
+
+[functions.update-user-password]
+verify_jwt = false
+
+[functions.send-air-ticket-notification]
+verify_jwt = false
+
+[functions.send-whatsapp-test]
+verify_jwt = false
+
+[functions.emi-reminder]
+verify_jwt = false
+
+[functions.payment-installment]
+verify_jwt = false
+
+[functions.send-emi-notification]
+verify_jwt = false
