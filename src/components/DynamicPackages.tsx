@@ -19,6 +19,7 @@ import PackageDetailsModal from "./PackageDetailsModal";
 import PackageComparisonDrawer from "./PackageComparisonDrawer";
 import { formatCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
+import { getCurrentTenant } from "@/utils/tenant";
 
 interface Package {
   id: string;
@@ -304,11 +305,18 @@ const DynamicPackages = ({ type }: DynamicPackagesProps) => {
   }, [type]);
 
   const fetchPackages = async () => {
-    const { data, error } = await supabase
+    const tenant = await getCurrentTenant();
+    if (!tenant) {
+      setLoading(false);
+      return;
+    }
+
+    const { data, error } = await (supabase as any)
       .from("packages")
       .select("*")
       .eq("type", type)
-      .eq("is_active", true);
+      .eq("is_active", true)
+      .eq("tenant_id", tenant.id);
 
     if (!error && data) {
       setPackages(data as Package[]);

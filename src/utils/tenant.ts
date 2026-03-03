@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 export async function getCurrentTenant() {
   const domain = window.location.hostname;
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("tenants")
     .select("*")
     .eq("domain", domain)
