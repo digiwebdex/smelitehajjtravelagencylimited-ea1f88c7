@@ -236,14 +236,14 @@ const BookingConfirmation = () => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-              className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4"
+              className="w-16 h-16 sm:w-20 sm:h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4"
             >
-              <CheckCircle2 className="w-10 h-10 text-white" />
+              <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-primary-foreground" />
             </motion.div>
-            <h1 className="font-heading text-3xl font-bold text-foreground mb-2">
+            <h1 className="font-heading text-2xl sm:text-3xl font-bold text-foreground mb-2">
               Booking Confirmed!
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Thank you for booking with SM Elite Hajj Travel
             </p>
           </div>
@@ -290,15 +290,15 @@ const BookingConfirmation = () => {
                     <div key={step.status} className="relative z-10 flex flex-col items-center">
                       <div
                         className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300",
+                          "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300",
                           isCompleted ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
                           isCurrent && "ring-4 ring-primary/20 scale-110"
                         )}
                       >
-                        <Icon className="w-5 h-5" />
+                        <Icon className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                       </div>
                       <span className={cn(
-                        "text-xs mt-2 text-center max-w-[70px]",
+                        "text-[9px] sm:text-xs mt-1.5 sm:mt-2 text-center max-w-[50px] sm:max-w-[70px] leading-tight",
                         isCompleted ? "text-foreground font-medium" : "text-muted-foreground"
                       )}>
                         {step.label}
