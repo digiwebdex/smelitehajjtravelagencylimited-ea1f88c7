@@ -108,6 +108,18 @@ const menuGroups = [
     ]
   },
   {
+    label: "Accounting",
+    items: [
+      { value: "acc-dashboard", label: "Accounting Dashboard", icon: BookOpen },
+      { value: "chart-of-accounts", label: "Chart of Accounts", icon: ClipboardList },
+      { value: "acc-income", label: "Income", icon: TrendingUp },
+      { value: "acc-expense", label: "Expenses", icon: CreditCard },
+      { value: "general-ledger", label: "General Ledger", icon: Landmark },
+      { value: "bank-accounts", label: "Cash & Bank", icon: PiggyBank },
+      { value: "acc-reports", label: "Financial Reports", icon: BarChart3 },
+    ]
+  },
+  {
     label: "Finance",
     items: [
       { value: "revenue", label: "Revenue", icon: Wallet },
