@@ -322,7 +322,7 @@ const AdminDashboard = () => {
 
           <main className="flex-1 p-4 lg:p-6 min-w-0">
             {isViewer && (
-              <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg flex items-center gap-2 text-amber-800 dark:text-amber-200">
+              <div className="mb-4 p-3 bg-secondary/10 border border-secondary/30 rounded-lg flex items-center gap-2 text-secondary-foreground">
                 <Eye className="w-4 h-4" />
                 <span className="text-sm font-medium">Demo Mode: You are viewing as a read-only demo account. Editing is disabled.</span>
               </div>
