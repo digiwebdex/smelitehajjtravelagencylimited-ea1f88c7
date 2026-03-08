@@ -340,78 +340,153 @@ const AdminCustomers = () => {
             <DialogTitle>Edit Customer</DialogTitle>
           </DialogHeader>
           {editCustomer && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Full Name *</label>
-                <Input value={editCustomer.full_name}
-                  onChange={e => setEditCustomer({ ...editCustomer, full_name: e.target.value })} />
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Full Name *</label>
+                  <Input value={editCustomer.full_name}
+                    onChange={e => setEditCustomer({ ...editCustomer, full_name: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Email</label>
+                  <Input value={editCustomer.email || ""}
+                    onChange={e => setEditCustomer({ ...editCustomer, email: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Phone</label>
+                  <Input value={editCustomer.phone || ""}
+                    onChange={e => setEditCustomer({ ...editCustomer, phone: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Passport Number</label>
+                  <Input value={editCustomer.passport_number || ""}
+                    onChange={e => setEditCustomer({ ...editCustomer, passport_number: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Nationality</label>
+                  <Input value={editCustomer.nationality || ""}
+                    onChange={e => setEditCustomer({ ...editCustomer, nationality: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Date of Birth</label>
+                  <Input type="date" value={editCustomer.date_of_birth || ""}
+                    onChange={e => setEditCustomer({ ...editCustomer, date_of_birth: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Gender</label>
+                  <Select value={editCustomer.gender || ""} onValueChange={v => setEditCustomer({ ...editCustomer, gender: v })}>
+                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Status</label>
+                  <Select value={editCustomer.status} onValueChange={v => setEditCustomer({ ...editCustomer, status: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-sm font-medium">Address</label>
+                  <Input value={editCustomer.address || ""}
+                    onChange={e => setEditCustomer({ ...editCustomer, address: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Emergency Contact Name</label>
+                  <Input value={editCustomer.emergency_contact_name || ""}
+                    onChange={e => setEditCustomer({ ...editCustomer, emergency_contact_name: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Emergency Contact Phone</label>
+                  <Input value={editCustomer.emergency_contact_phone || ""}
+                    onChange={e => setEditCustomer({ ...editCustomer, emergency_contact_phone: e.target.value })} />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-sm font-medium">Notes</label>
+                  <Textarea value={editCustomer.notes || ""}
+                    onChange={e => setEditCustomer({ ...editCustomer, notes: e.target.value })} rows={3} />
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium">Email</label>
-                <Input value={editCustomer.email || ""}
-                  onChange={e => setEditCustomer({ ...editCustomer, email: e.target.value })} />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Phone</label>
-                <Input value={editCustomer.phone || ""}
-                  onChange={e => setEditCustomer({ ...editCustomer, phone: e.target.value })} />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Passport Number</label>
-                <Input value={editCustomer.passport_number || ""}
-                  onChange={e => setEditCustomer({ ...editCustomer, passport_number: e.target.value })} />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Nationality</label>
-                <Input value={editCustomer.nationality || ""}
-                  onChange={e => setEditCustomer({ ...editCustomer, nationality: e.target.value })} />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Date of Birth</label>
-                <Input type="date" value={editCustomer.date_of_birth || ""}
-                  onChange={e => setEditCustomer({ ...editCustomer, date_of_birth: e.target.value })} />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Gender</label>
-                <Select value={editCustomer.gender || ""} onValueChange={v => setEditCustomer({ ...editCustomer, gender: v })}>
-                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Status</label>
-                <Select value={editCustomer.status} onValueChange={v => setEditCustomer({ ...editCustomer, status: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="sm:col-span-2">
-                <label className="text-sm font-medium">Address</label>
-                <Input value={editCustomer.address || ""}
-                  onChange={e => setEditCustomer({ ...editCustomer, address: e.target.value })} />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Emergency Contact Name</label>
-                <Input value={editCustomer.emergency_contact_name || ""}
-                  onChange={e => setEditCustomer({ ...editCustomer, emergency_contact_name: e.target.value })} />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Emergency Contact Phone</label>
-                <Input value={editCustomer.emergency_contact_phone || ""}
-                  onChange={e => setEditCustomer({ ...editCustomer, emergency_contact_phone: e.target.value })} />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="text-sm font-medium">Notes</label>
-                <Textarea value={editCustomer.notes || ""}
-                  onChange={e => setEditCustomer({ ...editCustomer, notes: e.target.value })} rows={3} />
+
+              {/* Document Upload Section - Inline */}
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-semibold flex items-center gap-2 mb-3">
+                  <FileText className="h-4 w-4 text-primary" /> Documents
+                  {editDocuments.length > 0 && <Badge variant="secondary">{editDocuments.length}</Badge>}
+                </h3>
+                
+                {/* Upload Area */}
+                <div className="flex flex-col sm:flex-row gap-3 items-end mb-4">
+                  <div className="flex-1">
+                    <label className="text-sm font-medium">Document Type</label>
+                    <Select value={uploadDocType} onValueChange={setUploadDocType}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {DOCUMENT_TYPES.map(t => (
+                          <SelectItem key={t} value={t}>{t}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-sm font-medium">Notes (optional)</label>
+                    <Input value={uploadNotes} onChange={e => setUploadNotes(e.target.value)}
+                      placeholder="e.g. Expiry: Dec 2028" />
+                  </div>
+                  <div>
+                    <input ref={editFileInputRef} type="file" className="hidden"
+                      accept="image/*,.pdf,.doc,.docx" onChange={handleEditUploadDocument} />
+                    <Button onClick={() => editFileInputRef.current?.click()} disabled={uploading} size="sm" className="gap-1">
+                      {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                      Upload
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Existing Documents */}
+                {editDocsLoading ? (
+                  <div className="flex justify-center py-4">
+                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                  </div>
+                ) : editDocuments.length === 0 ? (
+                  <div className="text-center py-4 text-muted-foreground text-sm border rounded-lg bg-muted/30">
+                    <FileUp className="h-8 w-8 mx-auto mb-1 opacity-30" />
+                    <p>No documents uploaded yet</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {editDocuments.map(doc => (
+                      <div key={doc.id} className="flex items-center justify-between p-2 border rounded-lg text-sm">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileText className="h-5 w-5 text-primary shrink-0" />
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">{doc.file_name}</p>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <Badge variant="outline" className="text-xs">{doc.document_type}</Badge>
+                              <span>{format(new Date(doc.uploaded_at), "dd MMM yyyy")}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-1 shrink-0">
+                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => getDocSignedUrl(doc.file_url)} title="View">
+                            <Eye className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => handleDeleteDocumentInEdit(doc)} title="Delete">
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
