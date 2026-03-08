@@ -265,31 +265,31 @@ const AdminOverview = () => {
   return (
     <div className="space-y-6">
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">Today's Bookings</p>
-                <p className="text-2xl font-bold">{stats.todayBookings}</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+        <Card className="overflow-hidden">
+          <CardContent className="pt-4 px-3 lg:px-6">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Today's Bookings</p>
+                <p className="text-lg sm:text-2xl font-bold truncate">{stats.todayBookings}</p>
               </div>
-              <div className="bg-primary/10 p-2 rounded-lg">
-                <Calendar className="w-5 h-5 text-primary" />
+              <div className="bg-primary/10 p-2 rounded-lg flex-shrink-0">
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">This Week</p>
-                <p className="text-2xl font-bold">{stats.weekBookings}</p>
+        <Card className="overflow-hidden">
+          <CardContent className="pt-4 px-3 lg:px-6">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] sm:text-xs text-muted-foreground">This Week</p>
+                <p className="text-lg sm:text-2xl font-bold truncate">{stats.weekBookings}</p>
                 {stats.bookingChange !== 0 && (
                   <div className={cn(
-                    "flex items-center gap-1 text-xs mt-1",
-                    stats.bookingChange > 0 ? "text-green-600" : "text-red-600"
+                    "flex items-center gap-1 text-[10px] sm:text-xs mt-1",
+                    stats.bookingChange > 0 ? "text-primary" : "text-destructive"
                   )}>
                     {stats.bookingChange > 0 ? (
                       <TrendingUp className="w-3 h-3" />
@@ -300,23 +300,23 @@ const AdminOverview = () => {
                   </div>
                 )}
               </div>
-              <div className="bg-blue-500/10 p-2 rounded-lg">
-                <Package className="w-5 h-5 text-blue-500" />
+              <div className="bg-accent/50 p-2 rounded-lg flex-shrink-0">
+                <Package className="w-4 h-4 sm:w-5 sm:h-5 text-accent-foreground" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">Week Revenue</p>
-                <p className="text-2xl font-bold">{formatCurrency(stats.weekRevenue)}</p>
+        <Card className="overflow-hidden">
+          <CardContent className="pt-4 px-3 lg:px-6">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Week Revenue</p>
+                <p className="text-base sm:text-2xl font-bold truncate">{formatCurrency(stats.weekRevenue)}</p>
                 {stats.revenueChange !== 0 && (
                   <div className={cn(
-                    "flex items-center gap-1 text-xs mt-1",
-                    stats.revenueChange > 0 ? "text-green-600" : "text-red-600"
+                    "flex items-center gap-1 text-[10px] sm:text-xs mt-1",
+                    stats.revenueChange > 0 ? "text-primary" : "text-destructive"
                   )}>
                     {stats.revenueChange > 0 ? (
                       <TrendingUp className="w-3 h-3" />
@@ -327,23 +327,23 @@ const AdminOverview = () => {
                   </div>
                 )}
               </div>
-              <div className="bg-green-500/10 p-2 rounded-lg">
-                <TrendingUp className="w-5 h-5 text-green-500" />
+              <div className="bg-primary/10 p-2 rounded-lg flex-shrink-0">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">Pending</p>
-                <p className="text-2xl font-bold">{stats.pendingCount}</p>
-                <p className="text-xs text-muted-foreground mt-1">Needs attention</p>
+        <Card className="overflow-hidden">
+          <CardContent className="pt-4 px-3 lg:px-6">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Pending</p>
+                <p className="text-lg sm:text-2xl font-bold truncate">{stats.pendingCount}</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Needs attention</p>
               </div>
-              <div className="bg-yellow-500/10 p-2 rounded-lg">
-                <Clock className="w-5 h-5 text-yellow-500" />
+              <div className="bg-secondary/10 p-2 rounded-lg flex-shrink-0">
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
               </div>
             </div>
           </CardContent>

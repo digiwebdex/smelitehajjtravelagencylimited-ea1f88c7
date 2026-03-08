@@ -328,7 +328,7 @@ const AdminDashboard = () => {
               </div>
             )}
             
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 mb-6">
               {statCards.map((stat, index) => (
                 <motion.div
                   key={stat.title}
@@ -336,14 +336,14 @@ const AdminDashboard = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card>
-                    <CardContent className="pt-4 lg:pt-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs lg:text-sm text-muted-foreground">{stat.title}</p>
-                          <p className="text-xl lg:text-3xl font-bold mt-1">{stat.value}</p>
+                  <Card className="overflow-hidden">
+                    <CardContent className="pt-4 lg:pt-6 px-3 lg:px-6">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground truncate">{stat.title}</p>
+                          <p className="text-base sm:text-lg lg:text-3xl font-bold mt-1 truncate">{stat.value}</p>
                         </div>
-                        <div className={`${stat.bgColor} p-2 lg:p-3 rounded-xl`}>
+                        <div className={`${stat.bgColor} p-2 lg:p-3 rounded-xl flex-shrink-0`}>
                           <stat.icon className={`w-4 h-4 lg:w-6 lg:h-6 ${stat.color}`} />
                         </div>
                       </div>
