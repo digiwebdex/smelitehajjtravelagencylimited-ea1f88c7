@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { SiteSettingsProvider } from "@/hooks/useSiteSettings";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import FacebookPixel from "@/components/FacebookPixel";
+import DynamicSEOHead from "@/components/DynamicSEOHead";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
