@@ -71,6 +71,10 @@ const AdminCustomers = () => {
   const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDocsDialog, setShowDocsDialog] = useState(false);
+  const [showViewDialog, setShowViewDialog] = useState(false);
+  const [viewCustomer, setViewCustomer] = useState<Customer | null>(null);
+  const [viewDocuments, setViewDocuments] = useState<CustomerDocument[]>([]);
+  const [viewDocsLoading, setViewDocsLoading] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [documents, setDocuments] = useState<CustomerDocument[]>([]);
