@@ -149,6 +149,7 @@ const menuGroups = [
       { value: "notifications", label: "Notifications", icon: Bell },
       { value: "notification-retry", label: "Retry Queue", icon: MessageSquare },
       { value: "notification-templates", label: "Templates", icon: Mail },
+      { value: "installment-reminders", label: "EMI Reminders", icon: Bell },
       { value: "booking-settings", label: "Booking Settings", icon: Settings },
     ]
   },
