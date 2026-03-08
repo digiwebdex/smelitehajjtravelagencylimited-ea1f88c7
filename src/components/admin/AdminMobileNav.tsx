@@ -26,6 +26,12 @@ import {
   Shield,
   Receipt,
   Eye,
+  BookOpen,
+  PiggyBank,
+  Landmark,
+  CreditCard,
+  ClipboardList,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
