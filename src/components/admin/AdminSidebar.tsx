@@ -31,6 +31,11 @@ import {
   Plane,
   Mail,
   Eye,
+  BookOpen,
+  PiggyBank,
+  Landmark,
+  CreditCard,
+  ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
