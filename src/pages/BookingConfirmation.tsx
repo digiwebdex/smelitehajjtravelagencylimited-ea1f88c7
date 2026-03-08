@@ -236,9 +236,9 @@ const BookingConfirmation = () => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-              className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4"
+              className="w-16 h-16 sm:w-20 sm:h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4"
             >
-              <CheckCircle2 className="w-10 h-10 text-white" />
+              <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-primary-foreground" />
             </motion.div>
             <h1 className="font-heading text-3xl font-bold text-foreground mb-2">
               Booking Confirmed!
