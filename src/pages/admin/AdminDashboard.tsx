@@ -83,7 +83,6 @@ import GeneralLedger from "@/components/admin/accounting/GeneralLedger";
 import BankAccounts from "@/components/admin/accounting/BankAccounts";
 import FinancialReports from "@/components/admin/accounting/FinancialReports";
 import { formatCurrency } from "@/lib/currency";
-import { formatCurrency } from "@/lib/currency";
 
 interface Stats {
   totalBookings: number;
