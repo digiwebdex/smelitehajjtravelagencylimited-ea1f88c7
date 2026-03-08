@@ -131,6 +131,7 @@ const menuGroups = [
     label: "Website Design",
     items: [
       { value: "sections", label: "Section Visibility", icon: Layers },
+      { value: "seo", label: "SEO Settings", icon: Eye },
       { value: "menu", label: "Menu", icon: MenuIcon },
       { value: "hero", label: "Hero", icon: Image },
       { value: "services", label: "Services", icon: Settings },
