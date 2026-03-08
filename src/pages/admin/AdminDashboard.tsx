@@ -234,6 +234,9 @@ const AdminDashboard = () => {
       case "emi-report": return <AdminEMIReport />;
       case "payments": return <AdminPaymentMethods />;
       case "transaction-logs": return <AdminTransactionLogs />;
+      case "webinars": return <AdminWebinars />;
+      case "retargeting": return <AdminRetargetingSegments />;
+      case "installment-reminders": return <AdminInstallmentReminders />;
       case "staff": return <AdminStaffManagement />;
       case "audit-log": return <AdminAuditLog />;
       case "notifications": return <AdminNotifications />;
