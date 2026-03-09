@@ -3740,6 +3740,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_financial_summary: { Args: never; Returns: Json }
+      get_payment_asset_account: {
+        Args: { p_payment_method: string }
+        Returns: string
+      }
       get_public_payment_methods: {
         Args: never
         Returns: {
@@ -3766,6 +3771,7 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_admin_or_viewer: { Args: never; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      recalculate_account_balances: { Args: never; Returns: undefined }
     }
     Enums: {
       air_ticket_status: "pending" | "confirmed" | "rejected" | "cancelled"
