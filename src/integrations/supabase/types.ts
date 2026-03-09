@@ -3740,6 +3740,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_payment_methods: {
+        Args: never
+        Returns: {
+          description: string
+          icon_name: string
+          id: string
+          is_enabled: boolean
+          name: string
+          order_index: number
+          slug: string
+        }[]
+      }
       get_staff_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["staff_role"]
