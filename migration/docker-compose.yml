@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: smelite_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: smelite_hajj
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"  # Use 5433 to avoid conflict with existing PostgreSQL
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/functions.sql:/docker-entrypoint-initdb.d/02-functions.sql
+
+  backend:
+    build: ./backend
+    container_name: smelite_backend
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: smelite_hajj
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD}
+      PORT: 3001
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+    volumes:
+      - uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ../
+      dockerfile: migration/Dockerfile.frontend
+    container_name: smelite_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  pgdata:
+  uploads:
