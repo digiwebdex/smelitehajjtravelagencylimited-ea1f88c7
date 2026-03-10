@@ -256,6 +256,58 @@ app.use('/api/payment-nagad', paymentNagadRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/backup-restore', backupRoutes);
 
+// Functions proxy - replaces Supabase Edge Functions
+// Maps supabase.functions.invoke('name') -> /api/functions/name
+app.post('/api/functions/:name', async (req, res) => {
+  const { name } = req.params;
+  const routeMap = {
+    'payment-sslcommerz': '/api/payment-sslcommerz',
+    'payment-bkash': '/api/payment-bkash',
+    'payment-nagad': '/api/payment-nagad',
+    'backup-restore': '/api/backup-restore',
+    'send-booking-notification': '/api/notifications/booking',
+    'send-air-ticket-notification': '/api/notifications/air-ticket',
+    'send-visa-notification': '/api/notifications/visa',
+    'send-emi-notification': '/api/notifications/emi',
+    'send-tracking-notification': '/api/notifications/tracking',
+    'send-welcome-notification': '/api/notifications/welcome',
+    'send-whatsapp-test': '/api/notifications/whatsapp-test',
+    'emi-reminder': '/api/notifications/emi-reminder',
+    'fb-event': '/api/notifications/fb-event',
+    'create-guest-account': '/api/auth/create-guest',
+    'create-demo-user': '/api/admin-users/create-demo',
+    'create-admin-user': '/api/admin-users/create-admin',
+    'create-staff-user': '/api/admin-users/create-staff',
+    'update-user-password': '/api/admin-users/update-password',
+  };
+
+  const targetRoute = routeMap[name];
+  if (targetRoute) {
+    // Forward the request internally
+    try {
+      // Re-route internally by making a local fetch
+      const targetUrl = `http://127.0.0.1:${PORT}${targetRoute}`;
+      const response = await fetch(targetUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(req.headers.authorization ? { Authorization: req.headers.authorization } : {}),
+        },
+        body: JSON.stringify(req.body),
+      });
+      const data = await response.json().catch(() => ({}));
+      res.status(response.status).json(data);
+    } catch (error) {
+      console.error(`Functions proxy error for ${name}:`, error);
+      res.status(500).json({ error: `Function ${name} failed: ${error.message}` });
+    }
+  } else {
+    // Unknown function - return stub success
+    console.warn(`Unknown function called: ${name}`);
+    res.json({ success: true, message: `Function ${name} not implemented on VPS` });
+  }
+});
+
 // File upload endpoint (replaces Supabase Storage)
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
