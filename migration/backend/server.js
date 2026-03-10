@@ -98,19 +98,38 @@ app.get('/api/rest/:table', async (req, res) => {
   }
 });
 
-// POST /api/rest/:table - Insert row(s)
+// POST /api/rest/:table - Insert row(s) / Upsert
 app.post('/api/rest/:table', async (req, res) => {
   try {
     const { table } = req.params;
-    const data = Array.isArray(req.body) ? req.body : [req.body];
-
+    let rawData = req.body;
+    
+    // Handle upsert flag
+    const isUpsert = rawData?._upsert === true;
+    if (isUpsert) {
+      delete rawData._upsert;
+    }
+    
+    const data = Array.isArray(rawData) ? rawData : [rawData];
     const results = [];
+    
     for (const row of data) {
       const columns = Object.keys(row);
       const values = Object.values(row);
       const placeholders = values.map((_, i) => `$${i + 1}`);
 
-      const query = `INSERT INTO public."${table}" (${columns.map(c => `"${c}"`).join(',')}) VALUES (${placeholders.join(',')}) RETURNING *`;
+      let query;
+      if (isUpsert && row.id) {
+        // Upsert: INSERT ... ON CONFLICT (id) DO UPDATE
+        const updateClauses = columns.filter(c => c !== 'id').map((c, i) => `"${c}" = EXCLUDED."${c}"`);
+        query = `INSERT INTO public."${table}" (${columns.map(c => `"${c}"`).join(',')}) VALUES (${placeholders.join(',')}) ON CONFLICT (id) DO UPDATE SET ${updateClauses.join(', ')} RETURNING *`;
+      } else if (isUpsert) {
+        // Upsert without id - try insert, handle conflict gracefully
+        query = `INSERT INTO public."${table}" (${columns.map(c => `"${c}"`).join(',')}) VALUES (${placeholders.join(',')}) ON CONFLICT DO NOTHING RETURNING *`;
+      } else {
+        query = `INSERT INTO public."${table}" (${columns.map(c => `"${c}"`).join(',')}) VALUES (${placeholders.join(',')}) RETURNING *`;
+      }
+      
       const result = await pool.query(query, values);
       results.push(result.rows[0]);
     }
