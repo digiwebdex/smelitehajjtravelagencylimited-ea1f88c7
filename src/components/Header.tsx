@@ -318,14 +318,7 @@ const Header = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : (
-                <Link to="/auth">
-                  <Button size="sm" className="bg-gradient-primary hover:opacity-90 shadow-gold text-sm px-4 gap-2">
-                    <LogIn className="w-4 h-4" />
-                    Sign In
-                  </Button>
-                </Link>
-              )}
+              ) : null}
             </div>
 
             {/* Mobile Menu Toggle */}
